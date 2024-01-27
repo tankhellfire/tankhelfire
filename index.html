@@ -19,6 +19,7 @@
     <title>Tankhellfire</title>
     <style>
       body {
+        --background-red: 255;
         background-color: #111111; /* Set the background color for the entire body */
         color: #dddddd;
       }
@@ -29,10 +30,10 @@
       }
 
       group {
+        --background-red: calc(var(--background-red) - 1);
         margin-bottom: 20px;
-        filter: brightness(50%);
         display: flex;
-        background-color: #333333; /* Set the background color */
+         /* Set the background color */
         padding: 10px;
       }
       group:hover {
@@ -45,6 +46,7 @@
         color: #dddddd;
       }
       text {
+        
         text-decoration: null;
         filter: none;
         color: #dddddd;
