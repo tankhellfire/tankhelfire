@@ -1,0 +1,20 @@
+<add name="Access-Control-Allow-Headers" value="Authorization" />
+<script>
+  console.log(
+  fetch(
+    "https://google.com",
+    {
+      headers: {
+        "sec-ch-ua":
+          '"Not A(Brand";v="99", "Microsoft Edge";v="121", "Chromium";v="121"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        Referer:
+          "https://assets.compass.education/StaticAssetsM/Scripts/Lib/ext-js4.2.2/resources/css/azzurra/ba2a2ff_azzurra-core.min.css",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+      },
+      body: null,
+      method: "GET",
+    }
+  ));
+</script>
