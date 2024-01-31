@@ -1,15 +1,19 @@
 <script>
-  console.log(
-    fetch("https://google.com", {
-      headers: {
-        "sec-ch-ua":
-          '"Not A(Brand";v="99", "Microsoft Edge";v="121", "Chromium";v="121"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"Windows"',
-        
-      },
-      body: null,
-      method: "GET",
-    })
-  );
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+console.log(getCookie('_gid'));
 </script>
