@@ -2,13 +2,15 @@
 <html>
   <head> </head>
   <body>
+    <div top:20px left:20></div>
     <script>
+      let a = { state: 0, time: 0 };
+      let ks = { w: a, a: a, s: a, d: a };
       window.addEventListener("keydown", (event) => {
-        console.log(event);
-      });
+        if (!ks[event.key]) {
+          return;
+        }
 
-      let ks = {};
-      window.addEventListener("keydown", (event) => {
         if (ks[event.key].state == 0) {
           ks[event.key] = { state: 1, time: event.timeStamp };
           console.log(ks);
@@ -17,9 +19,21 @@
         ks[event.key] = { state: 2, time: event.timeStamp };
       });
       window.addEventListener("keyup", (event) => {
+        if (!ks[event.key]) {
+          return;
+        }
+
         ks[event.key] = { state: 0, time: event.timeStamp };
         console.log(ks);
       });
+      a = "hi"(async () => {
+        //time
+        while (true) {
+          await setTimeout(120000);
+          a = fetch("https://wholesale-magic-sneeze.glitch.me");
+          console.log(a);
+        }
+      })();
     </script>
   </body>
 </html>
