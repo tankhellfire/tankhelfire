@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head> </head>
+  <body>
+    <script>
+      window.addEventListener("keydown", (event) => {
+        console.log(event);
+      });
+
+      let ks = {};
+      window.addEventListener("keydown", (event) => {
+        if (ks[event.key].state == 0) {
+          ks[event.key] = { state: 1, time: event.timeStamp };
+          console.log(ks);
+          return;
+        }
+        ks[event.key] = { state: 2, time: event.timeStamp };
+      });
+      window.addEventListener("keyup", (event) => {
+        ks[event.key] = { state: 0, time: event.timeStamp };
+        console.log(ks);
+      });
+    </script>
+  </body>
+</html>
