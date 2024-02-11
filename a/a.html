@@ -2,10 +2,11 @@
 <html>
   <head> </head>
   <body>
-    <div top:20px left:20></div>
+    <div style="position: absolute; top: 20px; left: 30px">a</div>
     <script>
       let a = { state: 0, time: 0 };
       let ks = { w: a, a: a, s: a, d: a };
+
       window.addEventListener("keydown", (event) => {
         if (!ks[event.key]) {
           return;
@@ -26,14 +27,16 @@
         ks[event.key] = { state: 0, time: event.timeStamp };
         console.log(ks);
       });
-      a = "hi"(async () => {
-        //time
-        while (true) {
-          await setTimeout(120000);
-          a = fetch("https://wholesale-magic-sneeze.glitch.me");
-          console.log(a);
-        }
-      })();
+
+      function update() {
+        // Your existing code here
+
+        // Use requestAnimationFrame to schedule the next update
+        requestAnimationFrame(update);
+      }
+
+      // Start the update loop
+      update();
     </script>
   </body>
 </html>
