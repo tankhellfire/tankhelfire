@@ -1,84 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?cproprietyent=ca-pub-3214946299010637"
-      crossorigin="anonymous"
-    ></script>
-    <meta name="google-adsense-account" content="ca-pub-3214946299010637" />
-
-    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <link
       rel="icon"
       href="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/cat%20pick.png?v=1706326820251"
       type="image/x-icon"
     />
     <title>Tankhellfire</title>
-    <style>
-      body {
-        background-color: #111111; /* Set the background color for the entire body */
-        color: #dddddd;
-      }
-
-      main {
-        list-style-type: none;
-        padding: 10px;
-      }
-
-      group {
-        margin-bottom: 20px;
-        background-color: #333333;
-        display: flex;
-        padding: 10px;
-      }
-      group:hover {
-        background-color: #303030;
-      }
-
-      a {
-        text-decoration: null;
-        filter: none;
-        color: #dddddd;
-      }
-      text {
-        
-        text-decoration: null;
-        filter: none;
-        color: #dddddd;
-      }
-
-      img {
-        max-width: 150px;
-        margin-right: 20px;
-      }
-      h2 {
-        background-color: #444444;
-        padding: 10px;
-      }
-      h2:hover {
-        background-color: #404040;
-      }
-      
-    </style>
   </head>
-  <body>
+  
+  <body style="overflow: hidden">
+    
     <main>
-      <group>
-        <img
-          src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458"
-          alt="spacegamev5.PNG"
-        />
-        <div>
-          <h2><a href="/games/spacegamev5.html">space game v5</a></h2>
-          <text>
-            Space Game was my first game.<br />This is the fith and best
-            iteration of it.<br />It is a scratch game ported to html
-          </text>
-        </div>
-      </group>
+      <div style="position: absolute; top: 20px; left: 30px">a</div>
+      <img
+        src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458"
+        alt="spacegamev5.PNG"
+        style="position: absolute; left: 525px; top: 128px"
+      />
     </main>
+
+    <script>
+      let a = { state: 0, time: 0 };
+      let ks = { w: a, a: a, s: a, d: a };
+      let mx = 0;
+      let my = 0;
+      let mouse = { x: 0, y: 0, scrollX: 0, scrollY: 0 };
+
+      document.addEventListener("keydown", (event) => {
+        //key
+        if (!ks[event.key]) {
+          //key down
+          return;
+        }
+
+        if (ks[event.key].state == 0) {
+          //key still down
+          ks[event.key] = { state: 1, time: event.timeStamp };
+          console.log(ks);
+          return;
+        }
+        ks[event.key] = { state: 2, time: event.timeStamp };
+      });
+      document.addEventListener("keyup", (event) => {
+        //keyup
+        if (!ks[event.key]) {
+          return;
+        }
+
+        ks[event.key] = { state: 0, time: event.timeStamp };
+        console.log(ks);
+      });
+      document.addEventListener("mousemove", (event) => {
+        mx = event.clientX;
+        my = event.clientY;
+      });
+
+      let ty = 0;
+      let upf;
+      const main = document.getElementsByTagName("main")[0];
+
+      function update() {
+        upf = (performance.now() - ty) / 1000;
+
+        main.children[0].style.left = mx + "px";
+        main.children[0].style.top = my - 15 + "px";
+        main.children[0].innerText = 1 / upf;
+
+        main.children[1].style.left = mx + "px";
+        main.children[1].style.top = my + "px";
+
+        ty = performance.now();
+        requestAnimationFrame(update);
+      }
+
+      update();
+    </script>
   </body>
 </html>
