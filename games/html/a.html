@@ -55,6 +55,7 @@
       document.addEventListener("mousemove", (event) => {
         mouseb.x = event.clientX;
         mouseb.y = event.clientY;
+        test=event;
       });
       document.addEventListener("mousedown", (event) => {
         mouseb.c.now=1;
@@ -76,6 +77,7 @@
       let cx=0
       let cy=0
       let mouse=mouseb;
+      let test={'a':3,'b':5}
 
       function update() {
         upf = (performance.now() - ty) / 1000;
@@ -101,7 +103,7 @@
 
         main.children[0].style.left = mouse.x+"px";
         main.children[0].style.top = mouse.y-15+"px";
-        main.children[0].innerText = 1/upf;
+        main.children[0].innerText = JSON.stringify(test);//1/upf;
 
         main.children[1].style.left = a+"vmin";
         main.children[1].style.top = b+"vmin";
