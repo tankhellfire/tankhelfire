@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/cat%20pick.png?v=1706326820251"
+      type="image/x-icon"
+    />
+    <title>Tankhellfire</title>
+  </head>
+  
+  <body style="overflow:hidden;background-color:#111111;margin:0;">
+    
+    <main style="">
+      <div style="position:absolute;left:;top:;">a</div>
+      <img
+        src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458"
+        alt="spacegamev5.PNG"
+        style="
+        position:absolute;
+        width:10vmin;height:10vmin;
+        left:;top:;
+        z-index:-1;"
+      />
+    </main>
+
+
+    
+    <script>
+      let ksb={
+        w:0,
+        a:0,
+        s:0,
+        d:0
+      };
+      let mouseb={
+        x:0,y:0,
+        c:{
+          now:0,last:0
+        }
+      };
+
+      document.addEventListener("keydown", (event) => {
+        if (ksb[event.key]!=undefined) {
+          ksb[event.key]=1;
+        }
+      });
+      document.addEventListener("keyup", (event) => {
+        if (ksb[event.key]!=undefined) {
+          ksb[event.key]=0;
+        }
+      });
+      
+      document.addEventListener("mousemove", (event) => {
+        mouseb.x = event.clientX;
+        mouseb.y = event.clientY;
+      });
+      document.addEventListener("mousedown", (event) => {
+        mouseb.c.now=1;
+      });
+      document.addEventListener("mouseup", (event) => {
+        mouseb.c.now=0;
+      });
+
+
+
+      //Math.random()
+      //main.children[1].style.zIndex
+      //while(performance.now()<ty+1000);
+      let ty = 0;
+      let upf;
+      const main = document.getElementsByTagName("main")[0];
+      a=0;
+      let b=0;
+      let cx=0
+      let cy=0
+      let mouse=mouseb;
+
+      function update() {
+        upf = (performance.now() - ty) / 1000;
+        ty = performance.now();
+        mouseb.c.last=mouse.c.now;
+        mouse=JSON.parse(JSON.stringify(mouseb));
+        if((mouse.c.now==1)&&(mouse.c.last==0)){
+          console.log('click');
+        }
+
+        if(ksb.a==1){
+          a-=100*upf;
+        }
+        if(ksb.d==1){
+          a+=100*upf;
+        }
+        if(ksb.w==1){
+          b-=100*upf;
+        }
+        if(ksb.s==1){
+          b+=100*upf;
+        }
+
+        main.children[0].style.left = mouse.x+"px";
+        main.children[0].style.top = mouse.y-15+"px";
+        main.children[0].innerText = 1/upf;
+
+        main.children[1].style.left = a+"vmin";
+        main.children[1].style.top = b+"vmin";
+
+        requestAnimationFrame(update);
+      }
+      update();
+    </script>
+  </body>
+</html>
