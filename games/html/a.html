@@ -55,7 +55,9 @@
       document.addEventListener("mousemove", (event) => {
         mouseb.x = event.clientX;
         mouseb.y = event.clientY;
-        test=event;
+      });
+      document.addEventListener("handleTouchMove", (event) => {
+        test=[...event]
       });
       document.addEventListener("mousedown", (event) => {
         mouseb.c.now=1;
