@@ -10,9 +10,9 @@
     <title>Tankhellfire</title>
   </head>
   
-  <body style="overflow:hidden;background-color:#111111;margin:0;">
+  <body style="touch-action: manipulation;overflow:hidden;background-color:#111111;margin:0;">
     
-    <main style="">
+    <main>
       <div style="position:absolute;left:;top:;">a</div>
       <img
         src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458"
@@ -58,7 +58,7 @@
         mouseb.y = event.clientY;
       });
       document.addEventListener("touchmove", (event) => {
-        test=event.touches.length;
+        test=event.touches;
       });
       document.addEventListener("mousedown", (event) => {
         mouseb.c.now=1;
@@ -103,9 +103,14 @@
           b+=100*upf;
         }
 
-        let testa=test+'\n'
-        for (const prop in test) {
-          testa+=prop+'\n';
+        let testa=test.length+'\n'
+        if(test.length){
+          for(let prop=0;prop!=test.length;prop++) {
+            testa+='_'+test[prop]+'\n';
+            for(const proa in test[prop]){
+              testa+='__'+test[prop][proa]+'\n';
+            }
+          }
         }
         main.children[0].style.left = mouse.x+"px";
         main.children[0].style.top = mouse.y-15+"px";
