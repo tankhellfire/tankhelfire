@@ -58,7 +58,7 @@
         mouseb.y = event.clientY;
       });
       document.addEventListener("touchmove", (event) => {
-        test=event;
+        test=event.touches.length;
       });
       document.addEventListener("mousedown", (event) => {
         mouseb.c.now=1;
@@ -103,7 +103,7 @@
           b+=100*upf;
         }
 
-        var testa='a\n'
+        let testa=test+'\n'
         for (const prop in test) {
           testa+=prop+'\n';
         }
