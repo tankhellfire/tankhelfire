@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no" />
     <link
       rel="icon"
       href="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/cat%20pick.png?v=1706326820251"
@@ -59,6 +59,10 @@
       });
       document.addEventListener("touchmove", (event) => {
         test=event.touches;
+        if(test.length){
+          mouseb.x = test[0].clientX;
+          mouseb.y = test[0].clientY;
+        }
       });
       document.addEventListener("mousedown", (event) => {
         mouseb.c.now=1;
@@ -86,6 +90,8 @@
         ty = performance.now();
         mouseb.c.last=mouse.c.now;
         mouse=JSON.parse(JSON.stringify(mouseb));
+
+        
         if((mouse.c.now==1)&&(mouse.c.last==0)){
           console.log('click');
         }
