@@ -56,14 +56,25 @@
       keyState[event.key]=0;
     }
   });
-  let m;
   document.addEventListener("mousemove", (event) => {
     mouse.all.mouse.x = event.clientX;
     mouse.all.mouse.y = event.clientY;
-    m=event;
   });
+  let m;
+  
   document.addEventListener("touchmove", (event) => {
-    //mouse.all={mouse:mouse.all.mouse};
+    mouse.all={mouse:mouse.all.mouse};
+    m=event.touches.length;
+    for(var i=0;i!=event.touches.length;i++){
+      mouse.all[event.touches[i].identifier]={
+        x:event.touches[i].clientX,
+        y:event.touches[i].clientY
+      }
+    }
+  });
+  document.addEventListener("touchend", (event) => {
+    mouse.all={mouse:mouse.all.mouse};
+    m=event.touches.length;
     for(var i=0;i!=event.touches.length;i++){
       mouse.all[event.touches[i].identifier]={
         x:event.touches[i].clientX,
@@ -122,7 +133,7 @@
 
     main.children[0].style.left = mouse.x+"px";
     main.children[0].style.top = mouse.y-15+"px";
-    main.children[0].innerText = JSON.stringify(mouse);//1/upf;
+    main.children[0].innerText = m+JSON.stringify(mouse);//1/upf;
 
     main.children[1].style.left = a+"vmin";
     main.children[1].style.top = b+"vmin";
