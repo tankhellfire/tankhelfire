@@ -10,12 +10,12 @@
     <title>Tankhellfire</title>
   </head>
   
-  <body style="touch-action: manipulation;overflow:hidden;background-color:#111111;margin:0;">
-    <main>
+  <body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#111111;">
       
       <div style="position:absolute;left:;top:;">a</div>
       
       <img
+        id=1
         src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458"
         alt="spacegamev5.PNG"
         style="
@@ -25,124 +25,125 @@
         z-index:-1;"
       />
       
-    </main>
-
-
-    
-<script>
-  let keyState={
-    w:0,
-    a:0,
-    s:0,
-    d:0
-  };
-  let mouse={
-    x:0,y:0,
-    all:{
-      mouse:{x:0,y:0,click:{now:0,last:0}}
-    }
-  };
-  mouse.click=mouse.all.mouse.click;
-  
-  const main = document.getElementsByTagName("main")[0];
-
-  document.addEventListener("keydown", (event) => {
-    if (keyState[event.key]!=undefined) {
-      keyState[event.key]=1;
-    }
-  });
-  document.addEventListener("keyup", (event) => {
-    if (keyState[event.key]!=undefined) {
-      keyState[event.key]=0;
-    }
-  });
-  document.addEventListener("mousemove", (event) => {
-    mouse.all.mouse.x = event.clientX;
-    mouse.all.mouse.y = event.clientY;
-  });
-  let m;
-  
-  document.addEventListener("touchmove", (event) => {
-    mouse.all={mouse:mouse.all.mouse};
-    m=event.touches.length;
-    for(var i=0;i!=event.touches.length;i++){
-      mouse.all[event.touches[i].identifier]={
-        x:event.touches[i].clientX,
-        y:event.touches[i].clientY
-      }
-    }
-  });
-  document.addEventListener("touchend", (event) => {
-    mouse.all={mouse:mouse.all.mouse};
-    m=event.touches.length;
-    for(var i=0;i!=event.touches.length;i++){
-      mouse.all[event.touches[i].identifier]={
-        x:event.touches[i].clientX,
-        y:event.touches[i].clientY
-      }
-    }
-  });
-  document.addEventListener("mousedown", (event) => {
-    mouse.all.mouse.click.now=1;
-  });
-  document.addEventListener("mouseup", (event) => {
-    mouse.all.mouse.click.now=0;
-  });
 
 
 
-  //Math.random()
-  //main.children[1].style.zIndex
-  //while(performance.now()<ty+1000);
-  let ty = 0;
-  let upf;
-  let a=0;
-  let b=0;
-
-  function update() {
-    upf = (performance.now() - ty) / 1000;
-    ty = performance.now();
-
-    let ax=0;
-    let ay=0;
-    let av=0;
-    for(var i in mouse.all){
-      ax+=mouse.all[i].x;
-      ay+=mouse.all[i].y;
-      av++;
-    }
-    mouse.x=ax/av;
-    mouse.y=ay/av;
-    
-    if((mouse.click.now==1)&&(mouse.click.last==0)){
-      console.log('click');
-    }
-
-    if(keyState.a==1){
-      a-=100*upf;
-    }
-    if(keyState.d==1){
-      a+=100*upf;
-    }
-    if(keyState.w==1){
-      b-=100*upf;
-    }
-    if(keyState.s==1){
-      b+=100*upf;
-    }
-
-    main.children[0].style.left = mouse.x+"px";
-    main.children[0].style.top = mouse.y-15+"px";
-    main.children[0].innerText = m+JSON.stringify(mouse);//1/upf;
-
-    main.children[1].style.left = a+"vmin";
-    main.children[1].style.top = b+"vmin";
-
-    
-    mouse.click.last=mouse.click.now;
-    requestAnimationFrame(update);
-  }
-  update();
-</script>
   </body>
+<script>
+const main=document.body;
+
+let keyState={
+  w:0,
+  a:0,
+  s:0,
+  d:0
+};
+let mouse={
+  aveX:0,
+  aveY:0,
+  mouse:{x:0,y:0,click:{now:0,last:0}},
+  tuch:{
+  }
+};
+let device={
+}
+
+document.addEventListener("keydown", (event) => {
+  if (keyState[event.key]!=undefined) {
+    keyState[event.key]=1;
+  }
+});
+document.addEventListener("keyup", (event) => {
+  if (keyState[event.key]!=undefined) {
+    keyState[event.key]=0;
+  }
+});
+document.addEventListener("mousemove", (event) => {
+  main.style.backgroundColor='#ff0000';
+  mouse.mouse.x = event.clientX;
+  mouse.mouse.y = event.clientY;
+});
+
+document.addEventListener("touchmove", (event) => {
+  mouse.tuch={};
+  for(var i=0;i!=event.touches.length;i++){
+    mouse.tuch[event.touches[i].identifier]={
+      x:event.touches[i].clientX,
+      y:event.touches[i].clientY
+    }
+  }
+});
+document.addEventListener("touchend", (event) => {
+  mouse.tuch={};
+  for(var i=0;i!=event.touches.length;i++){
+    mouse.tuch[event.touches[i].identifier]={
+      x:event.touches[i].clientX,
+      y:event.touches[i].clientY
+    }
+  }
+});
+document.addEventListener("mousedown", (event) => {
+    main.style.backgroundColor='#00ff00';
+  mouse.mouse.click.now=1;
+});
+document.addEventListener("mouseup", (event) => {
+  mouse.mouse.click.now=0;
+});
+
+
+
+//Math.random()
+//main.children[1].style.zIndex
+//while(performance.now()<ty+1000);
+let ty = 0;
+let upf;
+let a=0;
+let b=0;
+
+function update() {
+  upf = (performance.now() - ty) / 1000;
+  ty = performance.now();
+
+  let ax=0;
+  let ay=0;
+  let av=0;
+  if(true){
+    ax+=mouse.mouse.x;
+    ay+=mouse.mouse.y;
+    av++;
+  }
+  for(i in mouse.all){
+    ax+=mouse.tuch[i].x;
+    ay+=mouse.tuch[i].y;
+    av++;
+  }
+  mouse.aveX=ax;
+  mouse.aveY=ay;
+
+  if(keyState.a==1){
+    a-=100*upf;
+  }
+  if(keyState.d==1){
+    a+=100*upf;
+  }
+  if(keyState.w==1){
+    b-=100*upf;
+  }
+  if(keyState.s==1){
+    b+=100*upf;
+  }
+
+  main.children[0].style.left = mouse.aveX+"px";
+  main.children[0].style.top = mouse.aveY-15+"px";
+  main.children[0].innerText = JSON.stringify(mouse);//1/upf;
+
+  main.children[1].style.left = a+"vmin";
+  main.children[1].style.top = b+"vmin";
+
+  
+  mouse.mouse.click.last=mouse.mouse.click.now;
+  requestAnimationFrame(update);
+}
+update();
+</script>
 </html>
