@@ -42,48 +42,46 @@ let mouse={
   aveX:0,
   aveY:0,
   mouse:{x:0,y:0,click:{now:0,last:0}},
-  tuch:{
+  touch:{
   }
 };
 let device={
-}
+};
 
 document.addEventListener("keydown", (event) => {
   if (keyState[event.key]!=undefined) {
     keyState[event.key]=1;
-  }
+  };
 });
 document.addEventListener("keyup", (event) => {
   if (keyState[event.key]!=undefined) {
     keyState[event.key]=0;
-  }
+  };
 });
 document.addEventListener("mousemove", (event) => {
-  main.style.backgroundColor='#ff0000';
   mouse.mouse.x = event.clientX;
   mouse.mouse.y = event.clientY;
 });
 
 document.addEventListener("touchmove", (event) => {
-  mouse.tuch={};
+  mouse.touch={};
   for(var i=0;i!=event.touches.length;i++){
-    mouse.tuch[event.touches[i].identifier]={
+    mouse.touch[event.touches[i].identifier]={
       x:event.touches[i].clientX,
       y:event.touches[i].clientY
-    }
-  }
+    };
+  };
 });
 document.addEventListener("touchend", (event) => {
-  mouse.tuch={};
+  mouse.touch={};
   for(var i=0;i!=event.touches.length;i++){
-    mouse.tuch[event.touches[i].identifier]={
+    mouse.touch[event.touches[i].identifier]={
       x:event.touches[i].clientX,
       y:event.touches[i].clientY
-    }
-  }
+    };
+  };
 });
 document.addEventListener("mousedown", (event) => {
-    main.style.backgroundColor='#00ff00';
   mouse.mouse.click.now=1;
 });
 document.addEventListener("mouseup", (event) => {
@@ -107,31 +105,31 @@ function update() {
   let ax=0;
   let ay=0;
   let av=0;
-  if(true){
+  if(Object.keys(mouse.touch).length===0){
     ax+=mouse.mouse.x;
     ay+=mouse.mouse.y;
     av++;
-  }
-  for(i in mouse.all){
-    ax+=mouse.tuch[i].x;
-    ay+=mouse.tuch[i].y;
+  };
+  for(i in mouse.touch){
+    ax+=mouse.touch[i].x;
+    ay+=mouse.touch[i].y;
     av++;
-  }
-  mouse.aveX=ax;
-  mouse.aveY=ay;
+  };
+  mouse.aveX=ax/av;
+  mouse.aveY=ay/av;
 
   if(keyState.a==1){
     a-=100*upf;
-  }
+  };
   if(keyState.d==1){
     a+=100*upf;
-  }
+  };
   if(keyState.w==1){
     b-=100*upf;
-  }
+  };
   if(keyState.s==1){
     b+=100*upf;
-  }
+  };
 
   main.children[0].style.left = mouse.aveX+"px";
   main.children[0].style.top = mouse.aveY-15+"px";
