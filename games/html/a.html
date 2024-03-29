@@ -58,9 +58,16 @@ document.addEventListener("keyup", (event) => {
     keyState[event.key]=0;
   };
 });
+  
 document.addEventListener("mousemove", (event) => {
   mouse.mouse.x = event.clientX;
   mouse.mouse.y = event.clientY;
+});
+document.addEventListener("mousedown", (event) => {
+  mouse.mouse.click.now=1;
+});
+document.addEventListener("mouseup", (event) => {
+  mouse.mouse.click.now=0;
 });
 
 document.addEventListener("touchmove", (event) => {
@@ -68,7 +75,8 @@ document.addEventListener("touchmove", (event) => {
   for(var i=0;i!=event.touches.length;i++){
     mouse.touch[event.touches[i].identifier]={
       x:event.touches[i].clientX,
-      y:event.touches[i].clientY
+      y:event.touches[i].clientY,
+      force:event.touches[i].force
     };
   };
 });
@@ -77,15 +85,10 @@ document.addEventListener("touchend", (event) => {
   for(var i=0;i!=event.touches.length;i++){
     mouse.touch[event.touches[i].identifier]={
       x:event.touches[i].clientX,
-      y:event.touches[i].clientY
+      y:event.touches[i].clientY,
+      force:event.touches[i].force
     };
   };
-});
-document.addEventListener("mousedown", (event) => {
-  mouse.mouse.click.now=1;
-});
-document.addEventListener("mouseup", (event) => {
-  mouse.mouse.click.now=0;
 });
 
 
