@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html oncontextmenu="return false;" style="/*cursor:none;*/">
   <head>
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no" />
     <link
@@ -10,24 +10,21 @@
     <title>Tankhellfire</title>
   </head>
   
-  <body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#111111;">
+  <body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#111111;height:100vh;width:100vw;">
+    
+    <div style="position:absolute;left:;top:;user-select:none;">a</div>
+    
+    <img
+      id="1"
+      src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458"
+      alt="spacegamev5.PNG"
+      style="
+      position:absolute;
+      width:10vmin;height:10vmin;
+      left:;top:;
+      z-index:0;"
+    />
       
-      <div style="position:absolute;left:;top:;">a</div>
-      
-      <img
-        id=1
-        src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458"
-        alt="spacegamev5.PNG"
-        style="
-        position:absolute;
-        width:10vmin;height:10vmin;
-        left:;top:;
-        z-index:-1;"
-      />
-      
-
-
-
   </body>
 <script>
 const main=document.body;
@@ -62,37 +59,31 @@ document.addEventListener("keyup", (event) => {
 document.addEventListener("mousemove", (event) => {
   mouse.mouse.x = event.clientX;
   mouse.mouse.y = event.clientY;
+  mouse.mouse.target=event.target;
+  // mouse.mouse.x+=event.movementX;
+  // mouse.mouse.y+=event.movementY;
 });
 document.addEventListener("mousedown", (event) => {
   mouse.mouse.click.now=1;
+  mouse.mouse.target=event.target;
 });
 document.addEventListener("mouseup", (event) => {
   mouse.mouse.click.now=0;
 });
 
-document.addEventListener("touchmove", (event) => {
-  mouse.touch={};
-  for(var i=0;i!=event.touches.length;i++){
-    mouse.touch[event.touches[i].identifier]={
-      x:event.touches[i].clientX,
-      y:event.touches[i].clientY,
-      force:event.touches[i].force
+function handleTouchMove(event) {
+  mouse.touch = {};
+  for (const touch of event.touches) {
+    mouse.touch[touch.identifier] = {
+      x: touch.clientX,
+      y: touch.clientY,
+      target: touch.target,
+      force: touch.force,
     };
-  };
-});
-document.addEventListener("touchend", (event) => {
-  mouse.touch={};
-  for(var i=0;i!=event.touches.length;i++){
-    mouse.touch[event.touches[i].identifier]={
-      x:event.touches[i].clientX,
-      y:event.touches[i].clientY,
-      force:event.touches[i].force
-    };
-  };
-});
-
-
-
+  }
+};
+document.addEventListener("touchmove",handleTouchMove);
+document.addEventListener("touchend",handleTouchMove);
 //Math.random()
 //main.children[1].style.zIndex
 //while(performance.now()<ty+1000);
@@ -101,7 +92,7 @@ let upf;
 let a=0;
 let b=0;
 
-function update() {
+function uptade() {
   upf = (performance.now() - ty) / 1000;
   ty = performance.now();
 
@@ -141,10 +132,15 @@ function update() {
   main.children[1].style.left = a+"vmin";
   main.children[1].style.top = b+"vmin";
 
+  if(mouse.mouse.click.last=='0'&&mouse.mouse.click.now=='1'){
+    console.log(mouse.mouse.target);
+    console.log(document.elementFromPoint(mouse.mouse.x,mouse.mouse.y))
+  }
+
   
   mouse.mouse.click.last=mouse.mouse.click.now;
-  requestAnimationFrame(update);
+  requestAnimationFrame(uptade);
 }
-update();
+uptade()
 </script>
 </html>
