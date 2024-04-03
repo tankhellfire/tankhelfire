@@ -59,13 +59,13 @@ document.addEventListener("keyup", (event) => {
 document.addEventListener("mousemove", (event) => {
   mouse.mouse.x = event.clientX;
   mouse.mouse.y = event.clientY;
-  mouse.mouse.target=event.target;
+  mouse.mouse.target=event.target.tagName;
   // mouse.mouse.x+=event.movementX;
   // mouse.mouse.y+=event.movementY;
 });
 document.addEventListener("mousedown", (event) => {
   mouse.mouse.click.now=1;
-  mouse.mouse.target=event.target;
+  mouse.mouse.target=event.target.tagName;
 });
 document.addEventListener("mouseup", (event) => {
   mouse.mouse.click.now=0;
@@ -77,7 +77,7 @@ function handleTouchMove(event) {
     mouse.touch[touch.identifier] = {
       x: touch.clientX,
       y: touch.clientY,
-      target: touch.target,
+      target: touch.target.tagName,
       force: touch.force,
     };
   }
