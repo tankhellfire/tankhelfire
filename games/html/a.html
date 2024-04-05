@@ -74,20 +74,20 @@ document.addEventListener("mouseup", (event) => {
 function handleTouchMove(event) {
   mouse.touch={};
   for (const touch of event.touches) {
-    const currentElement = document.elementFromPoint(touch.clientX, touch.clientY);
-    const currentElements = document.elementsFromPoint(touch.clientX, touch.clientY);
+    //const currentElement = document.elementFromPoint(touch.clientX, touch.clientY);
+    //const currentElements = document.elementsFromPoint(touch.clientX, touch.clientY);
     mouse.touch[touch.identifier] = {
       x:touch.clientX,
       y:touch.clientY,
-      startTarget:touch.currentElement.tagName,
-      target:currentElement,
-      targets:currentElements,
+      startTarget:touch.target.tagName,
+      target:currentElement.tagName,
+      targets:currentElements.tagName,
       force:touch.force,
     };
   }
 };
 document.addEventListener("touchmove",handleTouchMove);
-//document.addEventListener("touchend",handleTouchMove);
+document.addEventListener("touchend",handleTouchMove);
 //Math.random()
 //main.children[1].style.zIndex
 //while(performance.now()<ty+1000);
