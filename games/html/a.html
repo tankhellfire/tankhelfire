@@ -12,7 +12,7 @@
   
   <body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#111111;height:100vh;width:100vw;">
     
-    <div style="position:absolute;left:;top:;user-select:none;">a</div>
+    <div style="position:absolute;left:;top:;user-select:none;color:#A0A0A0">a</div>
     
     <img
       id="1"
@@ -74,11 +74,15 @@ document.addEventListener("mouseup", (event) => {
 function handleTouchMove(event) {
   mouse.touch = {};
   for (const touch of event.touches) {
+    const currentElement = document.elementFromPoint(touch.clientX, touch.clientY);
+    const currentElements = document.elementsFromPoint(touch.clientX, touch.clientY);
     mouse.touch[touch.identifier] = {
-      x: touch.clientX,
-      y: touch.clientY,
-      target: touch.currentElement.tagName,
-      force: touch.force,
+      x:touch.clientX,
+      y:touch.clientY,
+      startTarget:touch.currentElement.tagName,
+      target:currentElement,
+      targets:currentElements,
+      force:touch.force,
     };
   }
 };
@@ -91,6 +95,7 @@ let ty = 0;
 let upf;
 let a=0;
 let b=0;
+
 
 function uptade() {
   upf = (performance.now() - ty) / 1000;
