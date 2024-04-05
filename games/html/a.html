@@ -77,7 +77,7 @@ function handleTouchMove(event) {
     mouse.touch[touch.identifier] = {
       x: touch.clientX,
       y: touch.clientY,
-      target: touch.target.tagName,
+      target: touch.currentElement.tagName,
       force: touch.force,
     };
   }
