@@ -72,7 +72,7 @@ document.addEventListener("mouseup", (event) => {
 });
 
 function handleTouchMove(event) {
-  mouse.touch = {};
+  mouse.touch={};
   for (const touch of event.touches) {
     const currentElement = document.elementFromPoint(touch.clientX, touch.clientY);
     const currentElements = document.elementsFromPoint(touch.clientX, touch.clientY);
@@ -87,7 +87,7 @@ function handleTouchMove(event) {
   }
 };
 document.addEventListener("touchmove",handleTouchMove);
-document.addEventListener("touchend",handleTouchMove);
+//document.addEventListener("touchend",handleTouchMove);
 //Math.random()
 //main.children[1].style.zIndex
 //while(performance.now()<ty+1000);
