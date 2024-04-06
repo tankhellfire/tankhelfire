@@ -57,15 +57,16 @@ document.addEventListener("keyup", (event) => {
 });
   
 document.addEventListener("mousemove", (event) => {
-  mouse.mouse.x = event.clientX;
-  mouse.mouse.y = event.clientY;
-  mouse.mouse.target=event.target.tagName;
+  const currentElements=document.elementsFromPoint(event.clientX, event.clientY);
   // mouse.mouse.x+=event.movementX;
   // mouse.mouse.y+=event.movementY;
+  mouse.mouse.x=event.clientX;
+  mouse.mouse.y=event.clientY;
+  mouse.mouse.target=event.target;
+  mouse.mouse.targets=currentElements;
 });
 document.addEventListener("mousedown", (event) => {
   mouse.mouse.click.now=1;
-  mouse.mouse.target=event.target.tagName;
 });
 document.addEventListener("mouseup", (event) => {
   mouse.mouse.click.now=0;
@@ -74,14 +75,14 @@ document.addEventListener("mouseup", (event) => {
 function handleTouchMove(event) {
   mouse.touch={};
   for (const touch of event.touches) {
-    const currentElement = document.elementFromPoint(touch.clientX, touch.clientY);
-    const currentElements = document.elementsFromPoint(touch.clientX, touch.clientY);
+    const currentElement=document.elementFromPoint(touch.clientX,touch.clientY);
+    const currentElements=document.elementsFromPoint(touch.clientX,touch.clientY);
     mouse.touch[touch.identifier] = {
       x:touch.clientX,
       y:touch.clientY,
-      startTarget:touch.target.tagName,
-      target:currentElement.tagName,
-      targets:currentElements.tagName,
+      startTarget:touch.target,
+      target:currentElement,
+      targets:currentElements,
       force:touch.force,
     };
   }
