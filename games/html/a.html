@@ -139,8 +139,8 @@
           main.children[1].innerText = Object.keys(mouse.touch) + '  ' + touchMove.object;
           gotoxy(main.children[1], touchMove.x, touchMove.y);
           main.children[1].innerText = `${mouse.touch[touchMove.object].x - touchMove.x}  ${mouse.touch[touchMove.object].y - touchMove.y}`;
-          move[0] = +mouse.touch[touchMove.object].x - touchMove.x;
-          move[1] = +mouse.touch[touchMove.object].y - touchMove.y;
+          move[0] = +(mouse.touch[touchMove.object].x - touchMove.x) * upf;
+          move[1] = +(mouse.touch[touchMove.object].y - touchMove.y) * upf;
         } else {
           touchMove = undefined;
         }
@@ -155,5 +155,3 @@
     uptade()
   </script>
 </html>
-
-
