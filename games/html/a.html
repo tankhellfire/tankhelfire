@@ -19,6 +19,13 @@
         color:#A0A0A0;
       ">a
     </div>
+    <div style="
+        position:absolute;
+        left:0vmin;top:0vmin;
+        z-index:0;
+        color:#ff0000;
+      ">a
+    </div>
   </body>
   <script>
     const main = document.body;
@@ -98,16 +105,16 @@
     //Math.random()
     //main.children[1].style.zIndex
     //while(performance.now()<ty+1000);
-    function clamp(x,min,max){
-      if(x<min){
+    function clamp(x, min, max) {
+      if (x < min) {
         return min
       }
-      if(max<x){
+      if (max < x) {
         return max
       }
       return x
     }
-    
+
     function gotoxy(element, x, y) {
       element.style.left = x + 'px';
       element.style.top = y + 'px';
@@ -148,17 +155,18 @@
         if (Object.keys(mouse.touch).includes(touchMove.object)) {
           main.children[1].innerText = Object.keys(mouse.touch) + '  ' + touchMove.object;
           gotoxy(main.children[1], touchMove.x, touchMove.y);
-          
-          let a=mouse.touch[touchMove.object].x - touchMove.x
-          let b=mouse.touch[touchMove.object].y - touchMove.y
-          
-          let c=clamp(Math.sqrt(a*a+b*b),1,Infinity);
-          a=a/c;
-          b=b/c;
-          
+
+          let a = (mouse.touch[touchMove.object].x - touchMove.x) / vmin * 2;
+          let b = (mouse.touch[touchMove.object].y - touchMove.y) / vmin * 2;
+
+          let c = clamp(Math.sqrt(a * a + b * b), 1, Infinity);
+          a = a / c;
+          b = b / c;
+
+          gotoxy(main.children[2], touchMove.x + a * 2 * vmin, touchMove.y + b * 2 * vmin);
           main.children[1].innerText = `${a}  ${b}  ${c}`;
-          move[0] += a * upf;
-          move[1] += b * upf;
+          move[0] += a;
+          move[1] += b;
         } else {
           touchMove = undefined;
         }
