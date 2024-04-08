@@ -9,9 +9,16 @@
     <img id="1" src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458" alt="spacegamev5.PNG" style="
         height:1000vmin;width:1000vmin;
         position:absolute;
-        left:0vmin;bottom:0vmin;
+        left:0vmin;top:0vmin;
         z-index:0;
       "/>
+    <div style="
+        position:absolute;
+        left:0vmin;top:0vmin;
+        z-index:0;
+        color:#A0A0A0;
+      ">a
+    </div>
   </body>
   <script>
     const main = document.body;
@@ -92,19 +99,21 @@
     //main.children[1].style.zIndex
     //while(performance.now()<ty+1000);
     function gotoxy(element, x, y) {
-      element.style.left = x * vmin + .5 * window.innerWidth + 'px';
-      element.style.bottom = y * vmin + .5 * window.innerHeight + 'px';
+      element.style.left = x + 'px';
+      element.style.top = y + 'px';
     }
 
     let cx = 0;
     let cy = 0;
+    let tuchMove;
+    let move = [0, 0];
 
     function uptade() {
       upf = (performance.now() - ty) / 1000;
       ty = performance.now();
       vmin = Math.min(window.innerWidth, window.innerHeight);
 
-      let move = [0, 0];
+      move = [0, 0];
       if (keyState.d == 1) {
         move[0] += 1
       }
@@ -118,9 +127,21 @@
         move[1] -= 1
       }
 
+      if (Object.keys(mouse.touch).length > 0 && tuchMove == undefined) {
+        tuchMove = {
+          x: mouse.touch[Object.keys(mouse.touch)[0]].x,
+          y: mouse.touch[Object.keys(mouse.touch)[0]].y,
+          obj: mouse.touch[Object.keys(mouse.touch)[0]]
+        };
+      }
+      if (tuchMove != undefined) {
+        gotoxy(main.children[1], tuchMove.x * vmin, tuchMove.y * vmin);
+      }
+      main.children[1].innerText = JSON.stringify(tuchMove);
+
       cx += move[0] * upf;
       cy += move[1] * upf;
-      gotoxy(main.children[0], -cx, -cy);
+      gotoxy(main.children[0], -cx * vmin, cy * vmin);
 
       mouse.mouse.click.last = mouse.mouse.click.now;
       requestAnimationFrame(uptade);
