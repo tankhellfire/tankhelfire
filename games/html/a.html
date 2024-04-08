@@ -135,13 +135,12 @@
         };
       }
       if (touchMove != undefined) {
-        if (Object.keys(mouse.touch).hasOwnProperty(touchMove.object)) {
-          main.children[1].innerText = Object.keys(mouse.touch);
+        if (Object.keys(mouse.touch).includes(touchMove.object)) {
+          main.children[1].innerText = Object.keys(mouse.touch) +'  '+touchMove.object;
           gotoxy(main.children[1], touchMove.x, touchMove.y);
-          main.children[1].innerText = `${Object.keys(mouse.touch)[0]}  ${mouse.touch[touchMove.object].x - touchMove.x}  ${1/upf}`;
+          main.children[1].innerText = `${mouse.touch[touchMove.object].x - touchMove.x}  ${mouse.touch[touchMove.object].y - touchMove.y}`;
         } else {
           touchMove = undefined;
-          main.children[1].innerText = 1/upf;
         }
       }
 
