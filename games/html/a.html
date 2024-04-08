@@ -7,7 +7,7 @@
   </head>
   <body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#111111;height:100vh;width:100vw;">
     <img id="1" src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458" alt="spacegamev5.PNG" style="
-        height:1000vmin;width:1000vmin;
+        height:10vmin;width:10vmin;
         position:absolute;
         left:0vmin;top:0vmin;
         z-index:0;
@@ -136,14 +136,15 @@
       }
       if (touchMove != undefined) {
         if (Object.keys(mouse.touch).includes(touchMove.object)) {
-          main.children[1].innerText = Object.keys(mouse.touch) +'  '+touchMove.object;
+          main.children[1].innerText = Object.keys(mouse.touch) + '  ' + touchMove.object;
           gotoxy(main.children[1], touchMove.x, touchMove.y);
           main.children[1].innerText = `${mouse.touch[touchMove.object].x - touchMove.x}  ${mouse.touch[touchMove.object].y - touchMove.y}`;
+          move[0] = +mouse.touch[touchMove.object].x - touchMove.x;
+          move[1] = +mouse.touch[touchMove.object].y - touchMove.y;
         } else {
           touchMove = undefined;
         }
       }
-
       cx += move[0] * upf;
       cy += move[1] * upf;
       gotoxy(main.children[0], -cx * vmin, cy * vmin);
@@ -154,3 +155,5 @@
     uptade()
   </script>
 </html>
+
+
