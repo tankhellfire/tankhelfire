@@ -115,10 +115,10 @@
 
       move = [0, 0];
       if (keyState.d == 1) {
-        move[0] += 1
+        move[0] -= 1
       }
       if (keyState.a == 1) {
-        move[0] -= 1
+        move[0] += 1
       }
       if (keyState.w == 1) {
         move[1] += 1
@@ -139,15 +139,15 @@
           main.children[1].innerText = Object.keys(mouse.touch) + '  ' + touchMove.object;
           gotoxy(main.children[1], touchMove.x, touchMove.y);
           main.children[1].innerText = `${mouse.touch[touchMove.object].x - touchMove.x}  ${mouse.touch[touchMove.object].y - touchMove.y}`;
-          move[0] = +(mouse.touch[touchMove.object].x - touchMove.x) * upf;
-          move[1] = +(mouse.touch[touchMove.object].y - touchMove.y) * upf;
+          move[0] += (mouse.touch[touchMove.object].x - touchMove.x) * upf;
+          move[1] += (mouse.touch[touchMove.object].y - touchMove.y) * upf;
         } else {
           touchMove = undefined;
         }
       }
       cx += move[0] * upf;
       cy += move[1] * upf;
-      gotoxy(main.children[0], -cx * vmin, cy * vmin);
+      gotoxy(main.children[0], -cx * vmin, -cy * vmin);
 
       mouse.mouse.click.last = mouse.mouse.click.now;
       requestAnimationFrame(uptade);
