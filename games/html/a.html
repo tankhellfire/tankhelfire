@@ -156,14 +156,14 @@
           main.children[1].innerText = Object.keys(mouse.touch) + '  ' + touchMove.object;
           gotoxy(main.children[1], touchMove.x, touchMove.y);
 
-          let a = (mouse.touch[touchMove.object].x - touchMove.x) / vmin * 2;
-          let b = (mouse.touch[touchMove.object].y - touchMove.y) / vmin * 2;
+          let a = (mouse.touch[touchMove.object].x - touchMove.x) / (vmin * .2);
+          let b = (mouse.touch[touchMove.object].y - touchMove.y) / (vmin * .2);
 
           let c = clamp(Math.sqrt(a * a + b * b), 1, Infinity);
           a = a / c;
           b = b / c;
 
-          gotoxy(main.children[2], touchMove.x + a * 2 * vmin, touchMove.y + b * 2 * vmin);
+          gotoxy(main.children[2], touchMove.x + a * vmin * .2, touchMove.y + b * vmin * .2);
           main.children[1].innerText = `${a}  ${b}  ${c}`;
           move[0] += a;
           move[1] += b;
