@@ -105,7 +105,7 @@
 
     let cx = 0;
     let cy = 0;
-    let tuchMove;
+    let touchMove;
     let move = [0, 0];
 
     function uptade() {
@@ -127,16 +127,22 @@
         move[1] -= 1
       }
 
-      if (Object.keys(mouse.touch).length > 0 && tuchMove == undefined) {
-        tuchMove = {
+      if (Object.keys(mouse.touch).length > 0 && touchMove == undefined) {
+        touchMove = {
           x: mouse.touch[Object.keys(mouse.touch)[0]].x,
           y: mouse.touch[Object.keys(mouse.touch)[0]].y,
           object: Object.keys(mouse.touch)[0]
         };
       }
-      if (tuchMove != undefined) {
-        gotoxy(main.children[1], tuchMove.x, tuchMove.y);
-        main.children[1].innerText = `${mouse.touch[tuchMove.object].x-tuchMove.x}`;
+      if (touchMove != undefined) {
+        if (Object.keys(mouse.touch).hasOwnProperty(touchMove.object)) {
+          main.children[1].innerText = Object.keys(mouse.touch);
+          gotoxy(main.children[1], touchMove.x, touchMove.y);
+          main.children[1].innerText = `${Object.keys(mouse.touch)[0]}  ${mouse.touch[touchMove.object].x - touchMove.x}  ${1/upf}`;
+        } else {
+          touchMove = undefined;
+          main.children[1].innerText = 1/upf;
+        }
       }
 
       cx += move[0] * upf;
