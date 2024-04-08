@@ -1,151 +1,130 @@
 <!DOCTYPE html>
 <html oncontextmenu="return false;" style="/*cursor:none;*/">
   <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no" />
-    <link
-      rel="icon"
-      href="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/cat%20pick.png?v=1706326820251"
-      type="image/x-icon"
-    />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
+    <link rel="icon" href="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/cat%20pick.png?v=1706326820251" type="image/x-icon"/>
     <title>Tankhellfire</title>
   </head>
-  
   <body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#111111;height:100vh;width:100vw;">
-    
-    <div style="position:absolute;left:;top:;user-select:none;color:#A0A0A0">a</div>
-    
-    <img
-      id="1"
-      src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458"
-      alt="spacegamev5.PNG"
-      style="
-      position:absolute;
-      width:10vmin;height:10vmin;
-      left:;top:;
-      z-index:0;"
-    />
-      
+    <img id="1" src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458" alt="spacegamev5.PNG" style="
+        height:1000vmin;width:1000vmin;
+        position:absolute;
+        left:0vmin;bottom:0vmin;
+        z-index:0;
+      "/>
   </body>
-<script>
-const main=document.body;
+  <script>
+    const main = document.body;
 
-let keyState={
-  w:0,
-  a:0,
-  s:0,
-  d:0
-};
-let mouse={
-  aveX:0,
-  aveY:0,
-  mouse:{x:0,y:0,click:{now:0,last:0}},
-  touch:{
-  }
-};
-let device={
-};
-
-document.addEventListener("keydown", (event) => {
-  if (keyState[event.key]!=undefined) {
-    keyState[event.key]=1;
-  };
-});
-document.addEventListener("keyup", (event) => {
-  if (keyState[event.key]!=undefined) {
-    keyState[event.key]=0;
-  };
-});
-  
-document.addEventListener("mousemove", (event) => {
-  const currentElements=document.elementsFromPoint(event.clientX, event.clientY);
-  // mouse.mouse.x+=event.movementX;
-  // mouse.mouse.y+=event.movementY;
-  mouse.mouse.x=event.clientX;
-  mouse.mouse.y=event.clientY;
-  mouse.mouse.target=event.target;
-  mouse.mouse.targets=currentElements;
-});
-document.addEventListener("mousedown", (event) => {
-  mouse.mouse.click.now=1;
-});
-document.addEventListener("mouseup", (event) => {
-  mouse.mouse.click.now=0;
-});
-
-function handleTouchMove(event) {
-  mouse.touch={};
-  for (const touch of event.touches) {
-    const currentElement=document.elementFromPoint(touch.clientX,touch.clientY);
-    const currentElements=document.elementsFromPoint(touch.clientX,touch.clientY);
-    mouse.touch[touch.identifier] = {
-      x:touch.clientX,
-      y:touch.clientY,
-      startTarget:touch.target,
-      target:currentElement,
-      targets:currentElements,
-      force:touch.force,
+    let vmin = 0
+    let ty = 0;
+    let upf = 0;
+    let keyState = {
+      w: 0,
+      a: 0,
+      s: 0,
+      d: 0
     };
-  }
-};
-document.addEventListener("touchmove",handleTouchMove);
-document.addEventListener("touchend",handleTouchMove);
-//Math.random()
-//main.children[1].style.zIndex
-//while(performance.now()<ty+1000);
-let ty = 0;
-let upf;
-let a=0;
-let b=0;
+    let mouse = {
+      mouse: {
+        x: 0,
+        y: 0,
+        click: {
+          now: 0,
+          last: 0
+        }
+      },
+      touch: {}
+    };
 
-function uptade() {
-  upf = (performance.now() - ty) / 1000;
-  ty = performance.now();
+    document.addEventListener("keydown", (event)=>{
+      if (keyState[event.key] != undefined) {
+        keyState[event.key] = 1;
+      }
+      ;
+    }
+    );
+    document.addEventListener("keyup", (event)=>{
+      if (keyState[event.key] != undefined) {
+        keyState[event.key] = 0;
+      }
+      ;
+    }
+    );
 
-  let ax=0;
-  let ay=0;
-  let av=0;
-  if(Object.keys(mouse.touch).length===0){
-    ax+=mouse.mouse.x;
-    ay+=mouse.mouse.y;
-    av++;
-  };
-  for(i in mouse.touch){
-    ax+=mouse.touch[i].x;
-    ay+=mouse.touch[i].y;
-    av++;
-  };
-  mouse.aveX=ax/av;
-  mouse.aveY=ay/av;
+    document.addEventListener("mousemove", (event)=>{
+      const currentElements = document.elementsFromPoint(event.clientX, event.clientY);
+      // mouse.mouse.x+=event.movementX;
+      // mouse.mouse.y+=event.movementY;
+      mouse.mouse.x = event.clientX;
+      mouse.mouse.y = event.clientY;
+      mouse.mouse.target = event.target;
+      mouse.mouse.targets = currentElements;
+    }
+    );
+    document.addEventListener("mousedown", (event)=>{
+      mouse.mouse.click.now = 1;
+    }
+    );
+    document.addEventListener("mouseup", (event)=>{
+      mouse.mouse.click.now = 0;
+    }
+    );
 
-  if(keyState.a==1){
-    a-=100*upf;
-  };
-  if(keyState.d==1){
-    a+=100*upf;
-  };
-  if(keyState.w==1){
-    b-=100*upf;
-  };
-  if(keyState.s==1){
-    b+=100*upf;
-  };
+    function handleTouchMove(event) {
+      mouse.touch = {};
+      for (const touch of event.touches) {
+        const currentElement = document.elementFromPoint(touch.clientX, touch.clientY);
+        const currentElements = document.elementsFromPoint(touch.clientX, touch.clientY);
+        mouse.touch[touch.identifier] = {
+          x: touch.clientX,
+          y: touch.clientY,
+          startTarget: touch.target,
+          target: currentElement,
+          targets: currentElements,
+          force: touch.force,
+        };
+      }
+    }
+    ;document.addEventListener("touchmove", handleTouchMove);
+    document.addEventListener("touchend", handleTouchMove);
+    //Math.random()
+    //main.children[1].style.zIndex
+    //while(performance.now()<ty+1000);
+    function gotoxy(element, x, y) {
+      element.style.left = x * vmin + .5 * window.innerWidth + 'px';
+      element.style.bottom = y * vmin + .5 * window.innerHeight + 'px';
+    }
 
-  main.children[0].style.left = mouse.aveX+"px";
-  main.children[0].style.top = mouse.aveY-15+"px";
-  main.children[0].innerText = JSON.stringify(mouse);//1/upf;
+    let cx = 0;
+    let cy = 0;
 
-  main.children[1].style.left = a+"vmin";
-  main.children[1].style.top = b+"vmin";
+    function uptade() {
+      upf = (performance.now() - ty) / 1000;
+      ty = performance.now();
+      vmin = Math.min(window.innerWidth, window.innerHeight);
 
-  if(mouse.mouse.click.last=='0'&&mouse.mouse.click.now=='1'){
-    console.log(mouse.mouse.target);
-    console.log(document.elementFromPoint(mouse.mouse.x,mouse.mouse.y))
-  }
+      let move = [0, 0];
+      if (keyState.d == 1) {
+        move[0] += 1
+      }
+      if (keyState.a == 1) {
+        move[0] -= 1
+      }
+      if (keyState.w == 1) {
+        move[1] += 1
+      }
+      if (keyState.s == 1) {
+        move[1] -= 1
+      }
 
-  
-  mouse.mouse.click.last=mouse.mouse.click.now;
-  requestAnimationFrame(uptade);
-}
-uptade()
-</script>
+      cx += move[0] * upf;
+      cy += move[1] * upf;
+      gotoxy(main.children[0], -cx, -cy);
+
+      mouse.mouse.click.last = mouse.mouse.click.now;
+      requestAnimationFrame(uptade);
+    }
+    uptade()
+  </script>
 </html>
