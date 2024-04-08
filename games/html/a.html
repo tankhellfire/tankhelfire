@@ -131,13 +131,13 @@
         tuchMove = {
           x: mouse.touch[Object.keys(mouse.touch)[0]].x,
           y: mouse.touch[Object.keys(mouse.touch)[0]].y,
-          obj: mouse.touch[Object.keys(mouse.touch)[0]]
+          object: Object.keys(mouse.touch)[0]
         };
       }
       if (tuchMove != undefined) {
-        gotoxy(main.children[1], tuchMove.x * vmin, tuchMove.y * vmin);
+        gotoxy(main.children[1], tuchMove.x, tuchMove.y);
+        main.children[1].innerText = `${mouse.touch[tuchMove.object].x-tuchMove.x}`;
       }
-      main.children[1].innerText = JSON.stringify(tuchMove);
 
       cx += move[0] * upf;
       cy += move[1] * upf;
