@@ -5,27 +5,25 @@
     <link rel="icon" href="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/cat%20pick.png?v=1706326820251" type="image/x-icon"/>
     <title>Tankhellfire</title>
   </head>
-  <body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#111111;height:100vh;width:100vw;">
-    <img id="1" src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458" alt="spacegamev5.PNG" style="
-        height:10vmin;width:10vmin;
+  <body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#1E1F22;height:100vh;width:100vw;">
+    <img id="1" src="e.svg" alt="spacegamev5.PNG" style="
+        height:100vmin;width:100vmin;
         position:absolute;
         left:0vmin;top:0vmin;
         z-index:0;
       "/>
-    <div style="
+    <img id="1" src="e.svg" alt="spacegamev5.PNG" style="
+        height:25vmin;width:25vmin;
         position:absolute;
         left:0vmin;top:0vmin;
         z-index:0;
-        color:#A0A0A0;
-      ">a
-    </div>
-    <div style="
+      "/>
+    <img id="1" src="e.svg" alt="spacegamev5.PNG" style="
+        height:25vmin;width:25vmin;
         position:absolute;
         left:0vmin;top:0vmin;
         z-index:0;
-        color:#ff0000;
-      ">a
-    </div>
+      "/>
   </body>
   <script>
     const main = document.body;
@@ -132,16 +130,16 @@
 
       move = [0, 0];
       if (keyState.d == 1) {
-        move[0] -= 1
-      }
-      if (keyState.a == 1) {
         move[0] += 1
       }
+      if (keyState.a == 1) {
+        move[0] -= 1
+      }
       if (keyState.w == 1) {
-        move[1] += 1
+        move[1] -= 1
       }
       if (keyState.s == 1) {
-        move[1] -= 1
+        move[1] += 1
       }
 
       if (Object.keys(mouse.touch).length > 0 && touchMove == undefined) {
@@ -153,7 +151,6 @@
       }
       if (touchMove != undefined) {
         if (Object.keys(mouse.touch).includes(touchMove.object)) {
-          main.children[1].innerText = Object.keys(mouse.touch) + '  ' + touchMove.object;
           gotoxy(main.children[1], touchMove.x, touchMove.y);
 
           let a = (mouse.touch[touchMove.object].x - touchMove.x) / (vmin * .2);
@@ -164,7 +161,6 @@
           b = b / c;
 
           gotoxy(main.children[2], touchMove.x + a * vmin * .2, touchMove.y + b * vmin * .2);
-          main.children[1].innerText = `${a}  ${b}  ${c}`;
           move[0] += a;
           move[1] += b;
         } else {
@@ -173,7 +169,7 @@
       }
       cx += move[0] * upf;
       cy += move[1] * upf;
-      gotoxy(main.children[0], -cx * vmin, -cy * vmin);
+      gotoxy(main.children[0], -cx * vmin + .5 * window.innerWidth, -cy * vmin + .5 * window.innerHeight);
 
       mouse.mouse.click.last = mouse.mouse.click.now;
       requestAnimationFrame(uptade);
