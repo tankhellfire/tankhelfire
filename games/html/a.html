@@ -7,10 +7,11 @@
   </head>
   <body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#1E1F22;height:100vh;width:100vw;">
     <img id="1" src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458" alt="spacegamev5.PNG" style="
-        height:100vmin;width:100vmin;
+        height:10vmin;width:10vmin;
         position:absolute;
         left:0vmin;top:0vmin;
         z-index:0;
+        transform:translate(-50%,-50%);
       "/>
     <img id="1" src="assets/joystick bace.svg" alt="cicle :D" style="
         height:40vmin;width:40vmin;
@@ -18,6 +19,7 @@
         left:0vmin;top:0vmin;
         z-index:0;
         transform:translate(-50%,-50%);
+        display:none;
       "/>
     <img id="1" src="assets/joystick.svg" alt="cicle :D" style="
         height:15vmin;width:15vmin;
@@ -25,6 +27,7 @@
         left:0vmin;top:0vmin;
         z-index:0;
         transform:translate(-50%,-50%);
+        display:none;
       "/>
   </body>
   <script>
@@ -150,6 +153,8 @@
           y: mouse.touch[Object.keys(mouse.touch)[0]].y,
           object: Object.keys(mouse.touch)[0]
         };
+        main.children[1].style.display = 'block';
+        main.children[2].style.display = 'block';
       }
       if (touchMove != undefined) {
         if (Object.keys(mouse.touch).includes(touchMove.object)) {
@@ -167,6 +172,8 @@
           move[1] += b;
         } else {
           touchMove = undefined;
+          main.children[1].style.display = 'none';
+          main.children[2].style.display = 'none';
         }
       }
       cx += move[0] * upf;
