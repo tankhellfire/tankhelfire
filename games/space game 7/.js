@@ -90,14 +90,20 @@ document.addEventListener("keyup", (event) => {
 });
 
 document.addEventListener("mousemove", (event) => {
+  // console.log(event)
+  if (document.pointerLockElement) {
+    mouse.mouse.xPx += event.movementX;
+    mouse.mouse.yPx += event.movementY;
+  } else {
+    mouse.mouse.xPx = event.clientX;
+    mouse.mouse.yPx = event.clientY;
+  }
+
   const currentElements = document.elementsFromPoint(
     event.clientX,
     event.clientY
   );
-  // mouse.mouse.xPx += event.movementX;
-  // mouse.mouse.yPx += event.movementY;
-  mouse.mouse.xPx = event.clientX;
-  mouse.mouse.yPx = event.clientY;
+
   mouse.mouse.target = event.target;
   mouse.mouse.targets = currentElements;
 
@@ -105,6 +111,8 @@ document.addEventListener("mousemove", (event) => {
   mouse.mouse.y = ((mouse.mouse.yPx - window.innerHeight / 2) / vmin) * 2;
 });
 document.addEventListener("mousedown", (event) => {
+  document.body.requestPointerLock();
+  event.preventDefault();
   mouse.mouse.click.now = 1;
 });
 document.addEventListener("mouseup", (event) => {
