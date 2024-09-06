@@ -19,13 +19,14 @@ function $(a) {
 const clog = console.log;
 
 document.addEventListener("touchmove", function(e) {
+  alert(document.documentElement.requestPointerLock())
   e.preventDefault();
 }, {
   passive: false
 });
 
 document.addEventListener("click", (event) => {
-  document.body.requestPointerLock()
+  document.documentElement.requestPointerLock()
 })
 
 // addEventListener(
