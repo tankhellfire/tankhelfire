@@ -12,7 +12,13 @@ function update() {
     clog(1);
   }
 
-  $("mouse").gotoxy(mouse.mouse.x, mouse.mouse.y);
+  
+  if(mouse.touch[0]){
+    $("mouse").gotoxy(mouse.touch[0].x, mouse.touch[0].y);
+  }else{
+    $("mouse").gotoxy(mouse.mouse.x, mouse.mouse.y);
+  }
+    
   rot+=upf
   $("mouse").children[0].style.transform=`translate(-50%, -50%) rotate(${rot/5}turn) translate(50%, 50%)`
 

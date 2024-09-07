@@ -114,6 +114,7 @@ document.addEventListener("keyup", (event) => {
 );
 
 document.addEventListener("mousemove", (event) => {
+  setVmin()
   // console.log(event)
   if (document.pointerLockElement) {
     mouse.mouse.xPx += event.movementX;
@@ -128,7 +129,6 @@ document.addEventListener("mousemove", (event) => {
   mouse.mouse.target = event.target;
   mouse.mouse.targets = currentElements;
 
-  setVmin()
   mouse.mouse.x = ((mouse.mouse.xPx - window.innerWidth / 2) / vmin) * 2;
   mouse.mouse.y = ((mouse.mouse.yPx - window.innerHeight / 2) / vmin) * 2;
 }
@@ -144,13 +144,16 @@ document.addEventListener("mouseup", (event) => {
 );
 
 function handleTouchMove(event) {
+  setVmin()
   mouse.touch = {};
   for (const touch of event.touches) {
     const currentElement = document.elementFromPoint(touch.clientX, touch.clientY);
     const currentElements = document.elementsFromPoint(touch.clientX, touch.clientY);
     mouse.touch[touch.identifier] = {
-      x: touch.clientX,
-      y: touch.clientY,
+      xPx: touch.clientX,
+      yPx: touch.clientY,
+      x: ((touch.clientX - window.innerWidth / 2) / vmin) * 2,
+      y: ((touch.clientY - window.innerHeight / 2) / vmin) * 2,
       startTarget: touch.target,
       target: currentElement,
       targets: currentElements,
