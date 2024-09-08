@@ -17,6 +17,7 @@ function $(a) {
 }
 
 const clog = console.log;
+const keys=Object.keys
 
 document.addEventListener("touchmove", function(e) {
   e.preventDefault();
@@ -27,7 +28,8 @@ document.addEventListener("touchmove", function(e) {
 document.addEventListener("click", (event) => {
   document.body.requestPointerLock()
   document.documentElement.requestFullscreen()
-})
+}
+)
 
 // addEventListener(
 //   'beforeunload',
@@ -45,32 +47,21 @@ function setVmin() {
 
 let lastFrameTime = 0;
 function key(keyCode) {
-  if (typeof (keyCode) == 'object') {
-    for (var a of keyCode) {
-      key(a)
-    }
-    return
+  if (key[keyCode]) {
+    return key[keyCode]
   }
-  if(keyCode==undefined){
-    return keys(key)
-  }
-  key[keyCode] = {
-    down: 0,
-    first: 0,
-    fall: 0,
-    raise: 0,
-    up: 1
+
+  return {
+    down: undefined,
+    first: undefined,
+    fall: undefined,
+    raise: undefined,
+    up: undefined
   }
 }
 
-// Object.defineProperty(key, 'add', {
-//   value: ( (keyCode) => 
-//   ),
-//   enumerable: false
-// })
-
 let mouse = {
-  mouse: {
+  pc: {
     x: 0,
     y: 0,
     xPx: 0,
@@ -80,72 +71,93 @@ let mouse = {
       last: 0,
     },
   },
-  touch: {},
+  touch: [],
 };
 
 document.addEventListener("keydown", (event) => {
   // clog(key["Space"]);
-  if (key[event.code]) {
-    event.preventDefault();
-    if (!key[event.code].down) {
-      key[event.code] = {
-        down: 1,
-        first: 1,
-        fall: 1,
-        raise: 0,
-        up: 0
-      }
+  // if (key[event.code]) {
+  event.preventDefault();
+  if (!key(event.code).down) {
+    key[event.code] = {
+      down: 1,
+      first: 1,
+      fall: 1,
+      raise: 0,
+      up: 0
     }
   }
+  // }
 }
 );
 document.addEventListener("keyup", (event) => {
-  if (key[event.code]) {
-    event.preventDefault();
-    key[event.code] = {
-      down: 0,
-      first: 1,
-      fall: 0,
-      raise: 1,
-      up: 1
-    }
+  // if (key[event.code]) {
+  event.preventDefault();
+  key[event.code] = {
+    down: 0,
+    first: 1,
+    fall: 0,
+    raise: 1,
+    up: 1
   }
+  // }
 }
 );
 
+var mouseUpdate=()=>{
+  mouse.pc.new=1
+  mouse.pc.time=event.timeStamp
+}
 document.addEventListener("mousemove", (event) => {
   setVmin()
   // console.log(event)
   if (document.pointerLockElement) {
-    mouse.mouse.xPx += event.movementX;
-    mouse.mouse.yPx += event.movementY;
+    mouse.pc.xPx += event.movementX;
+    mouse.pc.yPx += event.movementY;
   } else {
-    mouse.mouse.xPx = event.clientX;
-    mouse.mouse.yPx = event.clientY;
+    mouse.pc.xPx = event.clientX;
+    mouse.pc.yPx = event.clientY;
   }
 
   const currentElements = document.elementsFromPoint(event.clientX, event.clientY);
 
-  mouse.mouse.target = event.target;
-  mouse.mouse.targets = currentElements;
+  mouse.pc.target = event.target;
+  mouse.pc.targets = currentElements;
 
-  mouse.mouse.x = ((mouse.mouse.xPx - window.innerWidth / 2) / vmin) * 2;
-  mouse.mouse.y = ((mouse.mouse.yPx - window.innerHeight / 2) / vmin) * 2;
+  mouse.pc.x = ((mouse.pc.xPx - window.innerWidth / 2) / vmin) * 2;
+  mouse.pc.y = ((mouse.pc.yPx - window.innerHeight / 2) / vmin) * 2;
+  mouseUpdate()
 }
 );
+
 document.addEventListener("mousedown", (event) => {
   event.preventDefault();
-  mouse.mouse.click.now = 1;
+  mouse.pc.click = {
+    down: 1,
+    first: 1,
+    fall: 1,
+    raise: 0,
+    up: 0
+  };
+  mouseUpdate()
 }
 );
+
 document.addEventListener("mouseup", (event) => {
-  mouse.mouse.click.now = 0;
+  mouse.pc.click={
+    down: 0,
+    first: 1,
+    fall: 0,
+    raise: 1,
+    up: 1
+  }
+  mouseUpdate()
 }
 );
 
 function handleTouchMove(event) {
   setVmin()
-  mouse.touch = {};
+  mouse.touch = [];
   for (const touch of event.touches) {
     const currentElement = document.elementFromPoint(touch.clientX, touch.clientY);
     const currentElements = document.elementsFromPoint(touch.clientX, touch.clientY);
