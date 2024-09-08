@@ -17,8 +17,9 @@ function update() {
     pointer.x=mouse.pc.x
     pointer.y=mouse.pc.y
   }else{
-    for (a in mouse.touch) {
+    for (a of mouse.touch) {
       if(!a){continue}
+      clog(a)
       pointer.x=a.x
       pointer.y=a.y
       break
