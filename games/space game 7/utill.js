@@ -25,7 +25,7 @@ document.addEventListener("touchmove", function(e) {
   passive: false
 });
 
-document.addEventListener("click", (event) => {
+document.addEventListener("touchmove", (event) => {
   document.body.requestPointerLock()
   document.documentElement.requestFullscreen()
 }
