@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online/Offline Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #status {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Connection Status</h1>
+    <img id="statusImage" src="online.png" alt="Online Image" width="200">
+    <div id="status">You are online!</div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('wifi/service-worker.js').then(function() {
+                console.log('Service Worker Registered');
+            });
+        }
+
+        function updateStatus() {
+            const statusDiv = document.getElementById('status');
+            const statusImage = document.getElementById('statusImage');
+            if (navigator.onLine) {
+                statusDiv.textContent = 'You are online!';
+                statusImage.src = 'online.png';
+                statusImage.alt = 'Online Image';
+            } else {
+                statusDiv.textContent = 'You are offline!';
+                statusImage.src = 'offline.png';
+                statusImage.alt = 'Offline Image';
+            }
+        }
+
+        window.addEventListener('online', updateStatus);
+        window.addEventListener('offline', updateStatus);
+
+        // Initial status check
+        updateStatus();
+    </script>
+</body>
+</html>
