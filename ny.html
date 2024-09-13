@@ -1,4 +1,4 @@
-<head>
+<html><head>
   <title>nython</title>
   <meta name="description" content="np">
   <meta charset="utf-8">
@@ -13,24 +13,34 @@
     }
 
     button {
-      width: 100%;
-      height: 10%;
+      width: 50%;
+      height: 10vh;
     }
 
     textarea {
       width: 100%; 
-      display: block;
       height: 90%;
+      display: block;
       background-color:#696969;
       white-space: nowrap;
       overflow-wrap: normal;
       overflow-x: scroll;
+  -ms-overflow-style: none; /* Hides scrollbar in Internet Explorer and Edge */
+  scrollbar-width: none; /* Hides scrollbar in Firefox */
     }
+
+textarea::-webkit-scrollbar {
+  display: none; /* Hides scrollbar in Chrome, Safari, and Opera */
+}
+
     
   </style>
 </head>
-<body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#1E1F22;">
-  <button onclick="runCode()" id="run">run</button>
+<body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#1E1F22;" class="vsc-initialized">
+<div style="display: flex;">
+  <button id="run">run</button>
+  <button id="donload">donload</button>
+</div>
   <textarea id="input">alert(1)</textarea>
   <script>
 
@@ -42,14 +52,19 @@
       return str.replaceAll('\\', '\\\\').replaceAll('\`', '\\\`').replaceAll('\$', '\\\$');
     }
 
-    function runCode(){
+run.onclick=(()=>{
       try{
         value = eval($("input").value);
         if(value){
           alert('script returned with {'+value+'}');
         }
       }catch(er){alert(er)}
-    };
+})
+
+
+donload.onclick=(()=>{
+downloadStringAsText(document.documentElement.outerHTML,'ny.html')
+})
 
     function openStringAsNewTab(htmlContent){
       const newTab = window.open();
@@ -57,17 +72,19 @@
       newTab.document.close();
     }
 
-    $("input").value=`function downloadStringAsText(content, filename){
-  const blob = new Blob([content],{ type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.download = filename;
-  link.href = url;
-  document.body.appendChild(link);//firefox
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-}
+    function downloadStringAsText(content, filename){
+      const blob = new Blob([content],{ type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = url;
+      document.body.appendChild(link);//firefox
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    $("input").value=`
 let str=\`${sanitizeString(document.documentElement.innerHTML)}\`;
 openStringAsNewTab(str,'a.html');`
-  </script></body>
+  </script></body></html>
