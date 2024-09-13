@@ -1,7 +1,7 @@
 const CACHE_NAME = 'offline-cache';
 const OFFLINE_URLS = [
-    '/wifi',
-    // 'online.png',
+    '/wifi/wifi',
+    '/wifi/a',
     // 'offline.png'
 ];
 console.log('a')

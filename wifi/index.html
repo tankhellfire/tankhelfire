@@ -18,7 +18,7 @@
 </head>
 <body>
     <h1>Connection Status</h1>
-    <img id="statusImage" src="online.png" alt="Online Image" width="200">
+    <img id="statusImage" alt="Online Image" width="200">
     <div id="status">You are online!</div>
 
     <script>
@@ -33,11 +33,11 @@
             const statusImage = document.getElementById('statusImage');
             if (navigator.onLine) {
                 statusDiv.textContent = 'You are online!';
-                statusImage.src = 'online.png';
+                // statusImage.src = 'online.png';
                 statusImage.alt = 'Online Image';
             } else {
                 statusDiv.textContent = 'You are offline!';
-                statusImage.src = 'offline.png';
+                // statusImage.src = 'offline.png';
                 statusImage.alt = 'Offline Image';
             }
         }
