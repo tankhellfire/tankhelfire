@@ -56,9 +56,11 @@
       updateStatus();
 
       async function test() {
+        const statusDiv = document.getElementById("status");
         var a = await fetch("/wifi");
         a = await a.text();
         console.log(a);
+        statusDiv.textContent = a;
       }
     </script>
   </body>
