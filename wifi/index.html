@@ -1,61 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Online/Offline Example</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        #status {
-            font-size: 24px;
-            margin-top: 20px;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+      #status {
+        font-size: 24px;
+        margin-top: 20px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Connection Status</h1>
-    <img id="statusImage" alt="Online Image" width="200">
+    <img id="statusImage" alt="Online Image" width="200" />
     <div id="status">You are online!</div>
-  <button
+    <button onclick="click()">a</button>
 
     <script>
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(a=>{for(var i of a){console.log(i)}}).then(()=>{
-              navigator.serviceWorker.register('wifi/service-worker.js').then(()=>{
-                  console.log('Service Worker Registered');
-              });
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then((a) => {
+          for (var i of a) {
+            console.log("unregistering", i);
+            i.unregister();
+          }
+        }).then(()=>{
+          navigator.serviceWorker.register("wifi/service-worker.js").then(() => {
+            console.log("Service Worker Registered");
           })
+        })
+      }
+
+      function updateStatus() {
+        const statusDiv = document.getElementById("status");
+        const statusImage = document.getElementById("statusImage");
+        if (navigator.onLine) {
+          statusDiv.textContent = "You are online!";
+          // statusImage.src = 'online.png';
+          statusImage.alt = "Online Image";
+        } else {
+          statusDiv.textContent = "You are offline!";
+          // statusImage.src = 'offline.png';
+          statusImage.alt = "Offline Image";
         }
+      }
 
-        function updateStatus() {
-            const statusDiv = document.getElementById('status');
-            const statusImage = document.getElementById('statusImage');
-            if (navigator.onLine) {
-                statusDiv.textContent = 'You are online!';
-                // statusImage.src = 'online.png';
-                statusImage.alt = 'Online Image';
-            } else {
-                statusDiv.textContent = 'You are offline!';
-                // statusImage.src = 'offline.png';
-                statusImage.alt = 'Offline Image';
-            }
-        }
+      window.addEventListener("online", updateStatus);
+      window.addEventListener("offline", updateStatus);
 
-        window.addEventListener('online', updateStatus);
-        window.addEventListener('offline', updateStatus);
+      // Initial status check
+      updateStatus();
 
-        // Initial status check
-        updateStatus();
-      
-      async function click(){
-        var a=await fetch('https://tankhellfire.glitch.me/wifi')
-        a=await a.text()
-        console.log(a)
+      async function click() {
+        var a = await fetch("https://tankhellfire.glitch.me/wifi");
+        a = await a.text();
+        console.log(a);
       }
     </script>
-</body>
+  </body>
 </html>
