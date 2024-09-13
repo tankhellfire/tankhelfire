@@ -15,10 +15,10 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("fetch", (event) => {
   console.log("fetch", event);
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return "a"; //response //|| fetch(event.request);
-    })
+  event.respondWith('a'
+    // caches.match(event.request).then((response) => {
+    //   return "a"; //response //|| fetch(event.request);
+    // })
   );
 });
 
