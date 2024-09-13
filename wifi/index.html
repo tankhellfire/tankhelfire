@@ -20,12 +20,15 @@
     <h1>Connection Status</h1>
     <img id="statusImage" alt="Online Image" width="200">
     <div id="status">You are online!</div>
+  <button
 
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('wifi/service-worker.js').then(function() {
-                console.log('Service Worker Registered');
-            });
+          navigator.serviceWorker.getRegistrations().then(a=>{for(var i of a){console.log(i)}}).then(()=>{
+              navigator.serviceWorker.register('wifi/service-worker.js').then(()=>{
+                  console.log('Service Worker Registered');
+              });
+          })
         }
 
         function updateStatus() {
@@ -47,6 +50,12 @@
 
         // Initial status check
         updateStatus();
+      
+      async function click(){
+        var a=await fetch('https://tankhellfire.glitch.me/wifi')
+        a=await a.text()
+        console.log(a)
+      }
     </script>
 </body>
 </html>
