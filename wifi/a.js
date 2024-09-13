@@ -1,9 +1,12 @@
 const CACHE_NAME = 'offline-cache';
 const OFFLINE_URLS = [
-    'https://tankhellfire.glitch.me/wifi',
+    '/wifi/wifi',
+    '/wifi/a',
     // 'offline.png'
 ];
+console.log('a')
 self.addEventListener('install', event => {
+console.log(self)
   console.log('install',event)
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
