@@ -34,25 +34,26 @@
     <input type="text" id="userInput" placeholder="Type your message here...">
     <button id="sendButton">Send</button>
     <script>
-      if ("serviceWorker"in navigator) {
-        // navigator.serviceWorker.getRegistrations().then( (a) => {
-        //   for (var i of a) {
-        //     console.log("unregistering", i);
-        //     i.unregister();
-        //   }
-        // }
-        // ).then( () => {
-          navigator.serviceWorker.register("https://tankhellfire.glitch.me/chat/sw.js").then( () => {
-            console.log("Service Worker Registered");
-          }
-          )
-        // }
-        // )
-      }
 
       let session
       let tokenizer
       async function setupChatbot() {
+      // if ("serviceWorker"in navigator) {
+      //   // navigator.serviceWorker.getRegistrations().then( (a) => {
+      //   //   for (var i of a) {
+      //   //     console.log("unregistering", i);
+      //   //     i.unregister();
+      //   //   }
+      //   // }
+      //   // ).then( () => {
+      //     await navigator.serviceWorker.register("https://tankhellfire.glitch.me/chat/sw.js").then( () => {
+      //       console.log("Service Worker Registered");
+      //     }
+      //     )
+      //   // }
+      //   // )
+      // }
+
         session = await ort.InferenceSession.create('https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/onnx/model.onnx?download=true', {
           executionProviders: ['wasm'],
           graphOptimizationLevel: 'all'
