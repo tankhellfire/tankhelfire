@@ -80,10 +80,13 @@
             document.getElementById("userInput").value = "";
 
             // Tokenize the input
-            const inputIds = userInput
-              .split("")
-              .map((char) => BigInt(tokenizer.vocab[char] || tokenizer.unk_token));
-            const attentionMask = new Array(inputIds.length).fill(BigInt(1));
+            let inputIds = []
+            for(var a in userInput){
+              inputIds.push(userInput[a])
+              
+            }
+            tokenizer.vocab[tokenizer.unk_token]
+            const attentionMask = new Array(inputIds.length).fill(1);
             const inputTensor = new ort.Tensor(
               "int64",
               new BigInt64Array(inputIds),
