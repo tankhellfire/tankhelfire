@@ -66,7 +66,7 @@
         tokenizer = await fetch(
           "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer.json"
         ).then((res) => res.json());
-        tokenizer = tokenizer.model.vocab;
+        tokenizer = tokenizer.model;
         document
           .getElementById("sendButton")
           .addEventListener("click", async () => {
@@ -80,7 +80,7 @@
             // Tokenize the input
             const inputIds = userInput
               .split("")
-              .map((char) => BigInt(tokenizer[char] || tokenizer["[UNK]"]));
+              .map((char) => BigInt(tokenizer.vocab[char] || tokenizer.unk_token));
             const attentionMask = new Array(inputIds.length).fill(BigInt(1));
             const inputTensor = new ort.Tensor(
               "int64",
@@ -103,11 +103,7 @@
             const output = results.output.data;
 
             // Decode the output
-            const botResponse = output
-              .map((id) =>
-                Object.keys(tokenizer).find((key) => tokenizer[key] === id)
-              )
-              .join("");
+            const botResponse = 
 
             chatbox.innerHTML += `<p><strong>Bot:</strong> ${botResponse}</p>`;
             chatbox.scrollTop = chatbox.scrollHeight;
@@ -118,12 +114,12 @@
     </script>
   </body>
 </html>
-let a=out[Object.keys(out)[0]].data
+let output=results[Object.keys(results)[0]].data
 var max=-Infinity
 var maxdex=-1
-for (let i = 0; i < a.length; i++) {
-  if(max<a[i]){
-    max=a[i]
+for (let i = 0; i < output.length; i++) {
+  if(max<output[i]){
+    max=output[i]
     maxdex=i
   }
-} 
+}
