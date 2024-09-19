@@ -37,6 +37,8 @@
       let session;
       let tokenizer;
       let out;
+      let max
+      let maxdex
       async function setupChatbot() {
         // if ("serviceWorker"in navigator) {
         //   // navigator.serviceWorker.getRegistrations().then( (a) => {
@@ -100,10 +102,26 @@
             };
             const results = await session.run(feeds);
             out = results;
-            const output = results.output.data;
+          
+            let output=results[Object.keys(results)[0]].data
+            max=-Infinity
+            maxdex=-1
+            for (let i = 0; i < output.length; i++) {
+              if(max<output[i]){
+                max=output[i]
+                maxdex=i
+              }
+            }
+            let a
+            for(a in tokenizer.model.vocab){
+              if(tokenizer.model.vocab[a]==maxdex){
+                break
+              }
+            }
+            output=a
 
             // Decode the output
-            const botResponse = 
+            const botResponse = a
 
             chatbox.innerHTML += `<p><strong>Bot:</strong> ${botResponse}</p>`;
             chatbox.scrollTop = chatbox.scrollHeight;
@@ -114,12 +132,3 @@
     </script>
   </body>
 </html>
-let output=results[Object.keys(results)[0]].data
-var max=-Infinity
-var maxdex=-1
-for (let i = 0; i < output.length; i++) {
-  if(max<output[i]){
-    max=output[i]
-    maxdex=i
-  }
-}
