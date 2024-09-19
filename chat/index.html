@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Local Chatbot</title>
     <style>
       body {
@@ -31,64 +31,87 @@
   <body>
     <h1>Local Chatbot</h1>
     <div id="chatbox"></div>
-    <input type="text" id="userInput" placeholder="Type your message here...">
+    <input type="text" id="userInput" placeholder="Type your message here..." />
     <button id="sendButton">Send</button>
     <script>
-
-      let session
-      let tokenizer
+      let session;
+      let tokenizer;
+      let out;
       async function setupChatbot() {
-      // if ("serviceWorker"in navigator) {
-      //   // navigator.serviceWorker.getRegistrations().then( (a) => {
-      //   //   for (var i of a) {
-      //   //     console.log("unregistering", i);
-      //   //     i.unregister();
-      //   //   }
-      //   // }
-      //   // ).then( () => {
-      //     await navigator.serviceWorker.register("https://tankhellfire.glitch.me/chat/sw.js").then( () => {
-      //       console.log("Service Worker Registered");
-      //     }
-      //     )
-      //   // }
-      //   // )
-      // }
+        // if ("serviceWorker"in navigator) {
+        //   // navigator.serviceWorker.getRegistrations().then( (a) => {
+        //   //   for (var i of a) {
+        //   //     console.log("unregistering", i);
+        //   //     i.unregister();
+        //   //   }
+        //   // }
+        //   // ).then( () => {
+        //     await navigator.serviceWorker.register("https://tankhellfire.glitch.me/chat/sw.js").then( () => {
+        //       console.log("Service Worker Registered");
+        //     }
+        //     )
+        //   // }
+        //   // )
+        // }
 
-        session = await ort.InferenceSession.create('https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/onnx/model.onnx?download=true', {
-          executionProviders: ['wasm'],
-          graphOptimizationLevel: 'all'
-        });
+        session = await ort.InferenceSession.create(
+          "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/onnx/model.onnx?download=true",
+          {
+            executionProviders: ["wasm"],
+            graphOptimizationLevel: "all",
+          }
+        );
         // Update the path to your local ONNX model
 
-        tokenizer = await fetch('https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer.json').then(res => res.json());
-        tokenizer = tokenizer.model.vocab
-        document.getElementById('sendButton').addEventListener('click', async () => {
-          const userInput = document.getElementById('userInput').value;
-          if (userInput.trim() === '')
-            return;
+        tokenizer = await fetch(
+          "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer.json"
+        ).then((res) => res.json());
+        tokenizer = tokenizer.model.vocab;
+        document
+          .getElementById("sendButton")
+          .addEventListener("click", async () => {
+            const userInput = document.getElementById("userInput").value;
+            if (userInput.trim() === "") return;
 
-          const chatbox = document.getElementById('chatbox');
-          chatbox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
-          document.getElementById('userInput').value = '';
+            const chatbox = document.getElementById("chatbox");
+            chatbox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+            document.getElementById("userInput").value = "";
 
-          // Tokenize the input
-          const inputIds = userInput.split('').map(char => BigInt(tokenizer[char] || tokenizer['<unk>']));
-          const inputTensor = new ort.Tensor('int64',new BigInt64Array(inputIds),[1, inputIds.length]);
+            // Tokenize the input
+            const inputIds = userInput
+              .split("")
+              .map((char) => BigInt(tokenizer[char] || tokenizer["<unk>"]));
+            const attentionMask = new Array(inputIds.length).fill(BigInt(1));
+            const inputTensor = new ort.Tensor(
+              "int64",
+              new BigInt64Array(inputIds),
+              [1, inputIds.length]
+            );
+            const attentionMaskTensor = new ort.Tensor(
+              "int64",
+              new BigInt64Array(attentionMask),
+              [1, attentionMask.length]
+            );
 
-          // Run the model
-          const feeds = {
-            input: inputTensor
-          };
-          const results = await session.run(feeds);
-          const output = results.output.data;
+            // Run the model
+            const feeds = {
+              input_ids: inputTensor,
+              attention_mask: attentionMaskTensor,
+            };
+            const results = await session.run(feeds);
+            out = results;
+            const output = results.output.data;
 
-          // Decode the output
-          const botResponse = output.map(id => Object.keys(tokenizer).find(key => tokenizer[key] === id)).join('');
+            // Decode the output
+            const botResponse = output
+              .map((id) =>
+                Object.keys(tokenizer).find((key) => tokenizer[key] === id)
+              )
+              .join("");
 
-          chatbox.innerHTML += `<p><strong>Bot:</strong> ${botResponse}</p>`;
-          chatbox.scrollTop = chatbox.scrollHeight;
-        }
-        );
+            chatbox.innerHTML += `<p><strong>Bot:</strong> ${botResponse}</p>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+          });
       }
 
       setupChatbot();
