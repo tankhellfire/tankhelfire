@@ -81,7 +81,8 @@
 
             // Tokenize the input
             let inputIds = []
-            for(var a in userInput){
+            let a
+            for(a in userInput){
               inputIds.push(userInput[a])
               
             }
@@ -115,7 +116,6 @@
                 maxdex=i
               }
             }
-            let a
             for(a in tokenizer.vocab){
               if(tokenizer.vocab[a]==maxdex){
                 break
