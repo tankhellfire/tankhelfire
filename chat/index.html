@@ -1,137 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Local Chatbot</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DistilBERT Sentiment Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/tfjs-converter"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite"></script>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
-
-      #chatbox {
-        width: 100%;
-        height: 300px;
-        border: 1px solid #ccc;
-        padding: 10px;
-        overflow-y: scroll;
-      }
-
-      #userInput {
-        width: 80%;
-        padding: 10px;
-      }
-
-      #sendButton {
-        padding: 10px;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #output {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            min-height: 50px;
+        }
+        #input {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
-  </head>
-  <body>
-    <h1>Local Chatbot</h1>
-    <div id="chatbox"></div>
-    <input type="text" id="userInput" placeholder="Type your message here..." />
-    <button id="sendButton">Send</button>
+</head>
+<body>
+    <h1>DistilBERT Sentiment Analysis</h1>
+    <textarea id="input" rows="3" placeholder="Enter some text..."></textarea>
+    <button onclick="analyzeSentiment()">Analyze Sentiment</button>
+    <div id="output"></div>
+
     <script>
-      let session;
-      let tokenizer;
-      let out;
-      let max
-      let maxdex
-      async function setupChatbot() {
-        // if ("serviceWorker"in navigator) {
-        //   // navigator.serviceWorker.getRegistrations().then( (a) => {
-        //   //   for (var i of a) {
-        //   //     console.log("unregistering", i);
-        //   //     i.unregister();
-        //   //   }
-        //   // }
-        //   // ).then( () => {
-        //     await navigator.serviceWorker.register("https://tankhellfire.glitch.me/chat/sw.js").then( () => {
-        //       console.log("Service Worker Registered");
-        //     }
-        //     )
-        //   // }
-        //   // )
-        // }
+        let model;
 
-        session = await ort.InferenceSession.create(
-          "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/onnx/model.onnx?download=true",
-          {
-            executionProviders: ["wasm"],
-            graphOptimizationLevel: "all",
-          }
-        );
-        // Update the path to your local ONNX model
+        async function loadModel() {
+            model = await tf.loadGraphModel('https://tfhub.dev/tensorflow/tfjs-model/sentiment_cnn/1/default/1', { fromTFHub: true });
+            document.getElementById('output').innerText = 'Model loaded. Ready for analysis!';
+        }
 
-        tokenizer = await fetch(
-          "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer.json"
-        ).then((res) => res.json());
-        tokenizer = tokenizer.model;
-        document
-          .getElementById("sendButton")
-          .addEventListener("click", async () => {
-            const userInput = document.getElementById("userInput").value;
-            if (userInput.trim() === "") return;
+        function preprocessInput(text) {
+            // This is a very simple preprocessor. A real implementation would use 
+            // tokenization and encoding specific to the model.
+            return text.toLowerCase().split(' ');
+        }
 
-            const chatbox = document.getElementById("chatbox");
-            chatbox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
-            document.getElementById("userInput").value = "";
+        async function analyzeSentiment() {
+            const input = document.getElementById('input').value;
+            const processedInput = preprocessInput(input);
 
-            // Tokenize the input
-            let inputIds = []
-            let a
-            for(a in userInput){
-              inputIds.push(userInput[a])
-              
-            }
-            tokenizer.vocab[tokenizer.unk_token]
-            const attentionMask = new Array(inputIds.length).fill(1);
-            const inputTensor = new ort.Tensor(
-              "int64",
-              new BigInt64Array(inputIds),
-              [1, inputIds.length]
-            );
-            const attentionMaskTensor = new ort.Tensor(
-              "int64",
-              new BigInt64Array(attentionMask),
-              [1, attentionMask.length]
-            );
+            // Pad or truncate to 100 tokens
+            const paddedInput = processedInput.slice(0, 100).concat(new Array(Math.max(0, 100 - processedInput.length)).fill(''));
 
-            // Run the model
-            const feeds = {
-              input_ids: inputTensor,
-              attention_mask: attentionMaskTensor,
-            };
-            const results = await session.run(feeds);
-            out = results;
-          
-            let output=results[Object.keys(results)[0]].data
-            max=-Infinity
-            maxdex=-1
-            for (let i = 0; i < output.length; i++) {
-              if(max<output[i]){
-                max=output[i]
-                maxdex=i
-              }
-            }
-            for(a in tokenizer.vocab){
-              if(tokenizer.vocab[a]==maxdex){
-                break
-              }
-            }
-            output=a
+            // Convert words to integers (this is a dummy vocabulary, real one would be much larger)
+            const dummyVocab = {'': 0, 'the': 1, 'a': 2, 'an': 3, 'and': 4, 'is': 5, 'was': 6, 'good': 7, 'bad': 8, 'great': 9, 'terrible': 10};
+            const inputTensor = tf.tensor2d([paddedInput.map(word => dummyVocab[word] || 0)]);
 
-            // Decode the output
-            const botResponse = a
+            const prediction = model.predict(inputTensor);
+            const score = await prediction.data();
 
-            chatbox.innerHTML += `<p><strong>Bot:</strong> ${botResponse}</p>`;
-            chatbox.scrollTop = chatbox.scrollHeight;
-          });
-      }
+            const sentiment = score[0] > 0.5 ? 'Positive' : 'Negative';
+            document.getElementById('output').innerText = `Sentiment: ${sentiment} (Score: ${score[0].toFixed(2)})`;
+        }
 
-      setupChatbot();
+        loadModel();
     </script>
-  </body>
+</body>
 </html>
