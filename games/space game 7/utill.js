@@ -4,20 +4,27 @@ Node.prototype.insertElement = function(element, index) {
 }
 ;
 
-Node.prototype.gotoxy = function(x, y) {
-  setVmin()
-  this.style.left = `${(x * vmin) / 2 + window.innerWidth / 2}px`;
-  this.style.top = `${(y * vmin) / 2 + window.innerHeight / 2}px`;
+Node.prototype.gotoxy = function(pos) {
+  if (pos.x) {
+    this.style.left = `${pos.x * 50}%`;
+  }
+  if (pos.y) {
+    this.style.top = `${pos.y * 50}%`;
+  }
+  if (pos.rot ?? pos.rotation ?? pos.dir) {
+    // clog(pos.rot??pos.rotation??pos.dir)
+    this.style.transform = `translate(-50%, -50%) rotate(${pos.rot ?? pos.rotation ?? pos.dir}turn) translate(50%, 50%)`
+
+  }
+
   this.style.position = "absolute";
 }
 ;
 
-function $(a) {
-  return document.getElementById(a);
-}
+const $ = (id) => document.getElementById(id);
 
 const clog = console.log;
-const keys=Object.keys
+const keys = Object.keys;
 
 document.addEventListener("touchmove", function(e) {
   e.preventDefault();
@@ -25,7 +32,7 @@ document.addEventListener("touchmove", function(e) {
   passive: false
 });
 
-document.addEventListener("touchmove", (event) => {
+document.addEventListener("click", (event) => {
   document.body.requestPointerLock()
   document.documentElement.requestFullscreen()
 }
@@ -40,12 +47,15 @@ document.addEventListener("touchmove", (event) => {
 //   true
 // );
 
-let vmin
-function setVmin() {
-  vmin = Math.min(window.innerWidth, window.innerHeight)
+let vmax
+function setVmax() {
+  vmax = Math.max(window.innerWidth, window.innerHeight)
 }
+setVmax()
+window.addEventListener('resize', setVmax)
 
 let lastFrameTime = 0;
+
 function key(keyCode) {
   if (key[keyCode]) {
     return key[keyCode]
@@ -75,8 +85,6 @@ let mouse = {
 };
 
 document.addEventListener("keydown", (event) => {
-  // clog(key["Space"]);
-  // if (key[event.code]) {
   event.preventDefault();
   if (!key(event.code).down) {
     key[event.code] = {
@@ -87,11 +95,9 @@ document.addEventListener("keydown", (event) => {
       up: 0
     }
   }
-  // }
 }
 );
 document.addEventListener("keyup", (event) => {
-  // if (key[event.code]) {
   event.preventDefault();
   key[event.code] = {
     down: 0,
@@ -100,16 +106,16 @@ document.addEventListener("keyup", (event) => {
     raise: 1,
     up: 1
   }
-  // }
 }
 );
 
-var mouseUpdate=()=>{
-  mouse.pc.new=1
-  mouse.pc.time=event.timeStamp
+function mouseUpdate() {
+  mouse.pc.new = 1
+  mouse.pc.time = event.timeStamp
 }
+
 document.addEventListener("mousemove", (event) => {
-  setVmin()
+  setVmax()
   // console.log(event)
   if (document.pointerLockElement) {
     mouse.pc.xPx += event.movementX;
@@ -124,8 +130,8 @@ document.addEventListener("mousemove", (event) => {
   mouse.pc.target = event.target;
   mouse.pc.targets = currentElements;
 
-  mouse.pc.x = ((mouse.pc.xPx - window.innerWidth / 2) / vmin) * 2;
-  mouse.pc.y = ((mouse.pc.yPx - window.innerHeight / 2) / vmin) * 2;
+  mouse.pc.x = ((mouse.pc.xPx - window.innerWidth / 2) / vmax) * 2;
+  mouse.pc.y = ((mouse.pc.yPx - window.innerHeight / 2) / vmax) * 2;
   mouseUpdate()
 }
 );
@@ -144,7 +150,7 @@ document.addEventListener("mousedown", (event) => {
 );
 
 document.addEventListener("mouseup", (event) => {
-  mouse.pc.click={
+  mouse.pc.click = {
     down: 0,
     first: 1,
     fall: 0,
@@ -156,7 +162,6 @@ document.addEventListener("mouseup", (event) => {
 );
 
 function handleTouchMove(event) {
-  setVmin()
   mouse.touch = [];
   for (const touch of event.touches) {
     const currentElement = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -164,8 +169,8 @@ function handleTouchMove(event) {
     mouse.touch[touch.identifier] = {
       xPx: touch.clientX,
       yPx: touch.clientY,
-      x: ((touch.clientX - window.innerWidth / 2) / vmin) * 2,
-      y: ((touch.clientY - window.innerHeight / 2) / vmin) * 2,
+      x: ((touch.clientX - window.innerWidth / 2) / vmax) * 2,
+      y: ((touch.clientY - window.innerHeight / 2) / vmax) * 2,
       startTarget: touch.target,
       target: currentElement,
       targets: currentElements,
@@ -176,7 +181,7 @@ function handleTouchMove(event) {
 document.addEventListener("touchmove", handleTouchMove);
 document.addEventListener("touchend", handleTouchMove);
 
-Math.clamp = function(x, min, max) {
+Math.clamp = (x, min, max) => {
   if (x < min) {
     return min;
   }

@@ -1,12 +1,7 @@
 <!DOCTYPE html>
-<html oncontextmenu="return false;" style="cursor: none">
+<html oncontextmenu="return false;" >
   <head>
-    <link
-      rel="icon"
-      href="https://th.bing.com/th/id/OIP.U9z-8X6en2CV4XODHfSm3AHaHa"
-      type="image/x-icon"
-    />
-    <!-- <link rel="icon" href="https://cdn.discordapp.com/emojis/684135972757176353.webp" type="image/x-icon"/> -->
+    <link rel="icon" href="assets/mouse.svg"/>
     <title>But dose the house need to win?, no but I do...</title>
     <style>
       .select {
@@ -15,7 +10,6 @@
         -moz-user-drag: none;
         -o-user-drag: none;
         user-drag: none;
-
         -webkit-user-select: none;
         /* Safari */
         -ms-user-select: none;
@@ -26,27 +20,25 @@
     </style>
     <script src="utill.js"></script>
   </head>
-  <body
-    class="select"
-    style="
-      overflow: hidden;
-      margin: 0;
-      background-color: #1e1f22;
-      height: 100vh;
-    "
-  >
-    <main id="main">
+  <body class="select" style="
+    margin: 0;
+    background-color: #1e1f22;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    ">
+    <main id="main" style="
+      position:absolute;
+      height: 100vmax;
+      width: 100vmax;
+      top:50vh;
+      left:50vw
+      ">
       <div id="mouse">
-        <img
-          src="assets/mouse.svg"
-          alt="<mouse.png.svg>"
-          style="
-            position: absolute;
+        <img src="assets/mouse.svg" alt="<mouse.png.svg>" style="
             height: 20vmin;
             width: 20vmin;
-            transform: translate(-50%, -50%) rotate(22.5deg) translate(50%, 50%);
-          "
-        />
+          "/>
       </div>
     </main>
     <script src="game.js"></script>

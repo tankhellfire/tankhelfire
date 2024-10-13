@@ -1,7 +1,7 @@
 main.insertElement(document.createElement('display'), 1).id = "display";
+
 let rot = 0
 let pointer={x:0,y:0}
-
 
 function update() {
   let upf = (performance.now() - lastFrameTime) / 1000;
@@ -26,10 +26,10 @@ function update() {
     }
   }
   
-  $("mouse").gotoxy(pointer.x, pointer.y);
-
   rot += upf
-  $("mouse").children[0].style.transform = `translate(-50%, -50%) rotate(${rot / 5}turn) translate(50%, 50%)`
+  if(!key('Space').down){
+  $("mouse").gotoxy({x:pointer.x, y:pointer.y,rot:rot/5});
+  }
 
   mouse.pc.new=0
   
