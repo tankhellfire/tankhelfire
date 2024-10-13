@@ -137,7 +137,7 @@ document.addEventListener("mousemove", (event) => {
 );
 
 document.addEventListener("mousedown", (event) => {
-  //event.preventDefault();
+  event.preventDefault();
   mouse.pc.click = {
     down: 1,
     first: 1,

@@ -30,7 +30,7 @@ function update() {
     pointer.x/=b
     pointer.y/=b
   }
-  $("text").innerHTML=pointer.x
+  //$("text").innerHTML=pointer.x
   
   rot += upf
   if(!key('Space').down){
