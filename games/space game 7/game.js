@@ -17,14 +17,20 @@ function update() {
     pointer.x=mouse.pc.x
     pointer.y=mouse.pc.y
   }else{
+    let b=0
+    pointer.x=0
+    pointer.y=0
     for (a of mouse.touch) {
       if(!a){continue}
-      clog(a)
-      pointer.x=a.x
-      pointer.y=a.y
-      break
+      // clog(a)
+      pointer.x+=a.x
+      pointer.y+=a.y
+      b++
     }
+    pointer.x/=b
+    pointer.y/=b
   }
+  $("text").innerHTML=pointer.x
   
   rot += upf
   if(!key('Space').down){

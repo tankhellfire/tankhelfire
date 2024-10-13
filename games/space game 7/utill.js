@@ -6,10 +6,10 @@ Node.prototype.insertElement = function(element, index) {
 
 Node.prototype.gotoxy = function(pos) {
   if (pos.x) {
-    this.style.left = `${pos.x * 50}%`;
+    this.style.left = `${pos.x * 100}%`;
   }
   if (pos.y) {
-    this.style.top = `${pos.y * 50}%`;
+    this.style.top = `${pos.y * 100}%`;
   }
   if (pos.rot ?? pos.rotation ?? pos.dir) {
     // clog(pos.rot??pos.rotation??pos.dir)
