@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html oncontextmenu="return false;" >
+<html oncontextmenu="return false;" style="cursor:none;">
   <head>
+    <meta name="viewport" content="interactive-widget=resizes-content"/>
     <link rel="icon" href="assets/mouse.svg"/>
     <title>But dose the house need to win?, no but I do...</title>
     <style>
@@ -24,7 +25,7 @@
     margin: 0;
     background-color: #1e1f22;
     height: 50vh;
-    width: 100vw;
+    width: 50vw;
     overflow: hidden;
     ">
     <main id="main" style="
@@ -35,8 +36,8 @@
       top:50%;
       left:50%
       ">
+      <input id='text'></input>
       <div id="mouse">
-        <div id='text'></div>
         <img src="assets/mouse.svg" alt="<mouse.png.svg>" style="
             height: 20vmin;
             width: 20vmin;
