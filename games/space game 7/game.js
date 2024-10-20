@@ -6,11 +6,13 @@ a.style.left ='-50vw'
 a.style.width='100vw'
 a.style.position = "absolute";
 
+let rot=0
+
 let pointer={x:0,y:0}
 let game=startGame()
 
 function update() {
-  let upf = (performance.now() - lastFrameTime) / 1000;
+  let dt = (performance.now() - lastFrameTime) / 1000;//delta time
   lastFrameTime = performance.now();
 
   if(mouse.pc.new){
@@ -32,10 +34,11 @@ function update() {
     }
   }
 
-  game.physics(upf)
+  game.physics(dt)
   $('text').innerHTML=`${pointer.x}<br>${pointer.y}<br><br>${JSON.stringify(mouse.touch)}`
   
-  $("mouse").gotoxy({x:pointer.x, y:pointer.y});
+  $("mouse").gotoxy({x:pointer.x, y:pointer.y,rot:rot});
+  rot+=dt
 
   mouse.pc.new=0
   
