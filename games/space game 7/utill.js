@@ -131,8 +131,8 @@ document.addEventListener("mousemove", (event) => {
     mouse.pc.xPx += event.movementX;
     mouse.pc.yPx += event.movementY;
   } else {
-    mouse.pc.xPx = event.clientX;
-    mouse.pc.yPx = event.clientY;
+    mouse.pc.xPx = event.pageX;
+    mouse.pc.yPx = event.pageY;
   }
 
   const currentElements = document.elementsFromPoint(event.clientX, event.clientY);
@@ -181,10 +181,10 @@ function handleTouchMove(event) {
     const currentElement = document.elementFromPoint(touch.clientX, touch.clientY);
     const currentElements = document.elementsFromPoint(touch.clientX, touch.clientY);
     mouse.touch[touch.identifier] = {
-      xPx: touch.clientX,
-      yPx: touch.clientY,
-      x: ((touch.clientX - window.innerWidth / 2) / vmax) * 2,
-      y: ((touch.clientY - window.innerHeight / 2) / vmax) * 2,
+      xPx: touch.pageX,
+      yPx: touch.pageY,
+      x: ((touch.pageX - window.innerWidth / 2) / vmax) * 2,
+      y: ((touch.pageY - window.innerHeight / 2) / vmax) * 2,
       startTarget: touch.target,
       target: currentElement,
       targets: currentElements,
