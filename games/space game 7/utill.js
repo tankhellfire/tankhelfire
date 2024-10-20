@@ -5,15 +5,24 @@ Node.prototype.insertElement = function(element, index) {
 ;
 
 Node.prototype.gotoxy = function(pos) {
-  if (pos.x) {
+  // clog(`${pos.x * 100}%`)
+  if (pos.x!=undefined) {
+    if(typeof pos.x!='number'){console.err("a x position was givin",pos.x,"but wasn't a number")}
     this.style.left = `${pos.x * 100}%`;
   }
-  if (pos.y) {
+  if (pos.y!=undefined) {
+    if(typeof pos.y!='number'){console.err("a y position was givin",pos.y,"but wasn't a number")}
     this.style.top = `${pos.y * 100}%`;
   }
-  if (pos.rot ?? pos.rotation ?? pos.dir) {
+  if (pos.center!=undefined) {
+    if(typeof pos.center!='object'){console.err("a center was givin",pos.center,"but wasn't a object (['x','y'])")}
+    this.style.transform = `translate(${pos.center[0]}, ${pos.center[1]})`
+  }
+  let rot=Number(pos.rot ?? pos.rotation ?? pos.dir)
+  if (rot!=undefined) {
+    if(typeof rot!='number'){console.err("a rotation was givin",rot,"but wasn't a number")}
     // clog(pos.rot??pos.rotation??pos.dir)
-    this.style.transform = `translate(-50%, -50%) rotate(${pos.rot ?? pos.rotation ?? pos.dir}turn) translate(50%, 50%)`
+    this.style.transform = `translate(-50%, -50%) rotate(${rot}turn) translate(50%, 50%)`
 
   }
 
@@ -115,7 +124,8 @@ function mouseUpdate() {
 }
 
 document.addEventListener("mousemove", (event) => {
-  setVmax()
+  mouse.pc.mxPx = event.movementX;
+  mouse.pc.myPx = event.movementY;
   // console.log(event)
   if (document.pointerLockElement) {
     mouse.pc.xPx += event.movementX;
@@ -132,6 +142,10 @@ document.addEventListener("mousemove", (event) => {
 
   mouse.pc.x = ((mouse.pc.xPx - window.innerWidth / 2) / vmax) * 2;
   mouse.pc.y = ((mouse.pc.yPx - window.innerHeight / 2) / vmax) * 2;
+
+  mouse.pc.mx = ((mouse.pc.mxPx) / vmax) * 2;
+  mouse.pc.my = ((mouse.pc.myPx) / vmax) * 2;
+  
   mouseUpdate()
 }
 );
