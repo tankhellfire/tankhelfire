@@ -3,6 +3,7 @@ var a = main.insertElement(document.createElement("div"), 0);
 a.id = "text";
 a.style.width = "100vw";
 a.style.position = "absolute";
+
 a.goto({
   top: -0.5,
   left: -0.5,
@@ -15,8 +16,7 @@ let pointer = {
 let game = startGame();
 
 function update() {
-  let dt = performance.now() / 1000 - time;
-  //delta time
+  let dt = performance.now() / 1000 - time;//delta time
   time = performance.now() / 1000;
 
   if (mouse.pc.new) {
