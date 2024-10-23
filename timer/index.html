@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="interactive-widget=resizes-content"/>
+    <link rel="icon" href="timer/assets/mouse.svg"/>
+    <title>smart timer</title>
+    <style>
+      .select {
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+        user-drag: none;
+        -webkit-user-select: none;
+        /* Safari */
+        -ms-user-select: none;
+        /* IE 10 and IE 11 */
+        user-select: none;
+        /* Standard syntax */
+      }
+    </style>
+    <script src="timer/utill.js"></script>
+  </head>
+  <body class="select" style="margin: 0; height: 100vh; width: 100vw">
+    <cliper style="overflow: hidden; height: 100vh; width: 100vw; position: absolute; background-color: #313338;color:#F2F3F5">
+      <main id="main" style="
+          position: absolute;
+          height: 50vmax;
+          width: 50vmax;
+          top: 50vh;
+          left: 50vw;
+        "></main>
+    </cliper>
+    <script src="timer/game.js"></script>
+  </body>
+</html>
