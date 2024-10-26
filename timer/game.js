@@ -2,7 +2,7 @@ main.insertElement(document.createElement("display"), 1).id = "display";
 var a = main.insertElement(document.createElement("div"), 0);
 a.id = "gui";
 a.style.position = "absolute";
-//document.cookie=`startTime=; expires=Thu, 01 Jan 1900 00:00:00 UTC; path=/;`
+//localStorage.clear()
 
 a.goto({
   top: -0.5,
@@ -19,8 +19,8 @@ a.style.width = "100vw";
 
 function update() {
 
-  text.innerHTML=Date()
-  m.innerHTML=document.cookie
+  text.innerText=Date()
+  m.innerText=JSON.stringify(localStorage)
   
   requestAnimationFrame(update);
 }
