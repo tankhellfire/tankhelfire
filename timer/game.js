@@ -19,12 +19,13 @@ a.style.width = "100vw";
 
 
 let DBOpenRequest  = window.indexedDB.open("savedata", 1);
+let db
 
 DBOpenRequest.onerror = (event) => {
   console.error(event)
 };
 
-let db
+//indexedDB.deleteDatabase('savedata')
 DBOpenRequest.onsuccess = (event) => {
   clog("Database initialized.")
 
@@ -34,6 +35,7 @@ DBOpenRequest.onsuccess = (event) => {
 };
 
 DBOpenRequest.onupgradeneeded=(event) => {
+  clog('updating db')
   db = event.target.result;
   
   db.createObjectStore('savedata', { keyPath: 'events' });
