@@ -9,7 +9,7 @@ class db {
               request.onupgradeneeded = (event) => {
                   const db = event.target.result;
                   if (!db.objectStoreNames.contains(storeName)) {
-                      db.createObjectStore(storeName, { keyPath: "key" });
+                      db.createObjectStore(storeName,{ keyPath: "key" });
                   }
               };
 
@@ -31,7 +31,7 @@ class db {
         return new Promise((resolve, reject) => {
             const transaction = this.dbInstance.transaction(this.storeName, "readwrite");
             const store = transaction.objectStore(this.storeName);
-            const request = store.put({ ...data, key: key });
+            const request = store.put({ data, key: key });
 
             request.onsuccess = () => resolve(`Data written successfully for key ${key}`);
             request.onerror = (event) => reject(`Write error: ${event.target.errorCode}`);
@@ -45,7 +45,7 @@ class db {
             const store = transaction.objectStore(this.storeName);
             const request = store.get(key);
 
-            request.onsuccess = (event) => resolve(event.target.result);
+            request.onsuccess = (event) => resolve(event.target.result.data);
             request.onerror = (event) => reject(`Read error: ${event.target.errorCode}`);
         });
     }
