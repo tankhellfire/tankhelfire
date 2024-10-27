@@ -27,4 +27,4 @@ function update() {
   
   requestAnimationFrame(update);
 }
-upda
+update()
