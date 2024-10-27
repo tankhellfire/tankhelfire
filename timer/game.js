@@ -18,10 +18,25 @@ a.style.width = "100vw";
 
 
 
-let req = window.indexedDB.open("savedata", 0);
+let DBOpenRequest  = window.indexedDB.open("savedata", 1);
 
-req.onupgradeneeded=(event) => {
-  const db = event.target.result;
+DBOpenRequest.onerror = (event) => {
+  console.error(event)
+};
+
+let db
+DBOpenRequest.onsuccess = (event) => {
+  clog("Database initialized.")
+
+  db = DBOpenRequest.result;
+
+  update();
+};
+
+DBOpenRequest.onupgradeneeded=(event) => {
+  db = event.target.result;
+  
+  db.createObjectStore('savedata', { keyPath: 'events' });
   
   db.onerror = (event) => {
     console.error(event)
@@ -35,4 +50,3 @@ function update() {
   
   requestAnimationFrame(update);
 }
-update();
