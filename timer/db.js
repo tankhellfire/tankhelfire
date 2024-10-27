@@ -1,36 +1,32 @@
 class db {
     constructor(dbName, storeName) {
-        this.dbName = dbName;
-        this.storeName = storeName;
-        this.dbInstance = null;
+      this.dbName=dbName
+      this.storeName=storeName
+      return (async () => {
+          await new Promise((resolve, reject) => {
+              const request = indexedDB.open(dbName, 1);
 
-        // Immediately open the database upon instantiation
-        return (async () => {
-            await new Promise((resolve, reject) => {
-                const request = indexedDB.open(dbName, 1);
+              request.onupgradeneeded = (event) => {
+                  const db = event.target.result;
+                  if (!db.objectStoreNames.contains(storeName)) {
+                      db.createObjectStore(storeName, { keyPath: "id" });
+                  }
+              };
 
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    if (!db.objectStoreNames.contains(storeName)) {
-                        db.createObjectStore(storeName, { keyPath: "id" });
-                    }
-                };
+              request.onsuccess = (event) => {
+                  this.dbInstance = event.target.result;
+                  resolve(this);
+              };
 
-                request.onsuccess = (event) => {
-                    this.dbInstance = event.target.result;
-                    resolve(this);
-                };
-
-                request.onerror = (event) => {
-                    reject(`Database error: ${event.target.errorCode}`);
-                };
-            });
-            return this;
-        })();
+              request.onerror = (event) => {
+                  reject(`Database error: ${event.target.errorCode}`);
+              };
+          });
+          return this;
+      })();
     }
 
     async write(key, data) {
-        if (!this.dbInstance) throw new Error("Database is not open.");
 
         return new Promise((resolve, reject) => {
             const transaction = this.dbInstance.transaction(this.storeName, "readwrite");
@@ -43,14 +39,13 @@ class db {
     }
 
     async read(key) {
-        if (!this.dbInstance) throw new Error("Database is not open.");
 
         return new Promise((resolve, reject) => {
             const transaction = this.dbInstance.transaction(this.storeName, "readonly");
             const store = transaction.objectStore(this.storeName);
             const request = store.get(key);
 
-            request.onsuccess = (event) => resolve(event.target.result || null);
+            request.onsuccess = (event) => resolve(event.target.result);
             request.onerror = (event) => reject(`Read error: ${event.target.errorCode}`);
         });
     }

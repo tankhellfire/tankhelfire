@@ -18,32 +18,7 @@ a.style.width = "100vw";
 
 
 
-// let DBOpenRequest  = window.indexedDB.open("savedata", 1);
-// let db
-
-// DBOpenRequest.onerror = (event) => {
-//   console.error(event)
-// };
-
-// //indexedDB.deleteDatabase('savedata')
-// DBOpenRequest.onsuccess = (event) => {
-//   clog("Database initialized.")
-
-//   db = DBOpenRequest.result;
-
-//   update();
-// };
-
-// DBOpenRequest.onupgradeneeded=(event) => {
-//   clog('updating db')
-//   db = event.target.result;
-  
-//   db.createObjectStore('a');
-  
-//   db.onerror = (event) => {
-//     console.error(event)
-//   };
-// }
+//await navigator.storage.estimate()
 
 function update() {
 
