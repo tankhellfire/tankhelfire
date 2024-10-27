@@ -38,7 +38,7 @@ DBOpenRequest.onupgradeneeded=(event) => {
   clog('updating db')
   db = event.target.result;
   
-  db.createObjectStore('savedata', { keyPath: 'events' });
+  db.createObjectStore('a');
   
   db.onerror = (event) => {
     console.error(event)
