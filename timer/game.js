@@ -18,32 +18,32 @@ a.style.width = "100vw";
 
 
 
-let DBOpenRequest  = window.indexedDB.open("savedata", 1);
-let db
+// let DBOpenRequest  = window.indexedDB.open("savedata", 1);
+// let db
 
-DBOpenRequest.onerror = (event) => {
-  console.error(event)
-};
+// DBOpenRequest.onerror = (event) => {
+//   console.error(event)
+// };
 
-//indexedDB.deleteDatabase('savedata')
-DBOpenRequest.onsuccess = (event) => {
-  clog("Database initialized.")
+// //indexedDB.deleteDatabase('savedata')
+// DBOpenRequest.onsuccess = (event) => {
+//   clog("Database initialized.")
 
-  db = DBOpenRequest.result;
+//   db = DBOpenRequest.result;
 
-  update();
-};
+//   update();
+// };
 
-DBOpenRequest.onupgradeneeded=(event) => {
-  clog('updating db')
-  db = event.target.result;
+// DBOpenRequest.onupgradeneeded=(event) => {
+//   clog('updating db')
+//   db = event.target.result;
   
-  db.createObjectStore('a');
+//   db.createObjectStore('a');
   
-  db.onerror = (event) => {
-    console.error(event)
-  };
-}
+//   db.onerror = (event) => {
+//     console.error(event)
+//   };
+// }
 
 function update() {
 
