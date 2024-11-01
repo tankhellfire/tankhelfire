@@ -26,7 +26,7 @@ class db {
     })();
   }
 
-  async write(key, data) {
+  async set(key, data) {
     return new Promise((resolve, reject) => {
       const transaction = this.dbInstance.transaction(
         this.storeName,
@@ -42,7 +42,7 @@ class db {
     });
   }
 
-  async read(key) {
+  async get(key) {
     return new Promise((resolve, reject) => {
       const transaction = this.dbInstance.transaction(
         this.storeName,

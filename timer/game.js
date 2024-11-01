@@ -17,14 +17,18 @@ a.id = "m";
 a.style.width = "100vw";
 
 
-
+let data
+(new db('timer','12h')).then((e)=>{
+  data=e;
+  update()
+})
 //await navigator.storage.estimate()
 
-function update() {
+async function update() {
 
   text.innerText=Date()
-  m.innerText=JSON.stringify(localStorage)
+  let a=data.keys()
+  m.innerText=
   
   requestAnimationFrame(update);
 }
-update()
