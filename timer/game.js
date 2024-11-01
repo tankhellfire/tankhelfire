@@ -1,26 +1,6 @@
-main.insertElement(document.createElement("display"), 1).id = "display";
-var a = main.insertElement(document.createElement("div"), 0);
-a.id = "gui";
-a.style.position = "absolute";
-
-a.goto({
-  top: -0.5,
-  left: -0.5,
-});
-
-a = gui.appendChild(document.createElement("div"));
-a.id = "text";
-a.style.width = "100vw";
-
-a = gui.appendChild(document.createElement("div"));
-a.id = "m";
-a.style.width = "100vw";
-
 let data;
 let dataobj = {};
-
-setInterval(()=>showNotification('hi',{  body: "This is a test notification.",
-  icon: "path/to/icon.png",}),2000)
+let time
 
 new db("timer", "12h").then(async (e) => {
   data = e;
@@ -34,6 +14,8 @@ new db("timer", "12h").then(async (e) => {
     ]);
   }
 
+  time=data.get('time')
+  
   let a = await data.keys();
   let arr = {};
   for (let b of a) {
@@ -42,6 +24,8 @@ new db("timer", "12h").then(async (e) => {
   for (let [key, promise] of Object.entries(arr)) {
     dataobj[key] = await promise;
   }
+  
+  time=await time
 
   update();
 });
@@ -53,8 +37,9 @@ async function update() {
 
   m.innerText = JSON.stringify(dataobj);
 
-  let time = await data.get("time");
-  now.setHours(time[0], time[1], time[2], time[3]);
+  let a=now
+  a.setHours(time[0], time[1], time[2], time[3]);
+  timer.innerHTML="a"
 
   last=now
   requestAnimationFrame(update);
