@@ -41,9 +41,14 @@ function update() {
   }
 
   game.physics(dt);
-  $("text").innerHTML = `${pointer.x}<br>${pointer.y}<br><br>${JSON.stringify(
-    mouse.touch
-  )}`;
+  $("text").innerHTML = `${Date()}<br>
+  <br>
+  ${pointer.x}<br>
+  ${pointer.y}<br>
+  <br>
+  ${JSON.stringify(mouse.pointer)}<br>
+  <br>
+  ${JSON.stringify(mouse.pc)}`;
 
   $("mouse").goto({
     x: pointer.x,
@@ -65,6 +70,13 @@ function update() {
     key[a].fall = 0;
     key[a].raise = 0;
   }
+  for(var a in mouse.pointer)(
+    Object.assign(mouse.pointer[a],{
+      new:0,
+      raise:0,
+      fall:0
+    })
+  )
   requestAnimationFrame(update);
 }
 update();

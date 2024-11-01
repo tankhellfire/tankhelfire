@@ -120,6 +120,7 @@ let mouse = {
     },
   },
   touch: [],
+  pointer:{}
 };
 
 document.addEventListener("keydown", (event) => {
@@ -227,6 +228,77 @@ function handleTouchMove(event) {
 }
 document.addEventListener("touchmove", handleTouchMove);
 document.addEventListener("touchend", handleTouchMove);
+
+
+function pointerHandler(event,sets={}) {
+  if(!mouse.pointer[event.pointerId]){
+    mouse.pointer[event.pointerId]={
+      time:null,
+      new:null,
+
+      
+      up:null,
+      down:null,
+      upTime:null,
+      downTime:null,
+
+      fall:null,
+      raise:null,
+
+      x:null,
+      y:null,
+      xPx:null,
+      yPx:null,
+
+      startTarget:null,
+      target:null,
+      targets:null,
+    }
+  }
+  const currentElement = document.elementFromPoint(
+    event.x,
+    event.y
+  );
+  const currentElements = document.elementsFromPoint(
+    event.x,
+    event.y
+  );
+  clog(event)
+  Object.assign(mouse.pointer[event.pointerId],{
+    time:event.timeStamp,
+    new:1,
+    x:((event.x - window.innerWidth / 2) / vmax) * 2,
+    y:((event.y - window.innerHeight / 2) / vmax) * 2,
+    xPx:event.x,
+    yPx:event.y,
+    startTarget:event.target,
+    target:currentElement,
+    targets:currentElements,
+  })
+  Object.assign(mouse.pointer[event.pointerId],sets)
+}
+
+document.addEventListener("pointerdown",(event)=>{
+  pointerHandler(event,{
+    downTime:event.timeStamp,
+    down:1,
+    fall:1,
+    
+    up:0,
+  })
+})
+document.addEventListener("pointerup",(event)=>{
+  pointerHandler(event,{
+    upTime:event.timeStamp,
+    up:1,
+    raise:1,
+    
+    down:0,
+  })
+})
+document.addEventListener("pointermove",(event)=>{
+  pointerHandler(event)
+})
 
 Math.clamp = (x, min, max) => {
   if (x < min) {
