@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta name="viewport" content="interactive-widget=resizes-content"/>
-    <link rel="icon" href="timer/assets/mouse.svg"/>
+    <meta name="viewport" content="interactive-widget=resizes-content" />
+    <link rel="icon" href="timer/assets/mouse.svg" />
     <title>smart timer</title>
     <style>
       .select {
@@ -19,16 +19,80 @@
         /* Standard syntax */
       }
     </style>
+    <style>
+      .time-container {
+        display: flex;
+        align-items: center;
+      }
+      .time-segment {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 5px;
+      }
+      .time-segment button {
+        margin: 2px 0;
+      }
+    </style>
     <script src="timer/utill.js"></script>
     <script src="timer/db.js"></script>
   </head>
   <body class="select" style="margin: 0; height: 100vh; width: 100vw">
-    <cliper style="overflow: hidden; height: 100vh; width: 100vw; position: absolute; background-color: #313338;color:#F2F3F5">
-          <div id="text" style="width: 100vw;"></div>
-          <div id="m" style="width: 100vw;"></div>
-      <div style="position: absolute;top: 50vh;left: 50vw;transform: translate(-50%, -50%);text-align: center;">
+    <cliper
+      style="
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+        position: absolute;
+        background-color: #313338;
+        color: #f2f3f5;
+      "
+    >
+      <div id="text" style="width: 100vw"></div>
+      <div id="m" style="width: 100vw"></div>
+      <div
+        style="
+          position: absolute;
+          top: 50vh;
+          left: 50vw;
+          transform: translate(-50%, -50%);
+          text-align: center;
+        "
+      >
         <h1 id="timer"></h1>
-        <h2 id="alarmTime">a</h2>
+        <div class="time-container">
+          <div class="time-segment">
+            
+            <button>↑</button>
+            <span id="hours"></span>
+            <button>↓</button>
+            
+          </div>
+          <span>:</span>
+          <div class="time-segment">
+            
+            <button>↑</button>
+            <span id="minutes"></span>
+            <button>↓</button>
+            
+          </div>
+          <span>:</span>
+          <div class="time-segment">
+            
+            <button>↑</button>
+            <span id="seconds"></span>
+            <button>↓</button>
+            
+          </div>
+          <span>:</span>
+          <div class="time-segment">
+            
+            <button>↑</button>
+            <span id="milliseconds"></span>
+            <button>↓</button>
+            
+          </div>
+        </div>
       </div>
     </cliper>
     <script src="timer/game.js"></script>

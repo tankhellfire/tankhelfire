@@ -40,7 +40,10 @@ async function update() {
     ":" +
     String(timetill % 1000).padStart(3, "0");
 
-  alarmTime.innerText = `${String(time.getHours()).padStart(2, '0')}:${String(time.getMinutes()).padStart(2, '0')}:${String(time.getSeconds()).padStart(2, '0')}:${String(time.getMilliseconds()).padStart(3, '0')}`;
+  hours.innerText = String(time.getHours()).padStart(2, '0')
+  minutes.innerText=String(time.getMinutes()).padStart(2, '0')
+  seconds.innerText=String(time.getSeconds()).padStart(2, '0')
+  milliseconds.innerText=String(time.getMilliseconds()).substr(2).padStart(2, '0')
 
   last = now;
   requestAnimationFrame(update);
