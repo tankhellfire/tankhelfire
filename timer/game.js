@@ -43,7 +43,6 @@ async function update() {
   hours.innerText = String(time.getHours()).padStart(2, '0')
   minutes.innerText=String(time.getMinutes()).padStart(2, '0')
   seconds.innerText=String(time.getSeconds()).padStart(2, '0')
-  milliseconds.innerText=String(time.getMilliseconds()).substr(2).padStart(2, '0')
 
   last = now;
   requestAnimationFrame(update);
@@ -51,18 +50,17 @@ async function update() {
 
 let i=0
 for (let ele of document.querySelectorAll('.time-segment')) {
-  let diff=(new Array(4)).fill(0)
+  let diff=(new Array(3)).fill(0)
   diff[i]=1
   const upButton = ele.querySelector('button:first-child');
   const downButton = ele.querySelector('button:last-child');
   const timeSpan = ele.querySelector('span');
   clog(ele)
   upButton.addEventListener('click', () => {
-    clog(diff)
-      time.setHours(time.getHours()+diff[0],time.getMinutes()+diff[1],time.getSeconds()+diff[2],time.getMilliseconds()+diff[3]*10)
+      time.setHours(time.getHours()+diff[0],time.getMinutes()+diff[1],time.getSeconds()+diff[2])
   })
   downButton.addEventListener('click', () => {
-      time.setHours(time.getHours()-diff[0],time.getMinutes()-diff[1],time.getSeconds()-diff[2],time.getMilliseconds()-diff[3]*10)
+      time.setHours(time.getHours()-diff[0],time.getMinutes()-diff[1],time.getSeconds()-diff[2])
   })
   i++
 }

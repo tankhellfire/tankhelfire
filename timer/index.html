@@ -54,35 +54,34 @@
         style="
           position: absolute;
           top: 50vh;
-          left: 50vw;
+          height: 50vmin;
+          width: 50vmin;
+               
           transform: translate(-50%, -50%);
           text-align: center;
+          display: flex;
+          align-items: center;
+          flex-direction: column;
         "
       >
         <h1 id="timer"></h1>
         <div class="time-container">
           <div class="time-segment">
-            
             <button>↑</button>
             <span id="hours"></span>
             <button>↓</button>
-            
           </div>
           <span>:</span>
           <div class="time-segment">
-            
             <button>↑</button>
             <span id="minutes"></span>
             <button>↓</button>
-            
           </div>
           <span>:</span>
           <div class="time-segment">
-            
             <button>↑</button>
             <span id="seconds"></span>
             <button>↓</button>
-            
           </div>
         </div>
       </div>
