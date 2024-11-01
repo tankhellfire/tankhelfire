@@ -20,18 +20,53 @@
       }
     </style>
     <style>
+      /* Styling the main container */
+      .container {
+        position: absolute;
+        top: 50vh;
+        left: 50vw;
+        height: 100vmin;
+        width: 100vmin;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      /* Styling the timer text */
+      #timer {
+        font-size: 15vmin; /* Resizes with the viewport */
+        margin: 0;
+      }
+
+      /* Styling the time container */
       .time-container {
         display: flex;
         align-items: center;
+        font-size: 10vmin; /* Set font size relative to viewport */
       }
+
+      /* Styling individual time segments */
       .time-segment {
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin: 0 5px;
       }
+
+      /* Styling buttons */
       .time-segment button {
-        margin: 2px 0;
+        font-size: 5vmin; /* Button text size */
+        width: 10vmin;
+        height: 10vmin;
+        border: none;
+        border-radius: 0.5vmin;
+        cursor: pointer;
+      }
+
+      /* Styling colons */
+      .time-container span {
       }
     </style>
     <script src="timer/utill.js"></script>
@@ -50,37 +85,24 @@
     >
       <div id="text" style="width: 100vw"></div>
       <div id="m" style="width: 100vw"></div>
-      <div
-        style="
-          position: absolute;
-          top: 50vh;
-          height: 50vmin;
-          width: 50vmin;
-               
-          transform: translate(-50%, -50%);
-          text-align: center;
-          display: flex;
-          align-items: center;
-          flex-direction: column;
-        "
-      >
-        <h1 id="timer"></h1>
+      <div class="container">
+        <div id="timer">Timer</div>
         <div class="time-container">
           <div class="time-segment">
             <button>↑</button>
-            <span id="hours"></span>
+            <span id="hours">00</span>
             <button>↓</button>
           </div>
           <span>:</span>
           <div class="time-segment">
             <button>↑</button>
-            <span id="minutes"></span>
+            <span id="minutes">00</span>
             <button>↓</button>
           </div>
           <span>:</span>
           <div class="time-segment">
             <button>↑</button>
-            <span id="seconds"></span>
+            <span id="seconds">00</span>
             <button>↓</button>
           </div>
         </div>
