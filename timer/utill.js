@@ -1,9 +1,8 @@
-function showNotification(title, options){
-  if (Notification.permission === "granted") {
-    new Notification(title, options);
-  } else {
-    console.warn("No notification permission granted");
+async function showNotification(title, options){
+  if (Notification.permission != "granted") {
+    await Notification.requestPermission()
   }
+  return new Notification(title, options);
 };
 
 Node.prototype.insertElement = function (element, index) {

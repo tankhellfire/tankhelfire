@@ -19,7 +19,8 @@ a.style.width = "100vw";
 let data;
 let dataobj = {};
 
-showNotification('hi')
+setInterval(()=>showNotification('hi',{  body: "This is a test notification.",
+  icon: "path/to/icon.png",}),2000)
 
 new db("timer", "12h").then(async (e) => {
   data = e;
