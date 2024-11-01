@@ -18,15 +18,22 @@ a.style.width = "100vw";
 
 
 let data
-(new db('timer','12h')).then((e)=>{
+(new db('timer','12h')).then(async(e)=>{
   data=e;
+  if(await data.get('time')==undefined){
+    var now=new Date()
+    data.set('time',[now.getHours(),now.getMinutes(),now.getSeconds(),now.getMilliseconds()])
+  }
   update()
 })
 //await navigator.storage.estimate()
 
 async function update() {
 
-  text.innerText=Date()
+  let now=new Date()
+  text.innerText=now
+  
+  
   let a=await data.keys()
   let arr={}
   for(let b of a){

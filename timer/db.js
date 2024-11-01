@@ -78,7 +78,7 @@ class db {
     });
   }
 
-  async del(...key) {
+  async del(key) {
     return new Promise((resolve, reject) => {
       const transaction = this.dbInstance.transaction(
         this.storeName,
