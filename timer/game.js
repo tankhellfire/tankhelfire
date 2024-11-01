@@ -6,12 +6,7 @@ new db("timer", "12h").then(async (e) => {
   data = e;
   if ((await data.get("time")) == undefined) {
     var now = new Date();
-    data.set("time", [
-      now.getHours(),
-      now.getMinutes(),
-      now.getSeconds(),
-      now.getMilliseconds(),
-    ]);
+    data.set("time",Date.now());
   }
 
   time=data.get('time')
@@ -25,7 +20,7 @@ new db("timer", "12h").then(async (e) => {
     dataobj[key] = await promise;
   }
   
-  time=await time
+  time=new Date(await time)
 
   update();
 });
@@ -36,14 +31,16 @@ async function update() {
   text.innerText = now;
 
   m.innerText = JSON.stringify(dataobj);
+  while (time<now)) {
+  time.setHours(time.getHours() + 12)
+}
 
   
-  let a=(new Date(now)).setHours(time[0], time[1], time[2], time[3]);
-  let timetill=a-now
+  let timetill=time-now
   timer.innerText=
-    String(hours).padStart(2, '0') + ':' +
-    String(minutes).padStart(2, '0') + ':' +
-    String(Math.floor(timetill / 1000)).padStart(2, '0') + ':' +
+    String(Math.floor(timetill / 3600000)%60).padStart(2, '0') + ':' +
+    String(Math.floor(timetill / 60000)%60).padStart(2, '0') + ':' +
+    String(Math.floor(timetill / 1000)%60).padStart(2, '0') + ':' +
     String(timetill%1000).padStart(3, '0');
   
   alarmTime.innerText=last
