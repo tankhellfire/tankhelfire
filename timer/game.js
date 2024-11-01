@@ -48,3 +48,21 @@ async function update() {
   last = now;
   requestAnimationFrame(update);
 }
+
+let i=0
+for (let ele of document.querySelectorAll('.time-segment')) {
+  let diff=(new Array(4)).fill(0)
+  diff[i]=1
+  const upButton = ele.querySelector('button:first-child');
+  const downButton = ele.querySelector('button:last-child');
+  const timeSpan = ele.querySelector('span');
+  clog(ele)
+  upButton.addEventListener('click', () => {
+    clog(diff)
+      time.setHours(time.getHours()+diff[0],time.getMinutes()+diff[1],time.getSeconds()+diff[2],time.getMilliseconds()+diff[3]*10)
+  })
+  downButton.addEventListener('click', () => {
+      time.setHours(time.getHours()-diff[0],time.getMinutes()-diff[1],time.getSeconds()-diff[2],time.getMilliseconds()-diff[3]*10)
+  })
+  i++
+}
