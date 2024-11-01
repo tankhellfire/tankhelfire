@@ -39,7 +39,7 @@ async function update() {
 
   let a=now
   a.setHours(time[0], time[1], time[2], time[3]);
-  timer.innerHTML="a"
+  timer.innerHTML=a-now
 
   last=now
   requestAnimationFrame(update);
