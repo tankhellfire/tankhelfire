@@ -300,6 +300,7 @@ document.addEventListener("pointermove",(event)=>{
   pointerHandler(event)
 })
 
+
 Math.clamp = (x, min, max) => {
   if (x < min) {
     return min;

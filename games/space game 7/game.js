@@ -3,6 +3,7 @@ var a = main.insertElement(document.createElement("div"), 0);
 a.id = "text";
 a.style.width = "100vw";
 a.style.position = "absolute";
+a.style.overflowWrap="break-word"
 
 a.goto({
   top: -0.5,
