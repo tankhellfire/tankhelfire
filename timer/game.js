@@ -1,26 +1,14 @@
-let data;
-let dataobj = {};
 let time
 
 new db("timer", "12h").then(async (e) => {
   data = e;
   if ((await data.get("time")) == undefined) {
     var now = new Date();
-    data.set("time",Date.now());
+    data.set("time",new Date());
   }
 
-  time=data.get('time')
   
-  let a = await data.keys();
-  let arr = {};
-  for (let b of a) {
-    arr[b] = data.get(b);
-  }
-  for (let [key, promise] of Object.entries(arr)) {
-    dataobj[key] = await promise;
-  }
-  
-  time=new Date(await time)
+  time = await data.get('time');
 
   update();
 });
@@ -30,10 +18,16 @@ async function update() {
   let now = new Date();
   text.innerText = now;
 
-  m.innerText = JSON.stringify(dataobj);
-  while (time<now)) {
-  time.setHours(time.getHours() + 12)
-}
+  if(time<now){
+    showNotification('/daily')
+    do{
+      time.setHours(time.getHours() + 12)
+    }while (time<now)
+    data.set("time",time);
+  }
+  while(now<(new date(time)).setHours(time.getHours()-12)){
+    
+  }
 
   
   let timetill=time-now
@@ -43,7 +37,7 @@ async function update() {
     String(Math.floor(timetill / 1000)%60).padStart(2, '0') + ':' +
     String(timetill%1000).padStart(3, '0');
   
-  alarmTime.innerText=last
+  alarmTime.innerText=time
 
   last=now
   requestAnimationFrame(update);
