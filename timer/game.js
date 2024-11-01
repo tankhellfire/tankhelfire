@@ -16,14 +16,26 @@ a=gui.appendChild(document.createElement("div"));
 a.id = "m";
 a.style.width = "100vw";
 
-
 let data
-(new db('timer','12h')).then(async(e)=>{
+let dataobj=clog
+
+(new db('timer','12h')).then(
+  async (e)=>{
   data=e;
   if(await data.get('time')==undefined){
     var now=new Date()
     data.set('time',[now.getHours(),now.getMinutes(),now.getSeconds(),now.getMilliseconds()])
   }
+  
+  let a=await data.keys()
+  let arr={}
+  for(let b of a){
+    arr[b]=data.get(b)
+  }
+  for (let [key, promise] of Object.entries(arr)) {
+    dataobj[key] = await promise;
+  }
+  
   update()
 })
 //await navigator.storage.estimate()
@@ -34,18 +46,13 @@ async function update() {
   text.innerText=now
   
   
-  let a=await data.keys()
-  let arr={}
-  for(let b of a){
-    arr[b]=data.get(b)
-  }
-  let resolvedObj = {};
-  for (let [key, promise] of Object.entries(arr)) {
-    resolvedObj[key] = await promise;
-  }
+
+  
+  m.innerText=JSON.stringify(dataobj)
   
   
-  m.innerText=JSON.stringify(resolvedObj)
+  let time=await data.get('time')
+  now.setHours(time[0],time[1],time[2],time[3])
   
   requestAnimationFrame(update);
 }
