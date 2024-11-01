@@ -44,6 +44,7 @@ async function update() {
     resolvedObj[key] = await promise;
   }
   
+  
   m.innerText=JSON.stringify(resolvedObj)
   
   requestAnimationFrame(update);
