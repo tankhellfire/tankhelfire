@@ -27,8 +27,17 @@ let data
 async function update() {
 
   text.innerText=Date()
-  let a=data.keys()
-  m.innerText=
+  let a=await data.keys()
+  let arr={}
+  for(let b of a){
+    arr[b]=data.get(b)
+  }
+  let resolvedObj = {};
+  for (let [key, promise] of Object.entries(arr)) {
+    resolvedObj[key] = await promise;
+  }
+  
+  m.innerText=JSON.stringify(resolvedObj)
   
   requestAnimationFrame(update);
 }
