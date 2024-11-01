@@ -39,7 +39,12 @@ async function update() {
 
   
   let a=(new Date(now)).setHours(time[0], time[1], time[2], time[3]);
-  timer.innerText=a-now
+  let timetill=a-now
+  timer.innerText=
+    String(hours).padStart(2, '0') + ':' +
+    String(minutes).padStart(2, '0') + ':' +
+    String(Math.floor(timetill / 1000)).padStart(2, '0') + ':' +
+    String(timetill%1000).padStart(3, '0');
   
   alarmTime.innerText=last
 
