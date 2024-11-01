@@ -8,51 +8,53 @@ a.goto({
   left: -0.5,
 });
 
-a=gui.appendChild(document.createElement("div"));
+a = gui.appendChild(document.createElement("div"));
 a.id = "text";
 a.style.width = "100vw";
 
-a=gui.appendChild(document.createElement("div"));
+a = gui.appendChild(document.createElement("div"));
 a.id = "m";
 a.style.width = "100vw";
 
-let data
-let dataobj=clog
+let data;
+let dataobj = {};
 
-(new db('timer','12h')).then(
-  async (e)=>{
-  data=e;
-  if(await data.get('time')==undefined){
-    var now=new Date()
-    data.set('time',[now.getHours(),now.getMinutes(),now.getSeconds(),now.getMilliseconds()])
+showNotification('hi')
+
+new db("timer", "12h").then(async (e) => {
+  data = e;
+  if ((await data.get("time")) == undefined) {
+    var now = new Date();
+    data.set("time", [
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds(),
+      now.getMilliseconds(),
+    ]);
   }
-  
-  let a=await data.keys()
-  let arr={}
-  for(let b of a){
-    arr[b]=data.get(b)
+
+  let a = await data.keys();
+  let arr = {};
+  for (let b of a) {
+    arr[b] = data.get(b);
   }
   for (let [key, promise] of Object.entries(arr)) {
     dataobj[key] = await promise;
   }
-  
-  update()
-})
+
+  update();
+});
 //await navigator.storage.estimate()
-
+let last=0
 async function update() {
+  let now = new Date();
+  text.innerText = now;
 
-  let now=new Date()
-  text.innerText=now
-  
-  
+  m.innerText = JSON.stringify(dataobj);
 
-  
-  m.innerText=JSON.stringify(dataobj)
-  
-  
-  let time=await data.get('time')
-  now.setHours(time[0],time[1],time[2],time[3])
-  
+  let time = await data.get("time");
+  now.setHours(time[0], time[1], time[2], time[3]);
+
+  last=now
   requestAnimationFrame(update);
 }

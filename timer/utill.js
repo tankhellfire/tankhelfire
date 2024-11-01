@@ -1,3 +1,11 @@
+function showNotification(title, options){
+  if (Notification.permission === "granted") {
+    new Notification(title, options);
+  } else {
+    console.warn("No notification permission granted");
+  }
+};
+
 Node.prototype.insertElement = function (element, index) {
   return this.insertBefore(
     element, //document.createElement(child_element_tagName)
