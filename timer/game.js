@@ -37,9 +37,11 @@ async function update() {
 
   m.innerText = JSON.stringify(dataobj);
 
-  let a=now
-  a.setHours(time[0], time[1], time[2], time[3]);
-  timer.innerHTML=a-now
+  
+  let a=(new Date(now)).setHours(time[0], time[1], time[2], time[3]);
+  timer.innerText=a-now
+  
+  alarmTime.innerText=last
 
   last=now
   requestAnimationFrame(update);
