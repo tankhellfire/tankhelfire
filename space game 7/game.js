@@ -15,7 +15,7 @@ let pointer = {
   y: 0,
 };
 let game = startGame();
-
+buffer=''
 function update() {
   let dt = performance.now() / 1000 - time;//delta time
   time = performance.now() / 1000;
@@ -40,6 +40,9 @@ function update() {
       pointer.y /= b;
     }
   }
+  for (let i of key.new) {
+    buffer+=i[1]
+  }
 
   game.physics(dt);
   $("text").innerHTML = `${Date()}<br>
@@ -49,7 +52,7 @@ function update() {
   <br>
   ${JSON.stringify(mouse.pointer)}<br>
   <br>
-  ${JSON.stringify(mouse.pc)}`;
+  ${buffer}`;
 
   $("mouse").goto({
     x: pointer.x,
@@ -71,6 +74,8 @@ function update() {
     key[a].fall = 0;
     key[a].raise = 0;
   }
+
+  
   for(var a in mouse.pointer)(
     Object.assign(mouse.pointer[a],{
       new:0,
@@ -78,6 +83,7 @@ function update() {
       fall:0
     })
   )
+  key.new=[]
   requestAnimationFrame(update);
 }
 update();

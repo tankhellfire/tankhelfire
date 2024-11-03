@@ -107,6 +107,7 @@ function key(keyCode) {
     up: undefined,
   };
 }
+key.new=[]
 
 let mouse = {
   pc: {
@@ -125,6 +126,7 @@ let mouse = {
 
 document.addEventListener("keydown", (event) => {
   event.preventDefault();
+  key.new.push([event.code,event.key])
   if (!key(event.code).down) {
     key[event.code] = {
       down: 1,
@@ -236,6 +238,9 @@ function pointerHandler(event,sets={}) {
       time:null,
       new:null,
 
+      pointerType:null,
+      isPrimary:false,
+
       
       up:null,
       down:null,
@@ -263,10 +268,12 @@ function pointerHandler(event,sets={}) {
     event.x,
     event.y
   );
-  clog(event)
+  // clog(event)
   Object.assign(mouse.pointer[event.pointerId],{
     time:event.timeStamp,
     new:1,
+    pointerType:event.pointerType,
+    isPrimary:event.isPrimary,
     x:((event.x - window.innerWidth / 2) / vmax) * 2,
     y:((event.y - window.innerHeight / 2) / vmax) * 2,
     xPx:event.x,
