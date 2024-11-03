@@ -10,36 +10,12 @@ a.goto({
   left: -0.5,
 });
 
-let pointer = {
-  x: 0,
-  y: 0,
-};
 let game = startGame();
 buffer=''
 function update() {
   let dt = performance.now() / 1000 - time;//delta time
   time = performance.now() / 1000;
 
-  if (mouse.pc.new) {
-    pointer.x = mouse.pc.x;
-    pointer.y = mouse.pc.y;
-  } else {
-    if (mouse.touch.length != 0) {
-      let b = 0;
-      pointer.x = 0;
-      pointer.y = 0;
-      for (a of mouse.touch) {
-        if (!a) {
-          continue;
-        }
-        pointer.x += a.x;
-        pointer.y += a.y;
-        b++;
-      }
-      pointer.x /= b;
-      pointer.y /= b;
-    }
-  }
   for (let i of key.new) {
     buffer+=i[1]
   }
@@ -47,37 +23,28 @@ function update() {
   game.physics(dt);
   $("text").innerHTML = `${Date()}<br>
   <br>
-  ${pointer.x}<br>
-  ${pointer.y}<br>
+  ${pointer[pointer.primary]?.x}<br>
+  ${pointer[pointer.primary]?.y}<br>
   <br>
-  ${JSON.stringify(mouse.pointer)}<br>
+  ${JSON.stringify(pointer)}<br>
   <br>
   ${buffer}`;
 
   $("mouse").goto({
-    x: pointer.x,
-    y: pointer.y,
+    x: pointer[pointer.primary]?.x,
+    y: pointer[pointer.primary]?.y,
     rot: time / 12,
   });
 
-  mouse.pc.new = 0;
-
-  mouse.pc.mx = 0;
-  mouse.pc.my = 0;
-
-  mouse.pc.mxPx = 0;
-  mouse.pc.myPx = 0;
-
-  mouse.pc.click.first = 0;
+  
   for (var a in key) {
     key[a].first = 0;
     key[a].fall = 0;
     key[a].raise = 0;
   }
-
   
-  for(var a in mouse.pointer)(
-    Object.assign(mouse.pointer[a],{
+  for(var a in pointer)(
+    Object.assign(pointer[a],{
       new:0,
       raise:0,
       fall:0

@@ -109,21 +109,6 @@ function key(keyCode) {
 }
 key.new=[]
 
-let mouse = {
-  pc: {
-    x: 0,
-    y: 0,
-    xPx: 0,
-    yPx: 0,
-    click: {
-      now: 0,
-      last: 0,
-    },
-  },
-  touch: [],
-  pointer:{}
-};
-
 document.addEventListener("keydown", (event) => {
   event.preventDefault();
   key.new.push([event.code,event.key])
@@ -153,94 +138,14 @@ function mouseUpdate() {
   mouse.pc.time = event.timeStamp;
 }
 
-document.addEventListener("mousemove", (event) => {
-  mouse.pc.mxPx = event.movementX;
-  mouse.pc.myPx = event.movementY;
-  // console.log(event)
-  if (document.pointerLockElement) {
-    mouse.pc.xPx += event.movementX;
-    mouse.pc.yPx += event.movementY;
-  } else {
-    mouse.pc.xPx = event.pageX;
-    mouse.pc.yPx = event.pageY;
-  }
-
-  const currentElements = document.elementsFromPoint(
-    event.clientX,
-    event.clientY
-  );
-
-  mouse.pc.target = event.target;
-  mouse.pc.targets = currentElements;
-
-  mouse.pc.x = ((mouse.pc.xPx - window.innerWidth / 2) / vmax) * 2;
-  mouse.pc.y = ((mouse.pc.yPx - window.innerHeight / 2) / vmax) * 2;
-
-  mouse.pc.mx = (mouse.pc.mxPx / vmax) * 2;
-  mouse.pc.my = (mouse.pc.myPx / vmax) * 2;
-
-  mouseUpdate();
-});
-
-document.addEventListener("mousedown", (event) => {
-  event.preventDefault();
-  mouse.pc.click = {
-    down: 1,
-    first: 1,
-    fall: 1,
-    raise: 0,
-    up: 0,
-  };
-  mouseUpdate();
-});
-
-document.addEventListener("mouseup", (event) => {
-  mouse.pc.click = {
-    down: 0,
-    first: 1,
-    fall: 0,
-    raise: 1,
-    up: 1,
-  };
-  mouseUpdate();
-});
-
-function handleTouchMove(event) {
-  mouse.touch = [];
-  for (const touch of event.touches) {
-    const currentElement = document.elementFromPoint(
-      touch.clientX,
-      touch.clientY
-    );
-    const currentElements = document.elementsFromPoint(
-      touch.clientX,
-      touch.clientY
-    );
-    mouse.touch[touch.identifier] = {
-      xPx: touch.pageX,
-      yPx: touch.pageY,
-      x: ((touch.pageX - window.innerWidth / 2) / vmax) * 2,
-      y: ((touch.pageY - window.innerHeight / 2) / vmax) * 2,
-      startTarget: touch.target,
-      target: currentElement,
-      targets: currentElements,
-      force: touch.force,
-    };
-  }
-}
-document.addEventListener("touchmove", handleTouchMove);
-document.addEventListener("touchend", handleTouchMove);
-
-
+let pointer={}
 function pointerHandler(event,sets={}) {
-  if(!mouse.pointer[event.pointerId]){
-    mouse.pointer[event.pointerId]={
+  if(!pointer[event.pointerId]){
+    pointer[event.pointerId]={
       time:null,
       new:null,
 
       pointerType:null,
-      isPrimary:false,
-
       
       up:null,
       down:null,
@@ -260,6 +165,9 @@ function pointerHandler(event,sets={}) {
       targets:null,
     }
   }
+  if(event.isPrimary){
+    pointer.primary=event.pointerId
+  }
   const currentElement = document.elementFromPoint(
     event.x,
     event.y
@@ -269,11 +177,10 @@ function pointerHandler(event,sets={}) {
     event.y
   );
   // clog(event)
-  Object.assign(mouse.pointer[event.pointerId],{
+  Object.assign(pointer[event.pointerId],{
     time:event.timeStamp,
     new:1,
     pointerType:event.pointerType,
-    isPrimary:event.isPrimary,
     x:((event.x - window.innerWidth / 2) / vmax) * 2,
     y:((event.y - window.innerHeight / 2) / vmax) * 2,
     xPx:event.x,
@@ -282,7 +189,7 @@ function pointerHandler(event,sets={}) {
     target:currentElement,
     targets:currentElements,
   })
-  Object.assign(mouse.pointer[event.pointerId],sets)
+  Object.assign(pointer[event.pointerId],sets)
 }
 
 document.addEventListener("pointerdown",(event)=>{
@@ -305,6 +212,11 @@ document.addEventListener("pointerup",(event)=>{
 })
 document.addEventListener("pointermove",(event)=>{
   pointerHandler(event)
+})
+
+document.addEventListener("pointerleave",(event)=>{
+  clog('deling',event.pointerId)
+  delete pointer[event.pointerId]
 })
 
 
