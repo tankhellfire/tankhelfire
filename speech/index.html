@@ -3,46 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dynamic Text-to-Speech with Language Selection</title>
+  <title>Dynamic Text-to-Speech with Voice and Language Selection</title>
 </head>
 <body>
   <h1>Text-to-Speech Demo</h1>
   <textarea id="text" rows="5" cols="50" placeholder="Type something to speak..."></textarea>
   <br><br>
   <label for="language">Select Language:</label>
-  <select id="language"></select>
+  <select id="language" onchange="updateVoices()"></select>
+  <br><br>
+  <label for="voice">Select Voice:</label>
+  <select id="voice"></select>
   <br><br>
   <button onclick="speakText()">Speak</button>
   <script>
     const params = new Proxy(new URLSearchParams(window.location.search), {
       get: (searchParams, prop) => searchParams.get(prop),
     });
-    
-    
+
     const languageDropdown = document.getElementById('language');
+    const voiceDropdown = document.getElementById('voice');
+    let voices = [];
 
     // Populate the language dropdown with available voices
     function populateLanguages() {
-      const voices = speechSynthesis.getVoices();
+      voices = speechSynthesis.getVoices();
       const uniqueLanguages = new Set();
 
       // Collect unique language codes from available voices
       voices.forEach(voice => {
-          uniqueLanguages.add(voice.lang);
-          const option = document.createElement('option');
-          option.value = voice.voiceURI;
-          option.textContent = `${voice.lang} - ${voice.name}`;
-          languageDropdown.appendChild(option);
+        uniqueLanguages.add(voice.lang);
       });
-      languageDropdown.value=params.lang
+
+      uniqueLanguages.forEach(lang => {
+        const option = document.createElement('option');
+        option.value = lang;
+        option.textContent = lang;
+        languageDropdown.appendChild(option);
+      });
+
+      if (params.lang) {
+        languageDropdown.value = params.lang;
+      }
+      updateVoices(); // Populate the voices dropdown for the default or selected language
     }
 
-    // Populate the dropdown after voices are loaded
-    speechSynthesis.onvoiceschanged = populateLanguages;
+    // Update the voices dropdown based on the selected language
+    function updateVoices() {
+      const selectedLang = languageDropdown.value;
+      voiceDropdown.innerHTML = ''; // Clear existing voices
 
+      // Filter voices by the selected language
+      const filteredVoices = voices.filter(voice => voice.lang === selectedLang);
+
+      filteredVoices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice.name; // Use the voice name as the value
+        option.textContent = voice.name;
+        voiceDropdown.appendChild(option);
+      });
+    }
+
+    // Speak the text with the selected voice and language
     function speakText() {
       const text = document.getElementById('text').value;
-      const language = languageDropdown.value;
+      const selectedLang = languageDropdown.value;
+      const selectedVoiceName = voiceDropdown.value;
 
       if (!text) {
         alert('Please enter some text!');
@@ -50,13 +76,23 @@
       }
 
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = language; // Set the selected language
+      utterance.lang = selectedLang;
+
+      // Set the selected voice
+      const selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+
       utterance.rate = 1; // Adjust speech rate (1 = normal speed)
       utterance.pitch = 1; // Adjust pitch (1 = normal pitch)
 
       // Speak the text
       window.speechSynthesis.speak(utterance);
     }
+
+    // Populate the dropdowns after voices are loaded
+    speechSynthesis.onvoiceschanged = populateLanguages;
   </script>
 </body>
 </html>
