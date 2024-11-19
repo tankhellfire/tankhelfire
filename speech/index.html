@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Text-to-Speech with Language Selection</title>
+</head>
+<body>
+  <h1>Text-to-Speech Demo</h1>
+  <textarea id="text" rows="5" cols="50" placeholder="Type something to speak..."></textarea>
+  <br><br>
+  <label for="language">Select Language:</label>
+  <select id="language"></select>
+  <br><br>
+  <button onclick="speakText()">Speak</button>
+  <script>
+    const languageDropdown = document.getElementById('language');
+
+    // Populate the language dropdown with available voices
+    function populateLanguages() {
+      const voices = speechSynthesis.getVoices();
+      const uniqueLanguages = new Set();
+
+      // Collect unique language codes from available voices
+      voices.forEach(voice => {
+        if (!uniqueLanguages.has(voice.lang)) {
+          uniqueLanguages.add(voice.lang);
+          const option = document.createElement('option');
+          option.value = voice.lang;
+          option.textContent = `${voice.lang} - ${voice.name}`;
+          languageDropdown.appendChild(option);
+        }
+      });
+    }
+
+    // Populate the dropdown after voices are loaded
+    speechSynthesis.onvoiceschanged = populateLanguages;
+
+    function speakText() {
+      const text = document.getElementById('text').value;
+      const language = languageDropdown.value;
+
+      if (!text) {
+        alert('Please enter some text!');
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = language; // Set the selected language
+      utterance.rate = 1; // Adjust speech rate (1 = normal speed)
+      utterance.pitch = 1; // Adjust pitch (1 = normal pitch)
+
+      // Speak the text
+      window.speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
+</html>
