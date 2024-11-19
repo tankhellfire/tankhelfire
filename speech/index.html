@@ -63,10 +63,30 @@
         voiceDropdown.appendChild(option);
       });
     }
+    
+    
+    function passText(text){
+      let out=[]
+      
+      let line=''
+      for(letter of text){
+        if(letter==='/'){
+          if(out.lenght%2==0){
+            line
+          }
+          out.push(line)
+          line=''
+          continue
+        }
+        line+=letter
+      }
+      out.push(line)
+      return out
+    }
 
     // Speak the text with the selected voice and language
     function speakText() {
-      const text = document.getElementById('text').value;
+      const text =passText(document.getElementById('text').value) ;
       const selectedLang = languageDropdown.value;
       const selectedVoiceName = voiceDropdown.value;
 
