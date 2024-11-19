@@ -14,6 +14,11 @@
   <br><br>
   <button onclick="speakText()">Speak</button>
   <script>
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    
+    
     const languageDropdown = document.getElementById('language');
 
     // Populate the language dropdown with available voices
@@ -23,14 +28,13 @@
 
       // Collect unique language codes from available voices
       voices.forEach(voice => {
-        if (!uniqueLanguages.has(voice.lang)) {
           uniqueLanguages.add(voice.lang);
           const option = document.createElement('option');
-          option.value = voice.lang;
+          option.value = voice.voiceURI;
           option.textContent = `${voice.lang} - ${voice.name}`;
           languageDropdown.appendChild(option);
-        }
       });
+      languageDropdown.value=params.lang
     }
 
     // Populate the dropdown after voices are loaded
