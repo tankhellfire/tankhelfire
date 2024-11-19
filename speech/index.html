@@ -71,8 +71,8 @@
       let line=''
       for(letter of text){
         if(letter==='/'){
-          if(out.lenght%2==0){
-            line
+          if(out.length%2==1){
+            line=line.split(',')
           }
           out.push(line)
           line=''
