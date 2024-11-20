@@ -29,6 +29,10 @@
       const languageDropdown = document.getElementById("language");
       const voiceDropdown = document.getElementById("voice");
       let voices = [];
+      
+      try{
+      text.value=atob(params.text)
+      }catch(err){alert(`error with inporting text\n${err}`)}
 
       // Populate the language dropdown with available voices
       function populateLanguages() {
@@ -136,12 +140,13 @@
           alert("Please enter some text!");
           return;
         }
-        
-        voiceSettings={
-          rate:1,
-          pich:1,
-          selectedVoiceName
-        }
+
+        voiceSettings = {
+          rate: 1,
+          pitch: 1,
+          selectedVoiceName,
+          volume:1
+        };
 
         text = passText(text);
         for (let i = 0; i < text.length; i += 2) {
@@ -156,17 +161,30 @@
             utterance.voice = selectedVoice;
           }
 
+          console.log(voiceSettings)
           utterance.rate = voiceSettings.rate; // Adjust speech rate (1 = normal speed)
-          utterance.pitch = voiceSettings.pich; // Adjust pitch (1 = normal pitch)
+          utterance.pitch = voiceSettings.pitch; // Adjust pitch (1 = normal pitch)
+          utterance.volume=voiceSettings.volume
 
           // Speak the text
           window.speechSynthesis.speak(utterance);
-          
-          try{
-          for(a of text[i+1]??[]){
-            
+
+          try {
+            for (a of text[i + 1] ?? []) {
+              console.log(a)
+              if(a[1]==='+'){
+                voiceSettings[a[0]]+=Number(a[2])
+                continue
+              }
+              if(a[1]==='-'){
+                voiceSettings[a[0]]-=Number(a[2])
+                continue
+              }
+              voiceSettings[a[0]]=a[2]
+            }
+          } catch (err) {
+            alert(`${err}\nline: ${i/2+1}`);
           }
-          }catch(err)
         }
       }
 
