@@ -21,7 +21,10 @@
     <select id="voice"></select>
     <br /><br />
     <button onclick="speakText()">Speak</button>
+    <button onclick="makeExport()">export</button>
     <script>
+      
+      
       const params = new Proxy(new URLSearchParams(window.location.search), {
         get: (searchParams, prop) => searchParams.get(prop),
       });
@@ -30,9 +33,15 @@
       const voiceDropdown = document.getElementById("voice");
       let voices = [];
       
-      try{
-      text.value=atob(params.text)
-      }catch(err){alert(`error with inporting text\n${err}`)}
+      function makeExport(){
+        document.location.href=`?lang=${languageDropdown.value}&text=${btoa(text.value)}`
+      }
+      
+      if(params.text){
+        try{
+        text.value=atob(params.text)
+        }catch(err){alert(`error with inporting text\n${err}`)}
+      }
 
       // Populate the language dropdown with available voices
       function populateLanguages() {
