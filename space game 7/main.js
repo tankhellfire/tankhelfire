@@ -1,10 +1,12 @@
 ((n,f) => {if("object"==typeof exports){module.exports=exports=f()}else{if("function"==typeof define&&define.amd){define([], f)}else{this[n] = f()}}})(
 'spaceGame7',() => {
-  function startGame(input) {
-    function physics(time) {
+  class startGame{
+    time=0;
+    
+    physics(timePassed) {
+      this.time+=timePassed
 
     }
-    return {physics:physics}
   }
   
   return {startGame}
