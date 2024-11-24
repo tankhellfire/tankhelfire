@@ -10,7 +10,7 @@ a.goto({
   left: -0.5,
 });
 
-let game = startGame();
+let game = new spaceGame7.startGame;
 buffer=''
 function update() {
   let dt = performance.now() / 1000 - time;//delta time
