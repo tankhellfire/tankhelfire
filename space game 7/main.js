@@ -9,13 +9,15 @@
     }
   }
 })("spaceGame7", () => {
-  class startGame {
+  class Game {
     constructor({ objCount = 0 }) {
-      this.obj = Array.from({ length: objCount }, () => ({
+      this.#obj = Array.from({ length: objCount }, () => ({
         x: Math.random(),
         y: Math.random()
       }));
     }
+
+    #obj
 
     time = 0;
 
@@ -24,5 +26,5 @@
     }
   }
 
-  return { startGame };
+  return { Game };
 });
