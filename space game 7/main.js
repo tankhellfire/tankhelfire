@@ -2,7 +2,7 @@
 'spaceGame7',() => {
   class startGame{
     constructor({objCount=0}){
-      obj=new array(objCount)
+      obj=Array.from({length:objCount},()=>{x:1})
     };
     
     time=0;
