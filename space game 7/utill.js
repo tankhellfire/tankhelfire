@@ -6,31 +6,31 @@ Node.prototype.insertElement = function (element, index) {
 };
 
 Node.prototype.goto = function (pos) {
-  if (pos?.x != undefined) {
+  if (pos.x != undefined) {
     if (typeof pos?.x != "number") {
       console.err("a x position was givin", pos?.x, "but wasn't a number");
     }
-    this.style.left = `${pos?.x * 100}%`;
+    this.style.left = `${pos?.x * 50}%`;
   }
-  if (pos?.y != undefined) {
+  if (pos.y != undefined) {
     if (typeof pos?.y != "number") {
       console.err("a y position was givin", pos?.y, "but wasn't a number");
     }
-    this.style.top = `${pos?.y * 100}%`;
+    this.style.top = `${(0-pos?.y) * 50}%`;
   }
-  if (pos?.left != undefined) {
+  if (pos.left != undefined) {
     if (typeof pos?.left != "number") {
       console.err("a left position was givin", pos?.left, "but wasn't a number");
     }
-    this.style.left = `${pos?.left * 100}vw`;
+    this.style.left = `${pos?.left * 50}vw`;
   }
-  if (pos?.top != undefined) {
-    if (typeof pos?.top != "number") {
-      console.err("a top position was givin", pos?.top, "but wasn't a number");
+  if (pos.up != undefined) {
+    if (typeof pos?.up != "number") {
+      console.err("a top position was givin", pos?.up, "but wasn't a number");
     }
-    this.style.top = `${pos?.top * 100}vh`;
+    this.style.top = `${(0-pos?.up) * 50}vh`;
   }
-  if (pos?.center != undefined) {
+  if (pos.center != undefined) {
     if (typeof pos?.center != "object") {
       console.err(
         "a center was givin",
@@ -48,6 +48,11 @@ Node.prototype.goto = function (pos) {
     this.style.transform = `translate(-50%, -50%) rotate(${rot}turn) translate(50%, 50%)`;
   }
 
+  if(pos?.hidden==1){
+    this.style.display = 'none';  
+  }else{
+    this.style.display = 'block';
+  }
   this.style.position = "absolute";
 };
 
@@ -68,7 +73,7 @@ document.addEventListener(
 
 document.addEventListener("click", (event) => {
   document.body.requestPointerLock();
-  document.documentElement.requestFullscreen();
+  // document.documentElement.requestFullscreen();
 });
 
 // addEventListener(
@@ -89,43 +94,46 @@ window.addEventListener("resize", setVmax);
 
 let time = 0;
 
-function key(keyCode) {
-  if (key[keyCode]) {
-    return key[keyCode];
-  }
+let key={
+  new:[],
+  set:(e)=>{
+    
+    if(!key[e.code]){
+      key[e.code]={timeStamp:{key:e.timeStamp}}
+    }
+    
+    const ek=key[e.code]
+    const down=e.type==="keydown"
+    
+    key.new.push([e.code,e.key])
+    
+    Object.assign(ek,{
+      key:e.key,
+      new:1,
+      down,
+      up:!down,
+      fall:down&(key[e.code].up??1),
+      raise:!down&!(key[e.code].up??1),
+    })
 
-  return {
-    down: undefined,
-    first: undefined,
-    fall: undefined,
-    raise: undefined,
-    up: undefined,
-  };
+    for(let a of [
+      'new',
+      'fall',
+      'raise'
+    ]){
+      if(ek[a]){
+        ek.timeStamp[a]=e.timeStamp
+      }
+    }
+  }
 }
-key.new=[]
-
 document.addEventListener("keydown", (event) => {
-  event.preventDefault();
-  key.new.push([event.code,event.key])
-  if (!key(event.code).down) {
-    key[event.code] = {
-      down: 1,
-      first: 1,
-      fall: 1,
-      raise: 0,
-      up: 0,
-    };
-  }
+  // event.preventDefault();
+  key.set(event)
 });
 document.addEventListener("keyup", (event) => {
-  event.preventDefault();
-  key[event.code] = {
-    down: 0,
-    first: 1,
-    fall: 0,
-    raise: 1,
-    up: 1,
-  };
+  //event.preventDefault();
+  key.set(event)
 });
 
 function mouseUpdate() {
@@ -138,7 +146,7 @@ function pointerHandler(event,sets={}) {
   if(!pointer[event.pointerId]){
     pointer[event.pointerId]={
       time:null,
-      new:null,
+      new:1,
 
       pointerType:null,
       
@@ -152,8 +160,13 @@ function pointerHandler(event,sets={}) {
 
       x:null,
       y:null,
+      mx:0,
+      my:0,
+      
       xPx:null,
       yPx:null,
+      mxPx:0,
+      myPx:0,
 
       startTarget:null,
       target:null,
@@ -176,14 +189,22 @@ function pointerHandler(event,sets={}) {
     time:event.timeStamp,
     new:1,
     pointerType:event.pointerType,
+    
+    mx:2*(event.movementX/ vmax)+pointer[event.pointerId].mx??0,
+    my:-2*(event.movementY/ vmax)+pointer[event.pointerId].my??0,
     x:((event.x - window.innerWidth / 2) / vmax) * 2,
-    y:((event.y - window.innerHeight / 2) / vmax) * 2,
+    y:-((event.y - window.innerHeight / 2) / vmax) * 2,
+    
+    mxPx:event.movementX,
+    myPx:-event.movementY,
     xPx:event.x,
-    yPx:event.y,
+    yPx:-event.y,
+    
     startTarget:event.target,
     target:currentElement,
     targets:currentElements,
   })
+  
   Object.assign(pointer[event.pointerId],sets)
 }
 
@@ -211,6 +232,9 @@ document.addEventListener("pointermove",(event)=>{
 
 document.addEventListener("pointerleave",(event)=>{
   clog('deling',event.pointerId)
+  if(pointer.primary==event.pointerId){
+    delete pointer.primary
+  }
   delete pointer[event.pointerId]
 })
 
