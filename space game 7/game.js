@@ -1,3 +1,11 @@
+Object.assign(utill,{
+pointerLock: false,
+  fullscreen: false,
+  keyPreventDefault:false
+}
+
+
+
 main.insertElement(document.createElement("display"), 1).id = "display";
 var a = main.insertElement(document.createElement("div"), 0);
 a.id = "text";
