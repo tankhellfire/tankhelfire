@@ -206,6 +206,13 @@ function pointerHandler(event, sets = {}) {
     target: currentElement,
     targets: currentElements,
   });
+  if(event.pointerType==="mouse"&&document.pointerLockElement){
+    pointer[event.pointerId].x+=2 * (event.movementX / vmax) + pointer[event.pointerId].mx ?? 0
+    pointer[event.pointerId].y+=-2 * (event.movementY / vmax) + pointer[event.pointerId].my ?? 0
+  }else{
+    pointer[event.pointerId].x=((event.x - window.innerWidth / 2) / vmax) * 2
+    pointer[event.pointerId].y=-((event.y - window.innerHeight / 2) / vmax) * 2
+  }
 
   Object.assign(pointer[event.pointerId], sets);
 }

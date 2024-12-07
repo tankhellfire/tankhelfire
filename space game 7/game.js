@@ -1,8 +1,8 @@
 Object.assign(utill,{
-pointerLock: false,
-  fullscreen: false,
-  keyPreventDefault:false
-}
+  pointerLock: 1,
+  fullscreen: 1,
+  keyPreventDefault:1
+})
 
 
 
