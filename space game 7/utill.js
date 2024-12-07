@@ -194,8 +194,6 @@ function pointerHandler(event, sets = {}) {
 
     mx: 2 * (event.movementX / vmax) + pointer[event.pointerId].mx ?? 0,
     my: -2 * (event.movementY / vmax) + pointer[event.pointerId].my ?? 0,
-    x: ((event.x - window.innerWidth / 2) / vmax) * 2,
-    y: -((event.y - window.innerHeight / 2) / vmax) * 2,
 
     mxPx: event.movementX,
     myPx: -event.movementY,
@@ -207,8 +205,8 @@ function pointerHandler(event, sets = {}) {
     targets: currentElements,
   });
   if(event.pointerType==="mouse"&&document.pointerLockElement){
-    pointer[event.pointerId].x+=2 * (event.movementX / vmax) + pointer[event.pointerId].mx ?? 0
-    pointer[event.pointerId].y+=-2 * (event.movementY / vmax) + pointer[event.pointerId].my ?? 0
+    pointer[event.pointerId].x+=2 * (event.movementX / vmax)
+    pointer[event.pointerId].y+=-2 * (event.movementY / vmax)
   }else{
     pointer[event.pointerId].x=((event.x - window.innerWidth / 2) / vmax) * 2
     pointer[event.pointerId].y=-((event.y - window.innerHeight / 2) / vmax) * 2
