@@ -14,8 +14,8 @@ a.style.position = "absolute";
 a.style.overflowWrap="break-word"
 
 a.goto({
-  top: -0.5,
-  left: -0.5,
+  up: 1,
+  left: -1,
 });
 
 let game = new spaceGame7.Game(5);
