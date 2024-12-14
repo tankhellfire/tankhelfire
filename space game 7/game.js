@@ -18,7 +18,9 @@ a.goto({
   left: -1,
 });
 
-let game = new spaceGame7.Game(5);
+let game = new spaceGame7.game({
+  objCount:5
+});
 buffer=''
 function update() {
   let dt = performance.now() / 1000 - time;//delta time
