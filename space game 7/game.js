@@ -1,3 +1,5 @@
+lib.load('spaceGame7/main.js')
+
 Object.assign(utill,{
   pointerLock: 1,
   fullscreen: 1,
