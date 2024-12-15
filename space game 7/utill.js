@@ -192,8 +192,8 @@ function pointerHandler(event, sets = {}) {
     new: 1,
     pointerType: event.pointerType,
 
-    mx: 2 * (event.movementX / vmax) + pointer[event.pointerId].mx ?? 0,
-    my: -2 * (event.movementY / vmax) + pointer[event.pointerId].my ?? 0,
+    mx: 2 * (event.movementX / vmax) + (pointer[event.pointerId].mx ?? 0),
+    my: -2 * (event.movementY / vmax) + (pointer[event.pointerId].my ?? 0),
 
     mxPx: event.movementX,
     myPx: -event.movementY,

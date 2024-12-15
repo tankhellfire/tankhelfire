@@ -1,4 +1,5 @@
-lib.load('spaceGame7/main.js')
+(async()=>{
+const spaceGame7=await lib.load('spaceGame7/main.js')
 
 Object.assign(utill,{
   pointerLock: 1,
@@ -43,8 +44,8 @@ function update() {
   ${buffer}`;
 
   $("mouse").goto({
-    x: pointer[pointer.primary]?.x,
-    y: pointer[pointer.primary]?.y,
+    x: pointer[pointer.primary]?.mx,
+    y: pointer[pointer.primary]?.my,
     rot: time / 12,
   });
 
@@ -59,10 +60,15 @@ function update() {
     Object.assign(pointer[a],{
       new:0,
       raise:0,
-      fall:0
+      fall:0,
+      mx:0,
+      my:0,
+      mxPx:0,
+      myPx:0
     })
   )
   key.new=[]
   requestAnimationFrame(update);
 }
 update();
+})()
