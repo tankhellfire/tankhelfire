@@ -44,8 +44,8 @@ function update() {
   ${buffer}`;
 
   $("mouse").goto({
-    x: pointer[pointer.primary]?.mx,
-    y: pointer[pointer.primary]?.my,
+    x: pointer[pointer.primary]?.x,
+    y: pointer[pointer.primary]?.y,
     rot: time / 12,
   });
 
