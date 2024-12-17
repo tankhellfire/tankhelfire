@@ -1,5 +1,5 @@
 (async()=>{
-const spaceGame7=await lib('spaceGame7/main.js')
+const spaceGame7=await lib('spaceGame7/index.js')
 
 Object.assign(utill,{
   pointerLock: 1,
