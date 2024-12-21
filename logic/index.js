@@ -1,3 +1,6 @@
+// const img = new Image();
+// img.src = "assets/mouse.svg";
+
 Object.assign(utill, {
   pointerLock: 1,
   fullscreen: 1,
@@ -7,6 +10,11 @@ Object.assign(utill, {
 main.insertElement(document.createElement("img"), 0).id = "ico";
 ico.src = "assets/mouse.svg";
 ico.title = "ico";
+
+main.insertElement(document.createElement("img"), 0).id = "b";
+b.src = "assets/mouse.svg";
+b.title = "ico";
+
 
 
 (async () => {
