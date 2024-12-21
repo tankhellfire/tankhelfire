@@ -9,12 +9,13 @@ self.addEventListener('fetch', (event) => {
         console.log(`returning "${event.request.url}" from ${CACHE_NAME}`)
         return cachedResponse
       }
+      console.log(`fetching "${event.request.url}"`)
+      let a=fetch(event.request)
       if(event.request.url.startsWith('https://tankhellfire.glitch.me')){
         console.log(`adding "${event.request.url}" to ${CACHE_NAME}`)
-        caches.open(CACHE_NAME).then(cache=>cache.add(event.request))
+        a.then(res=>caches.open(CACHE_NAME).then(cache=>cache.put(event.request.url,res)))
       }
-      console.log(`fetching "${event.request.url}"`)
-      return fetch(event.request);
+      return a;
     })
   );
 });
