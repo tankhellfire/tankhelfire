@@ -19,13 +19,18 @@ self.addEventListener('install', (event) => {
 
 // Fetch event: serve cached assets
 self.addEventListener('fetch', (event) => {
-  console.log(event)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if(cachedResponse){
+        console.log(`returning "${event.request.url}" from ${CACHE_NAME}`)
         return cachedResponse
       }
-      caches.add(event.request)
+      console.log(event.request)
+      if(event.request.url.startsWith('https://tankhellfire.glitch.me')){
+        console.log(`adding "${event.request.url}" to ${CACHE_NAME}`)
+        caches.open(CACHE_NAME).then(cache=>cache.add(event.request))
+      }
+      console.log(`fetching "${event.request.url}"`)
       return fetch(event.request);
     })
   );
