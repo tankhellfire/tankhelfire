@@ -22,7 +22,11 @@ self.addEventListener('fetch', (event) => {
   console.log(event)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request);
+      if(cachedResponse){
+        return cachedResponse
+      }
+      caches.add(event.request)
+      return fetch(event.request);
     })
   );
 });
