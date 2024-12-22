@@ -16,8 +16,9 @@ b.src = "assets/mouse.svg";
 b.title = "ico";
 
 main.insertElement(document.createElement("div"), 0).id = "line";
-line.style.width='50max'
+line.style.width='100vmax'
 line.classList.add('line')
+
 
 
 
