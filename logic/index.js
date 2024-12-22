@@ -28,7 +28,7 @@ function drawLine(x1, y1, x2, y2) {
   
   // Style the line
   line.style.width = `${50*length}vmax`;
-  line.style.transform = `translate(${50*x1}vmax, ${-50*y1}vmax) rotate(${angle}rad)`;
+  line.style.transform = `translate(0, -50%) translate(${50*x1}vmax, ${-50*y1}vmax) rotate(${angle}rad)`;
 }
 
 
