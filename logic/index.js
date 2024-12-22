@@ -15,7 +15,11 @@ main.insertElement(document.createElement("img"), 0).id = "b";
 b.src = "assets/mouse.svg";
 b.title = "ico";
 
+main.insertElement(document.createElement("div"), 0).id = "line";
+line.style.width='50max'
+line.classList.add('line')
 
 
-(async () => {
-})();
+
+// (async () => {
+// })();
