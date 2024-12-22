@@ -18,10 +18,6 @@ b.title = "ico";
 main.insertElement(document.createElement("div"), 0).id = "line";
 line.classList.add('line')
 
-
-main.insertElement(document.createElement("div"), 0).id = "text";
-text.goto({})
-
 function drawLine(x1, y1, x2, y2) {
   const line = document.getElementById('line');
   
@@ -31,16 +27,17 @@ function drawLine(x1, y1, x2, y2) {
   const angle = Math.atan2(dy, dx)
   
   // Style the line
-  line.style.width = `${length}vmax`;
-  line.style.transform = `translate(${x1}vmax, ${-y1}vmax) rotate(${angle}rad)`;
+  line.style.width = `${50*length}vmax`;
+  line.style.transform = `translate(${50*x1}vmax, ${-50*y1}vmax) rotate(${angle}rad)`;
 }
 
 
 
 
 async function update() {
-  //drawLine(0,0,pointer,10)
-  text.innerText=JSON.stringify(pointer)
+  drawLine(0,0,pointer[pointer.primary]?.x,pointer[pointer.primary]?.y)
+  b.goto({x:pointer[pointer.primary]?.x,y:pointer[pointer.primary]?.y})
+  ico.goto({x:0,y:0})
   
   
   
