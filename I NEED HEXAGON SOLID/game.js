@@ -1,3 +1,6 @@
+utill.pointerLock=1
+
+
 let camera = {
   x: .5,
   y: .5,
@@ -8,11 +11,11 @@ let camera = {
   roll: 0,
   rotationSpeed: 1,
   rotationMatrix: [],
-  scale: 2 / Math.tan(60 * 0.01745329)
+  scale: 1/(Math.tan(120/2 * 2*Math.PI/360))
 }
 main.insertElement(document.createElement("div"), 0).id = 'hud'
 hud.goto({
-  left: -1,
+  right: -1,
   up: 1,
 })
 
