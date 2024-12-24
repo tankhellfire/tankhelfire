@@ -18,7 +18,7 @@ a.style.overflowWrap="break-word"
 
 a.goto({
   up: 1,
-  left: -1,
+  right: -1,
 });
 
 let game = new spaceGame7.game({
