@@ -28,6 +28,13 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
+// self.addEventListener('message', event => {
+//   if (event.data && event.data.type === 'FROM_PAGE') {
+//     console.log(event);
+//   }
+// });
+
+
 
 self.addEventListener('install', (event) => {
   console.log('Installing Service Worker...');
