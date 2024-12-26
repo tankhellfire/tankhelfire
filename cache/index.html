@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="assets/mouse.svg" />
+    <link rel="icon" href="assets/mouse.svg"/>
     <title>cache</title>
     <style>
-      * {
+      .select {
         -webkit-user-drag: none;
         -khtml-user-drag: none;
         -moz-user-drag: none;
@@ -19,18 +19,25 @@
         user-select: none;
         /* Standard syntax */
       }
-      
-      .line {
-        position: absolute;
-        height: 1vmax; /* Thickness of the line */
-        background: #fff;
-        transform-origin: center left;
-      }
     </style>
     <script src="/lib/utill.js"></script>
     <script src="/lib/lib.js"></script>
   </head>
   <body style="margin: 0; height: 100vh; width: 100vw;font-family: Consolas, monospace;background-color: #000;color:#fff">
+    <cliper style="
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+        position: absolute;   
+      ">
+      <main id="main" style="
+          position: absolute;
+          height: 50vmax;
+          width: 50vmax;
+          top: 50vh;
+          left: 50vw;
+        "></main>
+    </cliper>
+    <script src="index.js"></script>
   </body>
-  <script src="index.js"></script>
 </html>
