@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three.js Basic Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/three@171/build/three.module.js"></script>
+</head>
+<body>
+  <!-- The canvas for the 3D rendering -->
+  <div id="threejs-container" style="width: 100vw; height: 100vh;"></div>
+
+  <script>
+    // 1. Setup the scene, camera, and renderer
+    const scene = new THREE.Scene(); // Create the scene
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); // Create the camera
+    camera.position.z = 5; // Move the camera back so we can see the objects
+
+    const renderer = new THREE.WebGLRenderer(); // Create the WebGL renderer
+    renderer.setSize(window.innerWidth, window.innerHeight); // Set renderer size
+    document.getElementById("threejs-container").appendChild(renderer.domElement); // Add renderer to the DOM
+
+    // 2. Add a geometry (e.g., a cube)
+    const geometry = new THREE.BoxGeometry(); // Create a cube geometry
+    const material = new THREE.MeshStandardMaterial({ color: 0x0077ff }); // Create a material (color/texture)
+    const cube = new THREE.Mesh(geometry, material); // Combine geometry and material into a mesh
+    scene.add(cube); // Add the cube to the scene
+
+    // 3. Add lights
+    const light = new THREE.DirectionalLight(0xffffff, 1); // Add a directional light
+    light.position.set(5, 5, 5); // Set the light's position
+    scene.add(light);
+
+    // 4. Animate and render the scene
+    function animate() {
+      requestAnimationFrame(animate); // Request the next animation frame
+      cube.rotation.x += 0.01; // Rotate the cube on the X axis
+      cube.rotation.y += 0.01; // Rotate the cube on the Y axis
+      renderer.render(scene, camera); // Render the scene
+    }
+    animate(); // Start animation loop
+
+    // 5. Handle window resize
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight; // Update camera aspect
+      camera.updateProjectionMatrix(); // Update the camera's projection
+      renderer.setSize(window.innerWidth, window.innerHeight); // Resize the renderer
+    });
+  </script>
+</body>
+</html>
