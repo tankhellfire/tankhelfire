@@ -58,11 +58,26 @@
 
         scene.add(cube);
       }
+      
+      const geometry = new THREE.BoxGeometry(100,100);
+      const material = new THREE.MeshBasicMaterial
+      const edgeMaterial = new THREE.MeshBasicMaterial({color:'#000000'})
+      const edges = new THREE.EdgesGeometry(geometry); // Extract edges
+      const cube = new THREE.Mesh(geometry, material);
+
+      cube.position.z=-70
+
+      const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+      cube.add(edgeLines); // Add edges as a child of the cube
+
+      scene.add(cube);
+      
       // Animation loop
       function animate() {
         requestAnimationFrame(animate);
         let t=performance.now()*.001
-        for(let a of scene.children){
+        for (let index = 0; index < scene.children.length-1; index++) {
+          let a = scene.children[index]
           a.rotation.x = t;
           a.rotation.y = t;
         }
@@ -80,7 +95,7 @@
         
         // Maintain a constant visible scene area by scaling the FOV
         const aspectRatio = width / height;
-        const fov = Math.max(minFov, 75 / aspectRatio); // Adjust FOV based on the aspect ratio
+        const fov = Math.max(75 * aspectRatio, 75 / aspectRatio); // Adjust FOV based on the aspect ratio
 
         // Update the camera's FOV and the projection matrix
         camera.fov = fov;
