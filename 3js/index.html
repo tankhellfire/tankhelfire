@@ -31,9 +31,15 @@
       document.body.appendChild(renderer.domElement);
 
       // Add a cube
-      window.geometry = new THREE.BoxGeometry();
-      window.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-      window.cube = new THREE.Mesh(geometry, material);
+      const geometry = new THREE.BoxGeometry();
+      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const cube = new THREE.Mesh(geometry, material);
+      
+      // Create the edges and add them as a child of the cube
+      const edges = new THREE.EdgesGeometry(geometry); // Extract edges
+      const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000 }); // Black edges
+      const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+      cube.add(edgeLines); // Add edges as a child of the cube
       
       scene.add(cube);
 
