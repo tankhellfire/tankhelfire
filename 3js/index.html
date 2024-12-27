@@ -28,6 +28,7 @@
       // Set up the scene, camera, and renderer
       window.scene = new THREE.Scene();
       window.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+      const minFov = 75;
       // camera.rotation._order='YXZ'
       
       camera.position.z = 5;
@@ -65,7 +66,7 @@
       const edges = new THREE.EdgesGeometry(geometry); // Extract edges
       const cube = new THREE.Mesh(geometry, material);
 
-      cube.position.z=-70
+      cube.position.z=-60
 
       const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
       cube.add(edgeLines); // Add edges as a child of the cube
@@ -87,27 +88,33 @@
       animate();
       
       
-      const minFov = 75;
-
       function updateCanvas() {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
-        // Update the camera's aspect ratio based on the window size
+        // Calculate vmin (smallest dimension)
+        const vmin = Math.min(width, height);
+
+        // Update renderer size based on the smallest dimension
+        renderer.setSize(vmin, vmin);
+
+        // Position the canvas to center it on the screen
+        renderer.domElement.style.left = `${(width - vmin) / 2}px`;
+        renderer.domElement.style.top = `${(height - vmin) / 2}px`;
+
+        // Adjust the camera's aspect ratio based on the window size
         camera.aspect = width / height;
 
-        // Keep the minimum FOV constant and adjust it based on the aspect ratio
-        const fov = 75 * (height / width);  // You can adjust this formula as necessary
+        // Keep FOV constant for the smallest dimension (vmin)
+        camera.fov = 75 * (vmin / width);  // Adjust FOV based on the aspect ratio
 
         // Ensure the FOV doesn't go below a minimum value
-        camera.fov = Math.max(minFov, fov); // Minimum FOV to avoid too much zooming out
+        camera.fov = Math.max(45, camera.fov);
 
         // Update the camera's projection matrix after changing the FOV
         camera.updateProjectionMatrix();
-
-        // Update the renderer's size
-        renderer.setSize(width, height);
       }
+
 
       // Initial update of canvas and camera aspect
       updateCanvas();
