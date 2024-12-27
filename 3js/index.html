@@ -36,25 +36,33 @@
       document.body.appendChild(renderer.domElement);
 
       // Add a cube
-      const geometry = new THREE.BoxGeometry();
-      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-      const cube = new THREE.Mesh(geometry, material);
-      
-      // Create the edges and add them as a child of the cube
-      const edges = new THREE.EdgesGeometry(geometry); // Extract edges
-      const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000 }); // Black edges
-      const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
-      cube.add(edgeLines); // Add edges as a child of the cube
-      
-      scene.add(cube);
 
+      for (let props of [[1,0,0],[0,1,0],[0,0,1]]) {
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.Material
+        const edgeMaterial = new THREE.Material
+        const edges = new THREE.EdgesGeometry(geometry); // Extract edges
+        const cube = new THREE.Mesh(geometry, material);
+//         cube.r=props[0]
+//         cube.g=props[1]
+//         cube.b=props[2]
+        
+//         cube.position.x=props[0]
+//         cube.position.y=props[1]
+//         cube.position.z=props[2]
+         
+        const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+        cube.add(edgeLines); // Add edges as a child of the cube
+
+        scene.add(cube);
+      }
       // Animation loop
       function animate() {
         requestAnimationFrame(animate);
         let t=performance.now()*.001
         for(let a of scene.children){
-          a.rotation.x = t;
-          a.rotation.y = t;
+          // a.rotation.x = t;
+          // a.rotation.y = t;
         }
         renderer.render(scene, camera);
       }
