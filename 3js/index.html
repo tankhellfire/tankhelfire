@@ -81,6 +81,7 @@
           a.rotation.x = t;
           a.rotation.y = t;
         }
+        updateCanvas()
         renderer.render(scene, camera);
       }
       animate();
@@ -88,30 +89,32 @@
       
       const minFov = 75;
 
-      // Function to calculate and adjust the FOV based on the aspect ratio
-      function updateFOV() {
+      function updateCanvas() {
         const width = window.innerWidth;
         const height = window.innerHeight;
-        
-        // Maintain a constant visible scene area by scaling the FOV
-        const aspectRatio = width / height;
-        const fov = Math.max(75 * aspectRatio, 75 / aspectRatio); // Adjust FOV based on the aspect ratio
 
-        // Update the camera's FOV and the projection matrix
-        camera.fov = fov;
-        camera.aspect = aspectRatio;
+        // Update the camera's aspect ratio based on the window size
+        camera.aspect = width / height;
+
+        // Keep the minimum FOV constant and adjust it based on the aspect ratio
+        const fov = 75 * (height / width);  // You can adjust this formula as necessary
+
+        // Ensure the FOV doesn't go below a minimum value
+        camera.fov = Math.max(minFov, fov); // Minimum FOV to avoid too much zooming out
+
+        // Update the camera's projection matrix after changing the FOV
         camera.updateProjectionMatrix();
 
-        // Update the renderer size
+        // Update the renderer's size
         renderer.setSize(width, height);
       }
 
-      // Initial update of FOV and renderer size
-      updateFOV();
+      // Initial update of canvas and camera aspect
+      updateCanvas();
       
 
       // Resize canvas and camera on window resize
-      window.addEventListener('resize',updateFOV);
+      window.addEventListener('resize',updateCanvas);
     })
   </script>
 </body>
