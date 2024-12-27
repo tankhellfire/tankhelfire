@@ -4,7 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Three.js Basic Example</title>
-  <script src="https://cdn.jsdelivr.net/npm/three@171/build/three.module.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+      "lib":"/lib/lib.js"
+    }
+  }
+</script>
 </head>
 <body>
   <!-- The canvas for the 3D rendering -->
