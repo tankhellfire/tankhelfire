@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" oncontextmenu="return false;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Three.js Global Import</title>
+  <script src="/lib/utill.js"></script>
 </head>
 <body style="margin: 0; height: 100vh; width: 100vw;font-family: Consolas, monospace;background-color: #000;color:#fff">
   <script type="module">
@@ -17,6 +18,10 @@
 
   <!-- Other scripts that rely on THREE -->
   <script>
+    Object.assign(utill,{
+      fullscreen:1,
+      keyPreventDefault:1
+    })
     // Wait until THREE is ready
     window.addEventListener('threejs-ready', () => {
       // Set up the scene, camera, and renderer
@@ -46,8 +51,11 @@
       // Animation loop
       function animate() {
         requestAnimationFrame(animate);
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
+        let t=performance.now()*.001
+        for(let a of scene.children){
+          a.rotation.x = t;
+          a.rotation.y = t;
+        }
         renderer.render(scene, camera);
       }
       animate();
