@@ -95,23 +95,14 @@
         // Calculate vmin (smallest dimension)
         const vmin = Math.min(width, height);
 
-        // Update renderer size based on the smallest dimension
-        renderer.setSize(vmin, vmin);
+        // Set the renderer size to match the vmin dimension (smallest dimension)
+        renderer.setSize(width, height);
 
-        // Position the canvas to center it on the screen
-        renderer.domElement.style.left = `${(width - vmin) / 2}px`;
-        renderer.domElement.style.top = `${(height - vmin) / 2}px`;
+        // Update the camera's aspect ratio to match the window's width / height
+        camera.aspect = width/height;
 
-        // Adjust the camera's aspect ratio based on the window size
-        camera.aspect = width / height;
-
-        // Keep FOV constant for the smallest dimension (vmin)
-        camera.fov = 75 * (vmin / width);  // Adjust FOV based on the aspect ratio
-
-        // Ensure the FOV doesn't go below a minimum value
-        camera.fov = Math.max(45, camera.fov);
-
-        // Update the camera's projection matrix after changing the FOV
+        // Adjust the camera's FOV based on the window size
+        camera.fov = 75;  // Maintain a constant FOV
         camera.updateProjectionMatrix();
       }
 
