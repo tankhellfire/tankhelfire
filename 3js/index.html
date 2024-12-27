@@ -60,25 +60,11 @@
         scene.add(cube);
       }
       
-      const geometry = new THREE.BoxGeometry(100,100);
-      const material = new THREE.MeshBasicMaterial
-      const edgeMaterial = new THREE.MeshBasicMaterial({color:'#000000'})
-      const edges = new THREE.EdgesGeometry(geometry); // Extract edges
-      const cube = new THREE.Mesh(geometry, material);
-
-      cube.position.z=-60
-
-      const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
-      cube.add(edgeLines); // Add edges as a child of the cube
-
-      scene.add(cube);
-      
       // Animation loop
       function animate() {
         requestAnimationFrame(animate);
         let t=performance.now()*.001
-        for (let index = 0; index < scene.children.length-1; index++) {
-          let a = scene.children[index]
+        for (let a of scene.children) {
           a.rotation.x = t;
           a.rotation.y = t;
         }
@@ -102,7 +88,7 @@
         camera.aspect = width/height;
 
         // Adjust the camera's FOV based on the window size
-        camera.fov = 75*vmin;  // Maintain a constant FOV
+        camera.zoom= vmin // Maintain a constant FOV
         camera.updateProjectionMatrix();
       }
 
