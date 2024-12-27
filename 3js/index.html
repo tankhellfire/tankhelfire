@@ -24,13 +24,15 @@
     })
     // Wait until THREE is ready
     window.addEventListener('threejs-ready', () => {
+      THREE.Euler.DEFAULT_ORDER="YXZ"
       // Set up the scene, camera, and renderer
       window.scene = new THREE.Scene();
       window.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      // camera.rotation._order='YXZ'
       
       camera.position.z = 5;
 
-      window.renderer = new THREE.WebGLRenderer();
+      window.renderer = new THREE.WebGLRenderer({ antialias: true });
       
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
@@ -40,7 +42,7 @@
       for (let props of [[1,0,0],[0,1,0],[0,0,1],[1,1,1]]) {
         const geometry = new THREE.BoxGeometry();
         const material = new THREE.MeshBasicMaterial
-        const edgeMaterial = new THREE.MeshBasicMaterial
+        const edgeMaterial = new THREE.MeshBasicMaterial({color:'#000000'})
         const edges = new THREE.EdgesGeometry(geometry); // Extract edges
         const cube = new THREE.Mesh(geometry, material);
         cube.material.color.r=props[0]
@@ -72,9 +74,11 @@
       window.addEventListener('resize', () => {
         const width = window.innerWidth;
         const height = window.innerHeight;
+        
+        const vmin=Math.min(width,height)
 
         // Update renderer size
-        renderer.setSize(width, height);
+        renderer.setSize(vmin, vmin);
 
         // Update camera aspect ratio and projection matrix
         camera.aspect = width / height;
