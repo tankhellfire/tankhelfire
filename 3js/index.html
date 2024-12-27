@@ -31,7 +31,7 @@
       const minFov = 75;
       // camera.rotation._order='YXZ'
       
-      camera.position.z = 5;
+      camera.position.z = 7;
 
       window.renderer = new THREE.WebGLRenderer({ antialias: true });
       
@@ -40,7 +40,7 @@
 
       // Add a cube
 
-      for (let props of [[1,0,0],[0,1,0],[0,0,1],[1,1,1]]) {
+      for (let props of [[1,0,0],[0,1,0],[0,0,1],[1,1,1],[0,0,0]]) {
         const geometry = new THREE.BoxGeometry();
         const material = new THREE.MeshBasicMaterial
         const edgeMaterial = new THREE.MeshBasicMaterial({color:'#000000'})
@@ -60,14 +60,21 @@
         scene.add(cube);
       }
       
+      const rotspeed=[]
+      for(let a=0;a<6;a++){
+        rotspeed.push([2*(2*Math.random()-1),2*(2*Math.random()-1)])
+      }
       // Animation loop
       function animate() {
+        let n=0
         requestAnimationFrame(animate);
         let t=performance.now()*.001
         for (let a of scene.children) {
-          a.rotation.x = t;
-          a.rotation.y = t;
+          a.rotation.x = t*rotspeed[n][0];
+          a.rotation.y = t*rotspeed[n++][1];
         }
+        scene.rotation.x = t*rotspeed[n][0];
+        scene.rotation.y = t*rotspeed[n++][1];
         updateCanvas()
         renderer.render(scene, camera);
       }
