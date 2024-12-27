@@ -93,7 +93,7 @@
         const height = window.innerHeight;
 
         // Calculate vmin (smallest dimension)
-        const vmin = Math.min(width, height);
+        const vmin = Math.min(1, width/height)
 
         // Set the renderer size to match the vmin dimension (smallest dimension)
         renderer.setSize(width, height);
@@ -102,7 +102,7 @@
         camera.aspect = width/height;
 
         // Adjust the camera's FOV based on the window size
-        camera.fov = 75;  // Maintain a constant FOV
+        camera.fov = 75*vmin;  // Maintain a constant FOV
         camera.updateProjectionMatrix();
       }
 
