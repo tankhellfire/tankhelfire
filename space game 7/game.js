@@ -1,3 +1,4 @@
+let {game}=0;
 (async()=>{
 const spaceGame7=await lib('spaceGame7/index.js')
 
@@ -21,11 +22,11 @@ a.goto({
   right: -1,
 });
 
-let game = new spaceGame7.game({
+game = new spaceGame7.game({
   objCount:5
 });
 buffer=''
-function update() {
+async function update() {
   let dt = performance.now() / 1000 - time;//delta time
   time = performance.now() / 1000;
 
