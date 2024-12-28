@@ -11,12 +11,25 @@ Object.assign(utill,{
   
 main.insertElement(document.createElement("display"), 1).id = "display";
 (()=>{
-  let elecounter=0
+  let eleCounter=0
   display.start=()=>{
-    elecounter=0
+    eleCounter=0
+
   }
   display.draw=(object)=>{
-
+    if(display.children.length-1<eleCounter){
+      display.appendChild(document.createElement("div"))
+    }
+    const ele=display.children[eleCounter]
+    
+    ele.goto({x:object.x,y:object.y})
+    
+    eleCounter++
+  }
+  display.end=()=>{
+    while(eleCounter<display.children.length){
+      display.removeChild(display.children[eleCounter])
+    }
   }
 })()
 
