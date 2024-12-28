@@ -18,17 +18,18 @@ main.insertElement(document.createElement("display"), 1).id = "display";
   }
   display.draw=(object)=>{
     if(display.children.length-1<eleCounter){
-      display.appendChild(document.createElement("div"))
+      display.appendChild(document.createElement("img"))
     }
     const ele=display.children[eleCounter]
     
-    ele.goto({x:object.x,y:object.y})
+    ele.goto({x:object.x*3-1.5,y:object.y*3-1.5})
+    ele.src=object.img
     
     eleCounter++
   }
   display.end=()=>{
     while(eleCounter<display.children.length){
-      display.removeChild(display.children[eleCounter])
+      display.children[eleCounter].remove()
     }
   }
 })()
@@ -46,7 +47,7 @@ a.goto({
 });
 
 game = new spaceGame7.game({
-  objCount:5
+  objCount:100
 });
   
   
@@ -74,6 +75,14 @@ async function update() {
     y: pointer[pointer.primary]?.y,
     rot: time / 12,
   });
+  
+  display.start()
+  
+  game.obj.forEach((obj)=>{
+    display.draw(obj)
+  })
+  
+  display.end()
 
   
   for (var a in key) {
