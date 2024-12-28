@@ -25,7 +25,8 @@ main.insertElement(document.createElement("display"), 1).id = "display";
     ele.goto({
       x:object.x*3-1.5,
       y:object.y*3-1.5,
-      rot:object.dir
+      rot:object.dir,
+      center:[-50,-50]
     })
     ele.src=object.img
     
