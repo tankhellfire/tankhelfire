@@ -8,12 +8,19 @@ Object.assign(utill,{
   keyPreventDefault:1
 })
 
-function draw(element,object){
   
-}
-
-
 main.insertElement(document.createElement("display"), 1).id = "display";
+(()=>{
+  let elecounter=0
+  display.start=()=>{
+    elecounter=0
+  }
+  display.draw=(object)=>{
+
+  }
+})()
+
+
 var a = main.insertElement(document.createElement("div"), 0);
 a.id = "text";
 a.style.width = "100vw";
