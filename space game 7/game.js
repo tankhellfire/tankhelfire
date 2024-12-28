@@ -8,6 +8,9 @@ Object.assign(utill,{
   keyPreventDefault:1
 })
 
+function draw(element,object){
+  
+}
 
 
 main.insertElement(document.createElement("display"), 1).id = "display";
@@ -25,6 +28,8 @@ a.goto({
 game = new spaceGame7.game({
   objCount:5
 });
+  
+  
 buffer=''
 async function update() {
   let dt = performance.now() / 1000 - time;//delta time
