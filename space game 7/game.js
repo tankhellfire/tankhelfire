@@ -22,7 +22,11 @@ main.insertElement(document.createElement("display"), 1).id = "display";
     }
     const ele=display.children[eleCounter]
     
-    ele.goto({x:object.x*3-1.5,y:object.y*3-1.5})
+    ele.goto({
+      x:object.x*3-1.5,
+      y:object.y*3-1.5,
+      rot:object.dir
+    })
     ele.src=object.img
     
     eleCounter++
@@ -47,7 +51,7 @@ a.goto({
 });
 
 game = new spaceGame7.game({
-  objCount:100
+  objCount:50
 });
   
   
