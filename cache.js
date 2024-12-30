@@ -10,23 +10,28 @@ for(const a of [
   cache(a)
 }
 
-function cache(a){
-  let url=new URL(a,self.location.origin)
-  let res=await fetch(url)
-  if(url.hostname=='tankhellfire.glitch.me'){
+async function cache(a){
+  try{
+    let url=new URL(a,self.location.origin)
+    let res=await fetch(url)
+    if(url.hostname=='tankhellfire.glitch.me'){
 
-    if(neverCache.includes(url.pathname)){
-      console.log(`//never cache "${url.pathname}"`)
-      return res.clone()
+      if(neverCache.includes(url.pathname)){
+        console.log(`//never cache "${url.pathname}"`)
+        return res.clone()
+      }
+
+      caches.open(CACHE_NAME).then(cache=>{
+        cache.put(url.pathname,res.clone())
+        console.log(`//updated cache "${url.pathname}"`)
+      })
     }
 
-    caches.open(CACHE_NAME).then(cache=>{
-      cache.put(url.pathname,res.clone())
-      console.log(`//updated cache "${url.pathname}"`)
-    })
+    return res.clone()
+  }catch(err){
+    console.error(err)
+    return err
   }
-
-  return res.clone()
 }
 
 self.addEventListener('fetch', (event) => {
