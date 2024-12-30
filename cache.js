@@ -6,18 +6,21 @@ const neverCache=[]
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
+      
+      const url=new URL(event.request.url,event.request.origin)
+      console.log(event.request)
       let a=fetch(event.request).then(res=>{
-        console.log(event.request)
         
-        const url=new URL(event.request.url,event.request.origin)
-        if(neverCache.some(regex => regex.test(event.request.url))){
+        
+        if(url.hostname=='tankhellfire.glitch.me'){
+          if(neverCache.includes(url.pathname)){
+            console.log(`//neverCache "${url.herf}"`)
+            return res.clone()
+          }
           
-        }
-        
-        if(event.request.url.startsWith('https://tankhellfire.glitch.me')){
           caches.open(CACHE_NAME).then(cache=>{
-            cache.put(event.request.url,res.clone())
-            // console.log(`updated "${event.request.url}"`)
+            cache.put(url.herf,res.clone())
+            console.log(`//updated "${url.herf}"`)
           })
         }
         
@@ -26,10 +29,8 @@ self.addEventListener('fetch', (event) => {
       
       
       if(cachedResponse){
-        // console.log(`returning "${event.request.url}" from cache`)
         return cachedResponse
       }
-      // console.log(`returning "${event.request.url}" from fetch`)
       return a;
     })
   );
