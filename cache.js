@@ -1,20 +1,13 @@
-// Cache name
 const CACHE_NAME = 'tankh-cache';
-const neverCache=[]
 
-// Fetch event: serve cached assets
+let neverCache=[]
+
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const url=new URL(event.request.url)
-      let a=fetch(event.request).then(res=>{
-        
-        
+      const a=fetch(event.request).then(res=>{
         if(url.hostname=='tankhellfire.glitch.me'){
-          if(neverCache.includes(url.pathname)){
-            console.log(`//never cache "${url.href}"`)
-            return res.clone()
-          }
           
           caches.open(CACHE_NAME).then(cache=>{
             cache.put(url.href,res.clone())
@@ -41,6 +34,12 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('install', (event) => {
   console.log('//installing');
   self.skipWaiting(); // Activate immediately
+  fetch('/index.json').then(res=>res.json()).then(res=>{
+    neverCache=res.never
+    for(const a of res.always){
+      fetch(a)
+    }
+  })
 });
 
 self.addEventListener('activate', (event) => {
