@@ -1,6 +1,11 @@
 const CACHE_NAME = 'tankh-cache';
 
-let neverCache=[]
+let neverCache=['/games/scratch/spacegamev5.html']
+for(const a of [
+  '/txt'
+]){
+  fetch(a)
+}
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
@@ -8,6 +13,11 @@ self.addEventListener('fetch', (event) => {
       const url=new URL(event.request.url)
       const a=fetch(event.request).then(res=>{
         if(url.hostname=='tankhellfire.glitch.me'){
+          
+          if(neverCache.includes(url.pathname)){
+            console.log(`//never cache"${url.href}"`)
+            return res.clone()
+          }
           
           caches.open(CACHE_NAME).then(cache=>{
             cache.put(url.href,res.clone())
@@ -34,16 +44,9 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('install', (event) => {
   console.log('//installing');
   self.skipWaiting(); // Activate immediately
-  fetch('/index.json').then(res=>res.json()).then(res=>{
-    neverCache=res.never
-    for(const a of res.always){
-      fetch(a)
-    }
-  })
 });
 
 self.addEventListener('activate', (event) => {
   console.log('//activating');
   event.waitUntil(clients.claim()); // Take control of all open pages
 });
-

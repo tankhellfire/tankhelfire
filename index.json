@@ -1,4 +1,0 @@
-{
-  always:["/txt/index.html"],
-  never:["/index.json"]
-}
