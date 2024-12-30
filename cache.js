@@ -11,8 +11,8 @@ for(const a of [
 }
 
 async function cache(a){
+  let url=new URL(a,self.location.origin)
   try{
-    let url=new URL(a,self.location.origin)
     let res=await fetch(url)
     if(url.hostname=='tankhellfire.glitch.me'){
 
@@ -29,7 +29,7 @@ async function cache(a){
 
     return res.clone()
   }catch(err){
-    console.error(err)
+    console.warn(`//failed ${url}`)
     return err
   }
 }
