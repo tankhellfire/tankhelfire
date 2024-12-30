@@ -9,7 +9,8 @@ self.addEventListener('fetch', (event) => {
       let a=fetch(event.request).then(res=>{
         console.log(event.request)
         
-        if(neverCache.includes(event.request.url)){
+        const url=new URL(event.request.url,event.request.origin)
+        if(neverCache.some(regex => regex.test(event.request.url))){
           
         }
         
