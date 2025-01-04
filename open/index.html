@@ -18,22 +18,29 @@
     <input type="file" id="fileInput"/>
     <p id="info">click "Choose File"</p>
     <div>
-      <button id="openInNewTab">open in new tab</button>
+      <button id="openInNewTab">open in new tab</button><button id="openInNewTabAsText">open in new tab as text</button>
     </div>
     <script>
       let file
+      
+      openInNewTab.onclick=()=>{
+        window.open(URL.createObjectURL(file))
+      }
+      openInNewTabAsText.onclick=()=>{
+        window.open(URL.createObjectURL(file))
+      }
+      
+      
       document.getElementById('fileInput').addEventListener('change', function(event) {
         file = event.target.files[0];
         if (file) {
           console.log(file)
-          info.textContent=`
-${file.name}
-${file.size}
+          info.innerHTML=`<h2>${file.name}</h2>${file.size} B
 ${file.type}
 ${file.lastModifiedDate}
-`
+`.replace(/\n/g, "<br>")
         }else{
-          info.textContent='click "Choose File"'
+          info.innerHTML='click "Choose File"'
         }
       });
     </script>
