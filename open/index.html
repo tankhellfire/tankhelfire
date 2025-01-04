@@ -1,23 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>File Opener</title>
-</head>
-<body>
-    <h1>File Opener</h1>
+    <style>
+      * {
+        margin: 8px;
+      }
+      
+      div{
+        margin: 0px;
+      }
+    </style>
+  </head>
+  <body style="font-family: Consolas, monospace;background-color: #000;color:#fff">
     <input type="file" id="fileInput"/>
+    <div id="info">click "open in new tab"</div>
+    <div>
+      <button id="openInNewTab">open in new tab</button>
+    </div>
     <script>
-        document.getElementById('fileInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const fileURL = URL.createObjectURL(file);
-                setTimeout(() => {
-                    window.open(fileURL);
-                }, 500); // Delay of 500 milliseconds
-            }
-        });
+      let file
+      document.getElementById('fileInput').addEventListener('change', function(event) {
+        file = event.target.files[0];
+        if (file) {
+          console.log(file)
+        }else{
+          
+        }
+      });
     </script>
-</body>
+  </body>
 </html>
