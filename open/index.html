@@ -16,7 +16,7 @@
   </head>
   <body style="font-family: Consolas, monospace;background-color: #000;color:#fff">
     <input type="file" id="fileInput"/>
-    <div id="info">click "open in new tab"</div>
+    <p id="info">click "Choose File"</p>
     <div>
       <button id="openInNewTab">open in new tab</button>
     </div>
@@ -26,8 +26,14 @@
         file = event.target.files[0];
         if (file) {
           console.log(file)
+          info.textContent=`
+${file.name}
+${file.size}
+${file.type}
+${file.lastModifiedDate}
+`
         }else{
-          
+          info.textContent='click "Choose File"'
         }
       });
     </script>
