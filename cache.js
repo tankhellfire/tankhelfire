@@ -1,8 +1,7 @@
 const CACHE_NAME = 'tankh-cache';
 
 let neverCache=[
-  '/games/scratch/spacegamev5.html',
-  '/open'
+  '/games/scratch/spacegamev5.html'
 ]
 for(const a of [
   '/txt'

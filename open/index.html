@@ -29,7 +29,18 @@
       }
       openInNewTabAsText.onclick=async()=>{
         const newTab = window.open();
-        newTab.document.write(`<pre style="word-wrap: break-word; white-space: pre-wrap;">${await file.text()}</pre>`)
+        newTab.document.write(`
+<html>
+  <head>
+    <meta name="color-scheme" content="light dark">
+  </head>
+  <body>
+    <pre style="word-wrap: break-word; white-space: pre-wrap;">
+      ${await file.text()}
+    </pre>
+  </body>
+</html>
+        `)
         newTab.document.close();
       }
       
