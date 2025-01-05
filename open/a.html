@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MP3 Thumbnail Extractor</title>
+</head>
+<body>
+  <h1>Extract Thumbnail from MP3</h1>
+  <input type="file" id="fileInput" accept=".mp3">
+  <div id="output">
+    <h3>Thumbnail:</h3>
+    <img id="thumbnail" alt="Album Art" style="max-width: 300px; display: none;">
+    <p id="noImage" style="color: red; display: none;">No thumbnail found in this MP3.</p>
+  </div>
+
+  <script src="/lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+
+      if (file) {
+        jsmediatags.read(file, {
+          onSuccess: function(tag) {
+            const picture = tag.tags.picture;
+
+            if (picture) {
+              const base64String = arrayBufferToBase64(picture.data);
+              const mimeType = picture.format;
+              const imgSrc = `data:${mimeType};base64,${base64String}`;
+              const imgElement = document.getElementById('thumbnail');
+
+              imgElement.src = imgSrc;
+              imgElement.style.display = 'block';
+              document.getElementById('noImage').style.display = 'none';
+            } else {
+              document.getElementById('thumbnail').style.display = 'none';
+              document.getElementById('noImage').style.display = 'block';
+            }
+          },
+          onError: function(error) {
+            console.error('Error reading file:', error);
+            alert('Failed to extract thumbnail.');
+          }
+        });
+      }
+    });
+
+    // Helper function to convert ArrayBuffer to Base64
+    function arrayBufferToBase64(buffer) {
+      let binary = '';
+      const bytes = new Uint8Array(buffer);
+      bytes.forEach(byte => binary += String.fromCharCode(byte));
+      return btoa(binary);
+    }
+  </script>
+</body>
+</html>
