@@ -1,33 +1,75 @@
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>music</title>
-    <meta name="color-scheme" content="light dark">
-    <script>((a,b)=>{a.endsWith(b)||history.replaceState(null,'',a+(a.endsWith('/')?'':'/')+b)})(document.location.pathname,'index.html')</script>
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      ((a, b) => {
+        a.endsWith(b) ||
+          history.replaceState(null, "", a + (a.endsWith("/") ? "" : "/") + b);
+      })(document.location.pathname, "index.html");
+    </script>
+    <style>
+      * {
+        margin: 0px;
+      }
+    </style>
   </head>
-  <body style="font-family: Consolas, monospace;margin: 0px;" class="vsc-initialized">
-    <div style="
-      display: flex;
-      height: 100vh;
-      width: 100vw;
-      margin: 0;
-      padding: 0;">
-      <div style="
-  background-color: #f00;
-  height: 100vh;
-  margin: 0px;
-  width: max(calc(100vw - 100vmin),30vw););
-"></div>
-      <div style="
-  flex: 1;
-  background-color: #2196F3;
-">
-        <div style="
-  aspect-ratio: 1/1;
-  background-color: #0f0;
-"></div>
-      </div>
-    </div>
+  <body style="font-family: Consolas, monospace" class="vsc-initialized">
+    <input type="file" id="fileInput" />
+    <script>
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", function (event) {
+          const file = event.target.files[0];
+
+          if (file) {
+            jsmediatags.read(file, {
+              onSuccess: function (tag) {
+                const picture = tag.tags.picture;
+
+                if (picture) {
+                  const base64String = arrayBufferToBase64(picture.data);
+
+                  const mimeType = picture.format;
+
+                  const imgSrc = `data:${mimeType};base64,${base64String}`;
+
+                  const imgElement = document.getElementById("thumbnail");
+
+                  imgElement.src = imgSrc;
+
+                  imgElement.style.display = "block";
+
+                  document.getElementById("noImage").style.display = "none";
+                } else {
+                  document.getElementById("thumbnail").style.display = "none";
+
+                  document.getElementById("noImage").style.display = "block";
+                }
+              },
+
+              onError: function (error) {
+                console.error("Error reading file:", error);
+
+                alert("Failed to extract thumbnail.");
+              },
+            });
+          }
+        });
+
+      // Helper function to convert ArrayBuffer to Base64
+
+      function arrayBufferToBase64(buffer) {
+        let binary = "";
+
+        const bytes = new Uint8Array(buffer);
+
+        bytes.forEach((byte) => (binary += String.fromCharCode(byte)));
+
+        return btoa(binary);
+      }
+    </script>
   </body>
 </html>
