@@ -10,13 +10,25 @@ for(const a of [
   cache(a)
 }
 
+function fixUrl(url){
+  url=new URL(url,self.location.origin)
+  if(url.hostname=='tankhellfire.glitch.me'){
+    let end=url.pathname.split('/').pop()
+    if(!end.includes('.')){
+      if(end!==''){
+        url.pathname+='/'
+      }
+      url.pathname+='index.html'
+    }
+  }
+  return url
+}
+
 async function cache(a){
-  let url=new URL(a,self.location.origin)
+  let url=fixUrl(a)
   try{
     let res=await fetch(url)
     if(url.hostname=='tankhellfire.glitch.me'){ 
-      
-      if(url.pathname.split('/').pop().includes('.'))
 
       if(neverCache.includes(url.pathname)){
         console.log(`//never cache "${url.pathname}"`)
@@ -37,6 +49,7 @@ async function cache(a){
 }
 
 self.addEventListener('fetch', (event) => {
+  console.log(event)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const url=new URL(event.request.url)
