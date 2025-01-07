@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width">
   <meta name="color-scheme" content="light dark">
   <title>Custom Audio Player</title>
   <script src="/lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
@@ -23,7 +23,7 @@
       gap: 10px;
     }
     .thumbnail {
-      width: 200px;
+      width: 50vmi;
       height: 200px;
       object-fit: cover;
       border-radius: 10px;
@@ -75,7 +75,6 @@
   </style>
 </head>
 <body>
-  <h1>Custom Audio Player</h1>
   <div class="player-container">
     <input type="file" id="fileInput" accept="audio/*">
     <img id="thumbnail" class="thumbnail" alt="Thumbnail">
@@ -160,9 +159,6 @@
       }
     });
 
-    // Prevent screen scrolling on touch devices while interacting with the slider
-    seekBar.addEventListener('touchstart', (e) => e.preventDefault());
-    seekBar.addEventListener('touchmove', (e) => e.preventDefault());
   </script>
 </body>
 </html>
