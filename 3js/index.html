@@ -29,9 +29,24 @@
       document.body.appendChild(renderer.domElement);
 
       // Add a cube
+      
       let cubePose=[]
-      for(let i=0;i<(window.location.hash.substr(1)||8);i++){
-        cubePose.push([Math.random(),Math.random(),Math.random()])
+      if(window.location.hash.substr(1)){
+        let splited=window.location.hash.substr(1).split(',')
+        if(splited.length%3=-=0){
+          cubePose=splited
+        }else{
+          for(let i=0;i<(window.location.hash.substr(1));i++){
+            cubePose.push([2*Math.random()-1,2*Math.random()-1,2*Math.random()-1])
+          }
+        }
+      }else{
+        cubePose=[
+          [0,0,0],[1,0,0],
+          [0,1,0],
+          [0,0,1],
+                  [1,1,1],
+        ]
       }
 
       for (let props of cubePose) {
@@ -40,13 +55,13 @@
         const edgeMaterial = new THREE.MeshBasicMaterial({color:'#000000'})
         const edges = new THREE.EdgesGeometry(geometry); // Extract edges
         const cube = new THREE.Mesh(geometry, material);
-        cube.material.color.r=props[0]
-        cube.material.color.g=props[1]
-        cube.material.color.b=props[2]
+        cube.material.color.r=Math.abs(props[0])
+        cube.material.color.g=Math.abs(props[1])
+        cube.material.color.b=Math.abs(props[2])
 
-        cube.position.x=(props[0]*4)-2
-        cube.position.y=(props[1]*4)-2
-        cube.position.z=2-(props[2]*4)
+        cube.position.x=props[0]*2
+        cube.position.y=props[1]*2
+        cube.position.z=-props[2]*2
 
         const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
         cube.add(edgeLines); // Add edges as a child of the cube
@@ -56,7 +71,7 @@
 
       const rotspeed=[]
       for(let a=0;a<scene.children.length+1;a++){
-        rotspeed.push([1*(2*Math.random()-1),1*(2*Math.random()-1)])
+        rotspeed.push([2*(2*Math.random()-1),2*(2*Math.random()-1)])
       }
       // Animation loop
       function animate() {
