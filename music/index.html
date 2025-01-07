@@ -8,11 +8,13 @@
   <script src="/lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
       max-width: 600px;
-      margin: 0 auto;
       text-align: center;
       padding: 20px;
+      margin: 0 auto;
+    }
+    *{
+      font-family: Consolas, monospace;
     }
     .player-container {
       display: flex;
@@ -36,7 +38,7 @@
       width: 100%;
       -webkit-appearance: none;
       appearance: none;
-      height: 8px;
+      height: 20px;
       background: #ddd;
       outline: none;
       border-radius: 4px;
@@ -99,8 +101,8 @@
     function formatTime(seconds) {
       try{
       const minutes = Math.floor(seconds / 60);
-      let secs =new Number(seconds % 60);
-      return `${minutes}:${secs < 10 ? '0' : ''}${secs.ToFixed(2)}`;
+      const secs =seconds % 60;
+      return `${minutes}:${secs < 10 ? '0' : ''}${secs.toFixed(2)}`;
         }catch(e){alert(e)}
     }
 
