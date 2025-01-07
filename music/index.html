@@ -85,7 +85,7 @@
     <input type="range" id="seekBar" class="slider" value="0" min="0" max="100">
   </div>
 
-  <audio id="audioPlayer" hidden></audio>
+  <audio id="audioPlayer" loop hidden></audio>
 
   <script>
     const fileInput = document.getElementById('fileInput');
@@ -98,7 +98,7 @@
 
     function formatTime(seconds) {
       const minutes = Math.floor(seconds / 60);
-      const secs = Math.floor(seconds % 60);
+      const secs = seconds % 60;
       return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
     }
 
@@ -136,7 +136,7 @@
       });
 
       audioPlayer.addEventListener('timeupdate', () => {
-        seekBar.value = Math.floor(audioPlayer.currentTime);
+        seekBar.value = audioPlayer.currentTime;
         currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
       });
 
