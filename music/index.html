@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width">
   <meta name="color-scheme" content="light dark">
-  <link id="icon" rel="icon"/>
   <title id="title">Custom Audio Player</title>
   <script src="/lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
   <style>
@@ -90,7 +89,7 @@
     <input style="width:100%;height: 20px;" type="range" id="seekBar" class="slider" step="0.01">
   </div>
 
-  <audio id="audioPlayer" loop hidden></audio>
+  <audio id="audioPlayer" loop hidden autoplay></audio>
 
   <script>
     const fileInput = document.getElementById('fileInput');
