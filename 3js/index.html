@@ -29,8 +29,12 @@
       document.body.appendChild(renderer.domElement);
 
       // Add a cube
+      let cubePose=[]
+      for(let i=0,i<8,i++){
+        cubePose.push([Math.random(),Math.random(),Math.random()])
+      }
 
-      for (let props of [[1,0,0],[0,1,0],[0,0,1],[1,1,1],[0,0,0]]) {
+      for (let props of cubePose) {
         const geometry = new THREE.BoxGeometry();
         const material = new THREE.MeshBasicMaterial
         const edgeMaterial = new THREE.MeshBasicMaterial({color:'#000000'})
@@ -51,7 +55,7 @@
       }
 
       const rotspeed=[]
-      for(let a=0;a<6;a++){
+      for(let a=0;a<scene.children.length+1;a++){
         rotspeed.push([2*(2*Math.random()-1),2*(2*Math.random()-1)])
       }
       // Animation loop
