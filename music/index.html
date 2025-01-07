@@ -9,8 +9,6 @@
     <script src="/lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
     <style>
       body {
-        max-width: 600px;
-        text-align: center;
         padding: 20px;
         margin: 0 auto;
       }
@@ -83,13 +81,13 @@
       }
     </style>
   </head>
-  <body class="vsc-initialized">
+  <body>
     <div class="player-container">
       <div>
         <button id="playPauseButton" class="play-pause">Play</button>
         <input type="file" id="fileInput" accept="audio/*">
       </div>
-      <div style="display: flex;">
+      <div style="width: 100%;display: flex;justify-content: center;align-items: center;">
         <img id="thumbnail" class="thumbnail" alt="Thumbnail">
         <input style="width:20px;height:50vmin" type="range" id="volume" class="slider vertical" min="0" max="1" step="0.01" value=".5">
       </div>
@@ -182,7 +180,9 @@
       frame()
 
       // Play/Pause Button
-      playPauseButton.addEventListener('click', () => {
+      playPauseButton.addEventListener('click', pausePlay)
+      thumbnail.addEventListener('click', pausePlay)
+      function pausePlay(){
         if (audioPlayer.paused || audioPlayer.ended) {
           audioPlayer.play();
           playPauseButton.textContent = 'Pause';
@@ -191,7 +191,6 @@
           playPauseButton.textContent = 'Play';
         }
       }
-      );
     </script>
   </body>
 </html>
