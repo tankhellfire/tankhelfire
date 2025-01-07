@@ -26,31 +26,29 @@ function fixUrl(url){
 
 async function cache(a){
   let url=fixUrl(a)
-  try{
-    let res=await fetch(url)
-
-    if(neverCache.includes(url.pathname)){
-      console.log(`//never cache "${url}"`)
-      return res.clone()
-    }
-
-    caches.open(CACHE_NAME).then(cache=>{
-      cache.put(url.pathname,res.clone())
-      console.log(`//updated cache "${url}"`)
-    })
-
+  let res=await fetch(url)
+  if(!res.ok){
     return res.clone()
-  }catch(err){
-    console.error(`//failed ${url}`)
-    return err
   }
+
+  if(neverCache.includes(url.pathname)){
+    console.log(`//never cache "${url}"`)
+    return res.clone()
+  }
+
+  caches.open(CACHE_NAME).then(cache=>{
+    cache.put(url.pathname,res.clone())
+    console.log(`//updated cache "${url}"`)
+  })
+
+  return res.clone()
 }
 
 self.addEventListener('fetch', (event) => {
   const url=fixUrl(event.request.url)
   
   if(url.hostname=='tankhellfire.glitch.me'){
-    console.log(`//fetching ${url}`)
+    
     event.respondWith(
       caches.match(url).then((cachedResponse) => {
         const a=cache(url)
