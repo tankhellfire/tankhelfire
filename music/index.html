@@ -81,7 +81,7 @@
       <span id="currentTime">0:00</span>
       <span id="totalTime">0:00</span>
     </div>
-    <input type="range" id="seekBar" class="slider" value="0" max="100">
+    <input type="range" id="seekBar" class="slider" step="0.01">
   </div>
 
   <audio id="audioPlayer" loop hidden></audio>
@@ -132,7 +132,7 @@
 
       // Set up event listeners for the audio player
       audioPlayer.addEventListener('loadedmetadata', () => {
-        seekBar.max = Math.floor(audioPlayer.duration);
+        seekBar.max = audioPlayer.duration;
         totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
       });
 
