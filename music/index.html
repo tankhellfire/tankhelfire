@@ -1,53 +1,137 @@
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>music</title>
-    <meta name="color-scheme" content="light dark" />
-    <script>
-      ((a, b) => {
-        a.endsWith(b) ||
-          history.replaceState(null, "", a + (a.endsWith("/") ? "" : "/") + b);
-      })(document.location.pathname, "index.html");
-    </script>
-    <style>
-      * {
-        margin: 0px;
-      }
-    </style>
-  </head>
-  <body style="font-family: Consolas, monospace" class="vsc-initialized">
-    <input type="file" id="fileInput" />
-    <script>
-      document
-        .getElementById("fileInput")
-        .addEventListener("change", function (event) {
-          const file = event.target.files[0];
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Custom Audio Player</title>
+  <script src="/lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 20px;
+    }
+    .player-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .thumbnail {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      display: none;
+    }
+    .time-info {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .slider {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      background: #ddd;
+      outline: none;
+      border-radius: 4px;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #007bff;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #007bff;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Custom Audio Player</h1>
+  <div class="player-container">
+    <input type="file" id="fileInput" accept="audio/*">
+    <img id="thumbnail" class="thumbnail" alt="Thumbnail">
+    <div class="time-info">
+      <span id="currentTime">0:00</span>
+      <span id="totalTime">0:00</span>
+    </div>
+    <input type="range" id="seekBar" class="slider" value="0" min="0" max="100">
+  </div>
 
-          if (file) {
-            jsmediatags.read(file, {
-              onSuccess: function (tag) {
-                const picture = tag.tags.picture;
+  <audio id="audioPlayer" hidden></audio>
 
-                if (picture) {
-                  const base64String = arrayBufferToBase64(picture.data);
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const seekBar = document.getElementById('seekBar');
+    const currentTimeDisplay = document.getElementById('currentTime');
+    const totalTimeDisplay = document.getElementById('totalTime');
+    const thumbnail = document.getElementById('thumbnail');
 
-                  const mimeType = picture.format;
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    }
 
-                  const imgSrc = `data:${mimeType};base64,${base64String}`;
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
 
-                  const imgElement = document.getElementById("thumbnail");
+      // Load the audio file into the player
+      const fileURL = URL.createObjectURL(file);
+      audioPlayer.src = fileURL;
+      audioPlayer.load();
 
-                  imgElement.src = imgSrc;
+      // Extract metadata using jsmediatags
+      jsmediatags.read(file, {
+        onSuccess: (tag) => {
+          const { picture } = tag.tags;
+          if (picture) {
+            const data = picture.data;
+            const format = picture.format;
+            const base64String = data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
+            const thumbnailURL = `data:${format};base64,${btoa(base64String)}`;
+            thumbnail.src = thumbnailURL;
+            thumbnail.style.display = 'block';
+          }
+        },
+        onError: (error) => {
+          console.log('Error reading metadata:', error);
+        }
+      });
 
-                  imgElement.style.display = "block";
+      // Set up event listeners for the audio player
+      audioPlayer.addEventListener('loadedmetadata', () => {
+        seekBar.max = Math.floor(audioPlayer.duration);
+        totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
+      });
 
-                  document.getElementById("noImage").style.display = "none";
-                } else {
-                  document.getElementById("thumbnail").style.display = "none";
+      audioPlayer.addEventListener('timeupdate', () => {
+        seekBar.value = Math.floor(audioPlayer.currentTime);
+        currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
+      });
 
-                  document.getElementById("noImage").style.display = "block";
-                }
+      seekBar.addEventListener('input', () => {
+        audioPlayer.currentTime = seekBar.value;
+      });
+    });
+  </script>
+</body>
+</html>
               },
 
               onError: function (error) {
