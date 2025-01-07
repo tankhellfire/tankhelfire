@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width">
   <meta name="color-scheme" content="light dark">
-  <title>Custom Audio Player</title>
+  <link id="icon" rel="icon"/>
+  <title id="title">Custom Audio Player</title>
   <script src="/lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
   <style>
     body {
@@ -113,7 +114,7 @@
     fileInput.addEventListener('change', (event) => {
       const file = event.target.files[0];
       if (!file) return;
-      mediaSession.title=file.name
+      title.textContent=mediaSession.title=file.name
 
       // Load the audio file into the player
       const fileURL = URL.createObjectURL(file);
@@ -131,9 +132,10 @@
             const format = picture.format;
             const base64String = data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
             const thumbnailURL = `data:${format};base64,${btoa(base64String)}`;
-            thumbnail.src = thumbnailURL;
-            mediaSession.artwork=thumbnailURL
+            icon.href=thumbnail.src = thumbnailURL;
+            
             thumbnail.style.display = 'block';
+            mediaSession.artwork=[{src:thumbnailURL}];
           }
         },
         onError: (error) => {
