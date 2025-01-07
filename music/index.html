@@ -42,6 +42,10 @@
       border-radius: 4px;
       touch-action: none; /* Prevents screen scrolling on touch devices */
     }
+    .vertical{
+      transform:rotate(90deg)
+      /*writing-mode: vertical-rl;*/
+    }
     .slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
@@ -75,11 +79,14 @@
 <body>
   <div class="player-container">
     <input type="file" id="fileInput" accept="audio/*">
-    <img id="thumbnail" class="thumbnail" alt="Thumbnail">
+    <div>
+      <img id="thumbnail" class="thumbnail" alt="Thumbnail">
+      <input type="range" id="volume" class="slider vertical" step="0.01">
+    </div>
     <button id="playPauseButton" class="play-pause">Play</button>
     <div class="time-info">
-      <span id="currentTime">0:00</span>
-      <span id="totalTime">0:00</span>
+      <span id="currentTime">0:00.00</span>
+      <span id="totalTime">0:00.00</span>
     </div>
     <input type="range" id="seekBar" class="slider" step="0.01">
   </div>
@@ -136,15 +143,17 @@
         totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
       });
 
-      audioPlayer.addEventListener('timeupdate', () => {
-        seekBar.value = audioPlayer.currentTime;
-        currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
-      });
-
       seekBar.addEventListener('input', () => {
         audioPlayer.currentTime = seekBar.value;
       });
     });
+    
+    function frame(){
+      seekBar.value = audioPlayer.currentTime;
+      currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
+      requestAnimationFrame(frame)
+    }
+    frame()
 
     // Play/Pause Button
     playPauseButton.addEventListener('click', () => {
