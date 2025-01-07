@@ -6,7 +6,7 @@ let neverCache=[
 for(const a of [
   '/txt'
 ]){
-  console.log(`//always cache ${a}`)
+  console.log(`//always cache ${fixUrl(a)}`)
   cache(a)
 }
 
@@ -49,7 +49,8 @@ self.addEventListener('fetch', (event) => {
   
   if(url.hostname=='tankhellfire.glitch.me'){
     if(url!=event.request.url){
-      return event.respondWith()
+      console.log(`//redirecting "${event.request.url}"->"${url}"`)
+      return event.respondWith(Response.redirect(url, 301))
     }
     event.respondWith(
       caches.match(url).then((cachedResponse) => {
@@ -57,10 +58,10 @@ self.addEventListener('fetch', (event) => {
 
 
         if(cachedResponse){
-          console.log(`//returned cache "${url.href}"`)
+          console.log(`//returned cache "${url}"`)
           return cachedResponse
         }
-        console.log(`//returned fetch "${url.href}"`)
+        console.log(`//returned fetch "${url}"`)
         return a;
       })
     )
