@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width">
   <meta name="color-scheme" content="light dark">
+  <link id="icon" rel="icon"/>
   <title id="title">Custom Audio Player</title>
   <script src="/lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
   <style>
@@ -115,10 +116,9 @@
       if (!file) return;
       title.textContent=mediaSession.title=file.name
 
-      // Load the audio file into the player
       const fileURL = URL.createObjectURL(file);
       audioPlayer.src = fileURL;
-      audioPlayer.load();
+      //audioPlayer.load();
       audioPlayer.volume = 1-volume.value
       
 
@@ -141,6 +141,8 @@
           console.log('Error reading metadata:', error);
         }
       });
+
+
 
       // Set up event listeners for the audio player
       audioPlayer.addEventListener('loadedmetadata', () => {
