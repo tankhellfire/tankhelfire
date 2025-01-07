@@ -92,6 +92,7 @@
   <audio id="audioPlayer" loop hidden></audio>
 
   <script>
+    navigator.mediaSession.metadata = new MediaMetadata({})
     const fileInput = document.getElementById('fileInput');
     const audioPlayer = document.getElementById('audioPlayer');
     const seekBar = document.getElementById('seekBar');
