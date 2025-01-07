@@ -92,7 +92,6 @@
   <audio id="audioPlayer" loop hidden></audio>
 
   <script>
-    navigator.mediaSession.metadata = new MediaMetadata({})
     const fileInput = document.getElementById('fileInput');
     const audioPlayer = document.getElementById('audioPlayer');
     const seekBar = document.getElementById('seekBar');
@@ -101,6 +100,8 @@
     const thumbnail = document.getElementById('thumbnail');
     const playPauseButton = document.getElementById('playPauseButton');
 
+    const mediaSession=navigator.mediaSession.metadata = new MediaMetadata()
+    
     function formatTime(seconds) {
       try{
       const minutes = Math.floor(seconds / 60);
@@ -112,12 +113,14 @@
     fileInput.addEventListener('change', (event) => {
       const file = event.target.files[0];
       if (!file) return;
+      mediaSession.title=file.name
 
       // Load the audio file into the player
       const fileURL = URL.createObjectURL(file);
       audioPlayer.src = fileURL;
       audioPlayer.load();
       audioPlayer.volume = 1-volume.value
+      
 
       // Extract metadata using jsmediatags
       jsmediatags.read(file, {
@@ -129,6 +132,7 @@
             const base64String = data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
             const thumbnailURL = `data:${format};base64,${btoa(base64String)}`;
             thumbnail.src = thumbnailURL;
+            mediaSession.artwork=thumbnailURL
             thumbnail.style.display = 'block';
           }
         },
