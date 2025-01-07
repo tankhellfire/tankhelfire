@@ -28,42 +28,44 @@ async function cache(a){
   let url=fixUrl(a)
   try{
     let res=await fetch(url)
-    if(url.hostname=='tankhellfire.glitch.me'){ 
 
-      if(neverCache.includes(url.pathname)){
-        console.log(`//never cache "${url.pathname}"`)
-        return res.clone()
-      }
-
-      caches.open(CACHE_NAME).then(cache=>{
-        cache.put(url.pathname,res.clone())
-        console.log(`//updated cache "${url.pathname}"`)
-      })
+    if(neverCache.includes(url.pathname)){
+      console.log(`//never cache "${url}"`)
+      return res.clone()
     }
+
+    caches.open(CACHE_NAME).then(cache=>{
+      cache.put(url.pathname,res.clone())
+      console.log(`//updated cache "${url}"`)
+    })
 
     return res.clone()
   }catch(err){
-    console.warn(`//failed ${url}`)
+    console.error(`//failed ${url}`)
     return err
   }
 }
 
 self.addEventListener('fetch', (event) => {
-  console.log(event)
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      const url=new URL(event.request.url)
-      const a=cache(url)
-      
-      
-      if(cachedResponse){
-        console.log(`//returned cache "${url.href}"`)
-        return cachedResponse
-      }
-      console.log(`//returned fetch "${url.href}"`)
-      return a;
-    })
-  );
+  const url=fixUrl(event.request.url)
+  
+  if(url.hostname=='tankhellfire.glitch.me'){
+    console.log(`//fetching ${url}`)
+    event.respondWith(
+      caches.match(url).then((cachedResponse) => {
+        const a=cache(url)
+
+
+        if(cachedResponse){
+          console.log(`//returned cache "${url.href}"`)
+          return cachedResponse
+        }
+        console.log(`//returned fetch "${url.href}"`)
+        return a;
+      })
+    )
+  }
+  
 });
 
 
