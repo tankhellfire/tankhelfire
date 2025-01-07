@@ -40,6 +40,7 @@
       background: #ddd;
       outline: none;
       border-radius: 4px;
+      touch-action: none; /* Prevents screen scrolling on touch devices */
     }
     .slider::-webkit-slider-thumb {
       -webkit-appearance: none;
@@ -57,6 +58,18 @@
       border-radius: 50%;
       cursor: pointer;
     }
+    .play-pause {
+      font-size: 18px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+    .play-pause:active {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -64,6 +77,7 @@
   <div class="player-container">
     <input type="file" id="fileInput" accept="audio/*">
     <img id="thumbnail" class="thumbnail" alt="Thumbnail">
+    <button id="playPauseButton" class="play-pause">Play</button>
     <div class="time-info">
       <span id="currentTime">0:00</span>
       <span id="totalTime">0:00</span>
@@ -75,6 +89,79 @@
 
   <script>
     const fileInput = document.getElementById('fileInput');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const seekBar = document.getElementById('seekBar');
+    const currentTimeDisplay = document.getElementById('currentTime');
+    const totalTimeDisplay = document.getElementById('totalTime');
+    const thumbnail = document.getElementById('thumbnail');
+    const playPauseButton = document.getElementById('playPauseButton');
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Load the audio file into the player
+      const fileURL = URL.createObjectURL(file);
+      audioPlayer.src = fileURL;
+      audioPlayer.load();
+
+      // Extract metadata using jsmediatags
+      jsmediatags.read(file, {
+        onSuccess: (tag) => {
+          const { picture } = tag.tags;
+          if (picture) {
+            const data = picture.data;
+            const format = picture.format;
+            const base64String = data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
+            const thumbnailURL = `data:${format};base64,${btoa(base64String)}`;
+            thumbnail.src = thumbnailURL;
+            thumbnail.style.display = 'block';
+          }
+        },
+        onError: (error) => {
+          console.log('Error reading metadata:', error);
+        }
+      });
+
+      // Set up event listeners for the audio player
+      audioPlayer.addEventListener('loadedmetadata', () => {
+        seekBar.max = Math.floor(audioPlayer.duration);
+        totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
+      });
+
+      audioPlayer.addEventListener('timeupdate', () => {
+        seekBar.value = Math.floor(audioPlayer.currentTime);
+        currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
+      });
+
+      seekBar.addEventListener('input', () => {
+        audioPlayer.currentTime = seekBar.value;
+      });
+    });
+
+    // Play/Pause Button
+    playPauseButton.addEventListener('click', () => {
+      if (audioPlayer.paused || audioPlayer.ended) {
+        audioPlayer.play();
+        playPauseButton.textContent = 'Pause';
+      } else {
+        audioPlayer.pause();
+        playPauseButton.textContent = 'Play';
+      }
+    });
+
+    // Prevent screen scrolling on touch devices while interacting with the slider
+    seekBar.addEventListener('touchstart', (e) => e.preventDefault());
+    seekBar.addEventListener('touchmove', (e) => e.preventDefault());
+  </script>
+</body>
+</html>ut = document.getElementById('fileInput');
     const audioPlayer = document.getElementById('audioPlayer');
     const seekBar = document.getElementById('seekBar');
     const currentTimeDisplay = document.getElementById('currentTime');
