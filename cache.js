@@ -48,7 +48,9 @@ self.addEventListener('fetch', (event) => {
   const url=fixUrl(event.request.url)
   
   if(url.hostname=='tankhellfire.glitch.me'){
-    
+    if(url!=event.request.url){
+      return event.respondWith()
+    }
     event.respondWith(
       caches.match(url).then((cachedResponse) => {
         const a=cache(url)
