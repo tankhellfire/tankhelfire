@@ -2,7 +2,6 @@ const CACHE_NAME = 'tankh-cache';
 
 let neverCache=[
   '/games/scratch/spacegamev5.html',
-  '/music/index.html'
 ]
 for(const a of [
   '/txt'
@@ -15,7 +14,9 @@ async function cache(a){
   let url=new URL(a,self.location.origin)
   try{
     let res=await fetch(url)
-    if(url.hostname=='tankhellfire.glitch.me'){
+    if(url.hostname=='tankhellfire.glitch.me'){ 
+      
+      if(url.pathname.split('/').pop().includes('.'))
 
       if(neverCache.includes(url.pathname)){
         console.log(`//never cache "${url.pathname}"`)
