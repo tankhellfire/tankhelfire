@@ -49,7 +49,6 @@
 
       .vertical {
         writing-mode: vertical-rl;
-        transform: rotate(.5turn);
       }
 
       .slider::-webkit-slider-thumb {
@@ -106,7 +105,7 @@
       </div>
       <div style="width: 100%;display: flex;justify-content: center;align-items: center;">
         <img id="thumbnail" class="thumbnail select" alt="Thumbnail">
-        <input style="width:20px;height:50vmin" type="range" id="volume" class="slider vertical" min="0" max="1" step="0.01" value=".25">
+        <input style="width:20px;height:50vmin" type="range" id="volume" class="slider vertical" min="0" max="1" step="0.01" value=".75">
         <span id="volDisplay">25%</span>
       </div>
       <div class="time-info">
@@ -146,7 +145,7 @@
         const fileURL = URL.createObjectURL(file);
         audioPlayer.src = fileURL;
         //audioPlayer.load();
-        audioPlayer.volume = volume.value
+        audioPlayer.volume = 1-volume.value
 
         // Extract metadata using jsmediatags
         jsmediatags.read(file, {
@@ -193,8 +192,8 @@
       frame()
       
       volume.addEventListener('input', () => {
-        audioPlayer.volume = volume.value;
-        volDisplay.textContent=(Math.floor(volume.value*100)+"%").padStart('3',0)
+        audioPlayer.volume = 1-volume.value;
+        volDisplay.textContent=(Math.floor(100-volume.value*100)+"%").padStart('3',0).substring(0,3)
       }
       );
 
