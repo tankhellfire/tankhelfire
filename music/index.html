@@ -27,6 +27,7 @@
         height: 50vmin;
         object-fit: cover;
         display: none;
+        cursor: pointer;
       }
 
       .time-info {
@@ -43,10 +44,12 @@
         border-radius: 4px;
         touch-action: none;
         /* Prevents screen scrolling on touch devices */
+        cursor: pointer;
       }
 
       .vertical {
         writing-mode: vertical-rl;
+        transform: rotate(.5turn);
       }
 
       .slider::-webkit-slider-thumb {
@@ -79,6 +82,20 @@
       .play-pause:active {
         background-color: #0056b3;
       }
+      
+      .select {
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+        user-drag: none;
+        -webkit-user-select: none;
+        /* Safari */
+        -ms-user-select: none;
+        /* IE 10 and IE 11 */
+        user-select: none;
+        /* Standard syntax */
+      }
     </style>
   </head>
   <body>
@@ -88,8 +105,9 @@
         <input type="file" id="fileInput" accept="audio/*">
       </div>
       <div style="width: 100%;display: flex;justify-content: center;align-items: center;">
-        <img id="thumbnail" class="thumbnail" alt="Thumbnail">
-        <input style="width:20px;height:50vmin" type="range" id="volume" class="slider vertical" min="0" max="1" step="0.01" value=".5">
+        <img id="thumbnail" class="thumbnail select" alt="Thumbnail">
+        <input style="width:20px;height:50vmin" type="range" id="volume" class="slider vertical" min="0" max="1" step="0.01" value=".25">
+        <span id="volDisplay">25%</span>
       </div>
       <div class="time-info">
         <span id="currentTime">0:00.00</span>
@@ -128,7 +146,7 @@
         const fileURL = URL.createObjectURL(file);
         audioPlayer.src = fileURL;
         //audioPlayer.load();
-        audioPlayer.volume = 1 - volume.value
+        audioPlayer.volume = volume.value
 
         // Extract metadata using jsmediatags
         jsmediatags.read(file, {
@@ -164,11 +182,6 @@
           audioPlayer.currentTime = seekBar.value;
         }
         );
-
-        volume.addEventListener('input', () => {
-          audioPlayer.volume = 1 - volume.value;
-        }
-        );
       }
       );
 
@@ -178,6 +191,12 @@
         requestAnimationFrame(frame)
       }
       frame()
+      
+      volume.addEventListener('input', () => {
+        audioPlayer.volume = volume.value;
+        volDisplay.textContent=(Math.floor(volume.value*100)+"%").padStart('3',0)
+      }
+      );
 
       // Play/Pause Button
       playPauseButton.addEventListener('click', pausePlay)
