@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" oncontextmenu="return false;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three.js Global Import</title>
+  <script src="/lib/utill.js"></script>
+  <script src="/lib/lib.js"></script>
+</head>
+<body style="margin: 0; height: 100vh; width: 100vw;font-family: Consolas, monospace;background-color: #000;color:#fff">
+  <script>
+    Object.assign(utill,{
+      fullscreen:1,
+      pointerLock:1
+      //keyPreventDefault:1
+    });
+    (async()=>{
+      window.THREE = await import('/lib/npm/three/build/three.module.js')
+      window.spaceGame7=await lib('spaceGame7/index.js')
+      window.game = new spaceGame7.game({
+        objCount:window.location.hash.substr(1)
+      });
+      
+      async function update() {
+        game.physics(Date.now())
+        requestAnimationFrame(update);
+      }
+      update()
+    })()
+  </script>
+</body>
+</html>

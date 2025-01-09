@@ -52,7 +52,7 @@ a.goto({
 });
 
 game = new spaceGame7.game({
-  objCount:50
+  objCount:window.location.hash.substr(1)
 });
   
   
@@ -65,7 +65,7 @@ async function update() {
     buffer+=i[1]
   }
 
-  game.physics(dt);
+  game.physics(Date.now());
   $("text").innerHTML = `${Date()}<br>
   <br>
   ${pointer[pointer.primary]?.x}<br>

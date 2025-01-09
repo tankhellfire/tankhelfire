@@ -65,7 +65,7 @@ async function update() {
     buffer+=i[1]
   }
 
-  game.physics(dt);
+  game.physics(performance.now());
   $("text").innerHTML = `${Date()}<br>
   <br>
   ${pointer[pointer.primary]?.x}<br>

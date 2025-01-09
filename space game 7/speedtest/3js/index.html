@@ -16,7 +16,16 @@
     });
     (async()=>{
       window.THREE = await import('/lib/npm/three/build/three.module.js')
-      const spaceGame7=await lib('spaceGame7/index.js')
+      window.spaceGame7=await lib('spaceGame7/index.js')
+      window.game = new spaceGame7.game({
+        objCount:window.location.hash.substr(1)
+      });
+      
+      async function update() {
+        game.physics(Date.now())
+        requestAnimationFrame(update);
+      }
+      update()
     })()
   </script>
 </body>
