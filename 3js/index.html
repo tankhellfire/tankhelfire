@@ -51,7 +51,7 @@
       }
 
       for (let props of cubePose) {
-        const geometry = new THREE.BoxGeometry();
+        const geometry = new THREE.BoxGeometry(document.location.search.substr(1)||1,document.location.search.substr(1)||1,document.location.search.substr(1)||1);
         const material = new THREE.MeshBasicMaterial
         const edgeMaterial = new THREE.MeshBasicMaterial({color:'#000000'})
         const edges = new THREE.EdgesGeometry(geometry); // Extract edges
@@ -72,7 +72,7 @@
 
       const rotspeed=[]
       for(let a=0;a<scene.children.length+1;a++){
-        rotspeed.push([2*(2*Math.random()-1),2*(2*Math.random()-1)])
+        rotspeed.push([2*(2*Math.random()-1),2*(2*Math.random()-1),2*(2*Math.random()-1)])
       }
       // Animation loop
       function animate() {
@@ -81,12 +81,12 @@
         let t=performance.now()*.001
         for (let a of scene.children) {
           a.rotation.x = t*rotspeed[n][0];
-          a.rotation.y = t*rotspeed[n++][1];
-          // a.rotation.z = t*rotspeed[n++][2];
+          a.rotation.y = t*rotspeed[n][1];
+          a.rotation.z = t*rotspeed[n++][2];
         }
         scene.rotation.x = t*rotspeed[n][0];
-        scene.rotation.y = t*rotspeed[n++][1];
-        // scene.rotation.z = t*rotspeed[n++][2];
+        scene.rotation.y = t*rotspeed[n][1];
+        scene.rotation.z = t*rotspeed[n++][2];
         updateCanvas()
         renderer.render(scene, camera);
       }
