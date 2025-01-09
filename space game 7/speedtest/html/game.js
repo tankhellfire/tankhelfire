@@ -29,6 +29,7 @@ main.insertElement(document.createElement("display"), 1).id = "display";
       center:[-50,-50]
     })
     ele.src=object.img
+    ele.style.width=`${object.size*100}vmax`
     
     eleCounter++
   }

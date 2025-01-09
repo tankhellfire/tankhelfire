@@ -58,7 +58,7 @@
       
       for(let obj of game.obj){
         const textureLoader = new THREE.TextureLoader();
-        const texture = textureLoader.load('/space game 7/assets/mouse.svg'(texture) => {
+        const texture = textureLoader.load('/space game 7/assets/mouse.svg',(texture) => {
           texture.minFilter = THREE.NearestFilter; // For scaling down
           texture.magFilter = THREE.NearestFilter; // For scaling up
           texture.generateMipmaps = false; // Disable mipmaps for sharper edges
@@ -78,8 +78,9 @@
         game.physics(Date.now()/1000)
         
         for(let{obj,real}of map){
-          real.position.x=obj.x
-          real.position.y=obj.y
+          real.position.x=obj.x*3-1.5
+          real.position.y=obj.y*3-1.5
+          real.scale
         }
         
         renderer.render(scene, camera)
