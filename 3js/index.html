@@ -82,9 +82,11 @@
         for (let a of scene.children) {
           a.rotation.x = t*rotspeed[n][0];
           a.rotation.y = t*rotspeed[n++][1];
+          // a.rotation.z = t*rotspeed[n++][2];
         }
         scene.rotation.x = t*rotspeed[n][0];
         scene.rotation.y = t*rotspeed[n++][1];
+        // scene.rotation.z = t*rotspeed[n++][2];
         updateCanvas()
         renderer.render(scene, camera);
       }
