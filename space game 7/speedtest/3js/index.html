@@ -38,11 +38,11 @@
 
         renderer.setSize(width, height);
 
-        const aspect = width / height;
-        camera.left = -1;
-        camera.right = 1;
-        camera.top = 1/aspect;
-        camera.bottom = -1/aspect;
+        const vmax = Math.max(width, height);
+        camera.left = -width/vmax;
+        camera.right = width/vmax;
+        camera.top = height/vmax;
+        camera.bottom = -height/vmax;
         camera.updateProjectionMatrix();
       }
       window.addEventListener('resize', onResize);
@@ -52,8 +52,7 @@
       
       window.map=[]
       
-      for(let obj of game.obj){
-        const textureLoader = new THREE.TextureLoader();
+              const textureLoader = new THREE.TextureLoader();
         const texture = textureLoader.load('/space game 7/assets/mouse.svg',(texture) => {
           texture.minFilter = THREE.NearestFilter; // For scaling down
           texture.magFilter = THREE.NearestFilter; // For scaling up
@@ -62,6 +61,9 @@
 
         const geometry = new THREE.PlaneGeometry(1, 1); // 1x1 units
         const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+      
+      for(let obj of game.obj){
+
 
         const plane = new THREE.Mesh(geometry, material);
         scene.add(plane);
