@@ -35,13 +35,54 @@
         0.1, 10          // Near, far
       );
       camera.position.z = 1;
+      
+      function onResize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
 
-      // Create a Scene
+        renderer.setSize(width, height);
+
+        const aspect = width / height;
+        camera.left = -aspect;
+        camera.right = aspect;
+        camera.top = 1;
+        camera.bottom = -1;
+        camera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', onResize);
+      onResize();
+
       const scene = new THREE.Scene();
+      
+      window.map=[]
+      
+      for(let obj of game.obj){
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load('/space game 7/assets/mouse.svg'(texture) => {
+          texture.minFilter = THREE.NearestFilter; // For scaling down
+          texture.magFilter = THREE.NearestFilter; // For scaling up
+          texture.generateMipmaps = false; // Disable mipmaps for sharper edges
+        });
+
+        const geometry = new THREE.PlaneGeometry(1, 1); // 1x1 units
+        const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+
+        const plane = new THREE.Mesh(geometry, material);
+        scene.add(plane);
+        
+        map.push({obj,real:plane})
+      } 
       
       
       async function update() {
         game.physics(Date.now()/1000)
+        
+        for(let{obj,real}of map){
+          real.position.x=obj.x
+          real.position.y=obj.y
+        }
+        
+        renderer.render(scene, camera)
         requestAnimationFrame(update);
       }
       update()
