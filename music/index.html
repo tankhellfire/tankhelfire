@@ -209,6 +209,16 @@
           playPauseButton.textContent = 'Play';
         }
       }
+      
+      addEventListener("keydown",e=>{
+        let numcode=e.keyCode-48
+        if(e.code==="Space"){
+          pausePlay()
+        }
+        if(0=<numcode && numcode<=9){
+          
+        }
+      })
     </script>
   </body>
 </html>
