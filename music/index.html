@@ -214,9 +214,11 @@
         let numcode=e.keyCode-48
         if(e.code==="Space"){
           pausePlay()
+          return
         }
-        if(0=<numcode && numcode<=9){
-          
+        if(0<=numcode && numcode<=9){
+          audioPlayer.currentTime=audioPlayer.duration/10*numcode
+          return
         }
       })
     </script>
