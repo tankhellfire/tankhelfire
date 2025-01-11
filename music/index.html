@@ -10,6 +10,7 @@
     <style>
       body {
         padding: 20px;
+        padding-top: 0px;
         margin: 0 auto;
       }
 
@@ -99,6 +100,7 @@
   </head>
   <body>
     <div class="player-container">
+      <h2 id="h2Title">music</h2>
       <div>
         <button id="playPauseButton" class="play-pause">Play</button>
         <input type="file" id="fileInput" accept="audio/*">
@@ -140,7 +142,7 @@
         const file = event.target.files[0];
         if (!file)
           return;
-        title.textContent = mediaSession.title = file.name
+        h2Title.textContent=title.textContent = mediaSession.title = file.name
 
         const fileURL = URL.createObjectURL(file);
         audioPlayer.src = fileURL;
