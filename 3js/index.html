@@ -18,7 +18,7 @@
       window.THREE = await import('/lib/npm/three/build/three.module.js')
       
       statusCard.textContent='loading'
-      await new Promise(resolve => requestAnimationFrame(resolve));
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       THREE.Euler.DEFAULT_ORDER="YXZ"
       // Set up the scene, camera, and renderer

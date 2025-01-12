@@ -18,6 +18,7 @@
       window.THREE = await import('/lib/npm/three/build/three.module.js')
       window.spaceGame7=await lib('spaceGame7/index.js')
       statusCard.textContent='loading'
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       
       Object.assign(utill,{
