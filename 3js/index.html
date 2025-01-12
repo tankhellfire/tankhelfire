@@ -14,7 +14,12 @@
   <script>
     (async () => {  
       statusCard.textContent='importing'
+      
       window.THREE = await import('/lib/npm/three/build/three.module.js')
+      
+      statusCard.textContent='loading'
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      
       THREE.Euler.DEFAULT_ORDER="YXZ"
       // Set up the scene, camera, and renderer
       window.scene = new THREE.Scene();
@@ -118,7 +123,9 @@
 
       // Resize canvas and camera on window resize
       window.addEventListener('resize',updateCanvas);
-    })
+      
+      statusCard.remove()
+    })()
   </script>
 </body>
 </html>
