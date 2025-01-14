@@ -75,10 +75,20 @@
     }
     
     async function addToList(date){
-      tableList.insertAdjacentHTML('beforeEnd',`<tr>
-        <td>${new Date(date)}</td>
-        <td><button class="download" onclick="downloadTime(${Number(date)})">download</button></td>
+      let time=Number(date)
+      tableList.insertAdjacentHTML('beforeEnd',`<tr style="
+  background-color: rgb(${Math.floor(time)%100},${Math.floor(time/100)%100},${Math.floor(time/10000)%100});
+">
+        <td>${new Date(time)}</td>
+        <td><button class="download" onclick="downloadTime(${time})">download</button></td>
+        <td><button class="download" onclick="dataBace.del(${time}).then(reDraw)">del</button></td>
       </tr>`)
+    }
+    async function reDraw(){
+      tableList.innerHTML=''
+      for(let a of await dataBace.keys()){
+        addToList(a)
+      }
     }
     
     async function quota(){
@@ -109,12 +119,10 @@
         db=await lib('db.js')
         dataBace=await new db('audio','records')
         
+        reDraw()
+        
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
-        
-        for(let a of await dataBace.keys()){
-          addToList(a)
-        }
 
         // Event: Data available (audio chunks)
         mediaRecorder.ondataavailable = (event) => {
