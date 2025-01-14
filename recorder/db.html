@@ -19,7 +19,7 @@
     th {
       background-color: #A0A0A0;
     }
-    button {
+    .download {
       padding: 5px 10px;
       background-color: #007BFF;
       color: #fff;
@@ -64,10 +64,20 @@
     const stopBtn = document.getElementById('stopBtn');
     const audioPlayback = document.getElementById('audioPlayback');
     
-    async function addToList(date,data){
+    async function downloadTime(time){
+      const audioUrl = URL.createObjectURL(await dataBace.get(time));
+
+      // Download the audio file
+      const downloadLink = document.createElement('a');
+      downloadLink.href = audioUrl;
+      downloadLink.download = `recording_${Date.now()}.mp3`;
+      downloadLink.click();
+    }
+    
+    async function addToList(date){
       tableList.insertAdjacentHTML('beforeEnd',`<tr>
-        <td>${date}</td>
-        <td><button>download</button></td>
+        <td>${new Date(date)}</td>
+        <td><button class="download" onclick="downloadTime(${Number(date)})">download</button></td>
       </tr>`)
     }
     
@@ -101,6 +111,10 @@
         
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
+        
+        for(let a of await dataBace.keys()){
+          addToList(a)
+        }
 
         // Event: Data available (audio chunks)
         mediaRecorder.ondataavailable = (event) => {
@@ -111,7 +125,9 @@
 
         // Event: Recording stops
         mediaRecorder.onstop = () => {
-          dataBace.set(Date.now(),new Blob(audioChunks, { type: 'audio/mp3' })).then(quota);
+          let now=Date.now()
+          addToList(now)
+          dataBace.set(now,new Blob(audioChunks, { type: 'audio/mp3' })).then(quota);
 
           audioChunks = [];
         };
