@@ -26,6 +26,10 @@
 
     async function initAudioRecorder() {
       try {
+        window.db=await lib('db.js')
+        dataBace=await new db('audio','records')
+        a=6
+        
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
 
