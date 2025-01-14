@@ -1,0 +1,9 @@
+{
+ "quota": 36944685465,
+ "usage": 66430,
+ "usageDetails": {
+  "caches": 9216,
+  "indexedDB": 55468,
+  "serviceWorkerRegistrations": 1746
+ }
+}

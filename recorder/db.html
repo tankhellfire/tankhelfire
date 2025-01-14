@@ -5,8 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sound Recorder</title>
   <script src="/lib/lib.js"></script>
+  <style>
+    *{margin:0}
+  </style>
 </head>
-<body>
+<body style="height: 100vh; width: 100vw;font-family: Consolas, monospace;background-color: #000;color:#fff">
   <h1>Record Audio</h1>
   
   <button id="startBtn">Start Recording</button>
@@ -14,6 +17,8 @@
   
   <h2>Playback</h2>
   <audio id="audioPlayback" controls></audio>
+  
+  <pre id="jsonPreview"></pre>
 
   <script>
     let mediaRecorder;
@@ -23,6 +28,29 @@
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
     const audioPlayback = document.getElementById('audioPlayback');
+    
+    async function quota(){
+      function pass(inp,depth=0) {
+        if (typeof inp==='undefined') {return}
+        if (typeof inp==='function') {return 'func'}
+        if (typeof inp==='object') {
+          if(depth<0){
+            if(inp==null){return}
+            if(Object.keys(inp).length==0){return 'OOR'}
+            return inp
+          }
+          let ret={}
+          for (let a in inp){
+            ret[a]=pass(inp[a],depth-1)
+          }
+          if(Object.keys(ret).length==0){return {}}
+          return ret
+        }
+        return inp
+      }
+      jsonPreview.textContent=JSON.stringify(pass(await navigator.storage.estimate(),10),null,' ')
+    }
+    quota()
 
     async function initAudioRecorder() {
       try {
@@ -41,7 +69,7 @@
 
         // Event: Recording stops
         mediaRecorder.onstop = () => {
-          dataBace.set(Date.now(),new Blob(audioChunks, { type: 'audio/mp3' }));
+          dataBace.set(Date.now(),new Blob(audioChunks, { type: 'audio/mp3' })).then(quota);
 
           audioChunks = [];
         };
