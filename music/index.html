@@ -138,8 +138,10 @@
         }
       }
 
-      fileInput.addEventListener('change',e=>{
-        const file = e.target.files[0];
+      loadMusic()
+      fileInput.addEventListener('change',loadMusic)
+      function loadMusic(){
+        const file = fileInput.files[0];
         if (!file)
           return;
         h2Title.textContent=title.textContent = mediaSession.title = file.name
@@ -183,8 +185,7 @@
           audioPlayer.currentTime = seekBar.value;
         }
         );
-      }
-      );
+      };
 
       function frame() {
         seekBar.value = audioPlayer.currentTime;
