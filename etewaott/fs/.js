@@ -15,7 +15,10 @@ class syncFs {
     this.button.onclick = async () => {
       this.dir = await window.showDirectoryPicker()
       this.text.innerText = this.dir.name
-      info.textContent=await pullDir(this.dir,4)
+      alert("start")
+      
+      info.textContent=await pullDir(this.dir.handle,4)
+      alert("end")
     }
   }
 
