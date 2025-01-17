@@ -90,7 +90,7 @@ async function pullDir(handle, threads=1) {
     }
   }
   
-  alert("passing files:)
+  alert("passing files")
 
   for (let thread = 0; thread < threads; thread++) {
     wait.push(threadPassFile(thread))
