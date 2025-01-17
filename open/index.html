@@ -35,12 +35,13 @@
     <meta name="color-scheme" content="light dark">
   </head>
   <body>
-    <pre style="word-wrap: break-word; white-space: pre-wrap;">
-      ${await file.text()}
+    <pre id="text" style="word-wrap: break-word; white-space: pre-wrap;">
+      
     </pre>
   </body>
 </html>
         `)
+        newTab.text.textContent=await file.text()
         newTab.document.close();
       }
       
