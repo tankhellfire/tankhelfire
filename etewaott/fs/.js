@@ -17,7 +17,7 @@ class syncFs {
       this.text.innerText = this.dir.name
       alert("start")
       try{
-        info.textContent=JSON.stringify(passJsonawait pullDir(this.dir,4),5),null,' ')
+        info.textContent=JSON.stringify(await(pullDir(this.dir,4)),null,' ')
       }catch(err){alert(err)}
       alert("end")
     }
