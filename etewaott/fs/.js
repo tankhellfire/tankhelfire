@@ -16,13 +16,14 @@ class syncFs {
       this.dir = await window.showDirectoryPicker()
       this.text.innerText = this.dir.name
       alert("start")
-      
-      info.textContent=await pullDir(this.dir.handle,4)
+      try{
+        info.textContent=await pullDir(this.dir,4)
+      }catch(err){alert(err)}
       alert("end")
     }
   }
 
-  dir = null
+  dir;
 
 }
 
@@ -59,6 +60,7 @@ async function pullDir(handle, threads=1) {
   async function threadPassFile(thread) {
     while (1) {
       let jobNum = i++
+      info.textContent=jobNum
       console.log(thread, 'new job', jobNum)
       let job = files[jobNum]
       if (job === undefined) {
@@ -87,6 +89,8 @@ async function pullDir(handle, threads=1) {
       }
     }
   }
+  
+  alert("passing files:)
 
   for (let thread = 0; thread < threads; thread++) {
     wait.push(threadPassFile(thread))
