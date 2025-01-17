@@ -138,12 +138,11 @@
         }
       }
 
-      loadMusic()
+      /*playPauseButton.addEventListener('click',*/loadMusic()
       fileInput.addEventListener('change',loadMusic)
       function loadMusic(){
         const file = fileInput.files[0];
-        if (!file)
-          return;
+        if (!file){return /*alert("no file")*/}
         h2Title.textContent=title.textContent = mediaSession.title = file.name
 
         const fileURL = URL.createObjectURL(file);
