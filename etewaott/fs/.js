@@ -17,7 +17,7 @@ class syncFs {
       this.text.innerText = this.dir.name
       alert("start")
       try{
-        info.textContent=await pullDir(this.dir,4)
+        info.textContent=pawait pullDir(this.dir,4)
       }catch(err){alert(err)}
       alert("end")
     }
@@ -130,6 +130,7 @@ async function pullDir(handle, threads=1) {
 //       const hashArray = Array.from(new Uint8Array(hashBuffer));
 //       const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
+
 //       out.push({
 //         dir:relative+a.value.name,
 //         handle:a.value,
@@ -163,3 +164,28 @@ async function pullDir(handle, threads=1) {
 
 //   return ret
 // }
+
+
+
+function passJson(inp,depth=0) {
+    if (typeof inp==='undefined') {return}
+    if (typeof inp==='function') {return 'func'}
+    if (typeof inp==='object') {
+      if(depth<0){
+        if(inp==null){return}
+        if(Object.keys(inp).length==0){return 'OOR'}
+        return inp
+      }
+      let ret={}
+      for (let a in inp){
+        ret[a]=pass(inp[a],depth-1)
+      }
+      if(Object.keys(ret).length==0){return {}}
+      return ret
+    }
+    return inp
+  }
+
+
+
+
