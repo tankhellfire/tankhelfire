@@ -17,7 +17,7 @@ class syncFs {
       this.text.innerText = this.dir.name
       alert("start")
       try{
-        info.textContent=pawait pullDir(this.dir,4)
+        info.textContent=JSON.stringify(passJsonawait pullDir(this.dir,4),5),null,' ')
       }catch(err){alert(err)}
       alert("end")
     }
@@ -178,13 +178,16 @@ function passJson(inp,depth=0) {
       }
       let ret={}
       for (let a in inp){
-        ret[a]=pass(inp[a],depth-1)
+        ret[a]=passJson(inp[a],depth-1)
       }
       if(Object.keys(ret).length==0){return {}}
       return ret
     }
     return inp
   }
+
+
+
 
 
 
