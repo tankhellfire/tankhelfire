@@ -137,8 +137,10 @@
           alert(e)
         }
       }
+      loadMusic()
 
-      fileInput.addEventListener('change', (event) => {
+      fileInput.addEventListener('change', loadMusic)
+      function loadMusic(event){
         const file = event.target.files[0];
         if (!file)
           return;
