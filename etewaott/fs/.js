@@ -31,6 +31,17 @@ class syncFs {
       // alert("end")
     }
   }
+  
+  getFromPath(pathArr){
+    let c=this.directoryOverVeiw
+    
+    for (let path of pathArr) {
+      if((c=c[path])===undefined){
+        return undefined
+      }
+    }
+    return {val:c,file:this.overVeiw[c]}
+  }
 
   dir;
 
