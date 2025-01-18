@@ -16,9 +16,8 @@ class syncFs {
       this.dir = await window.showDirectoryPicker()
       this.text.innerText = this.dir.name
       // alert("start")
-      try{
-        this.overVeiw=await pullDir(this.dir,4)
-      }catch(err){alert(err)}
+      this.overVeiw=await pullDir(this.dir,4)
+      fs[0].directoryOverVeiw=
       // alert("end")
     }
   }
@@ -99,92 +98,26 @@ async function pullDir(handle, threads=1) {
   return files
 }
 
-// async function pullDir(handle) {
-
-//   let out = []
-//   async function get(handle,relative='/') {
-//     let b = handle.values()
-//     let c = []
-//     do {
-//       for (let i = 0; i < 10; i++) {
-//         c.push(b.next())
-//       }
-//       c = await Promise.all(c)
-//     } while (!c[c.length - 1].done)
-
-//     for(let a of c){
-//       if(a.done){continue}
-//       if(a.value.kind==="directory"){
-//         await get(a.value,relative+a.value.name+'/')
-//         continue
-//       }
-//       const fileGet=await a.value.getFile()
-
-//       // Step 2: Read the file as an ArrayBuffer
-//       const arrayBuffer = await fileGet.arrayBuffer();
-
-//       // Step 3: Compute the SHA-256 hash
-//       const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-
-//       // Step 4: Convert the hash buffer to a hex string
-//       const hashArray = Array.from(new Uint8Array(hashBuffer));
-//       const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-
-//       out.push({
-//         dir:relative+a.value.name,
-//         handle:a.value,
-//         kind:a.value.kind,
-
-//         lastModified:fileGet.lastModified,
-//         name:fileGet.name,
-//         size:fileGet.size,
-//         type:fileGet.type,
-
-//         hash:{
-//           sha256:hashHex
-//         }
-//       })
-//     }
-//   }
-//   await get(handle)
-
-//   let ret=[]
-//   for(let a of out){
-//     let val=await a
-
-//     let i
-//     for (i = 0; i < ret.length; i++) {
-//       if(val.dir<ret[i].dir){
-//         break
-//       }
-//     }
-//     ret=ret.toSpliced(i,0,val)
-//   }
-
-//   return ret
-// }
-
 
 
 function passJson(inp,depth=0) {
-    if (typeof inp==='undefined') {return}
-    if (typeof inp==='function') {return 'func'}
-    if (typeof inp==='object') {
-      if(depth<0){
-        if(inp==null){return}
-        if(Object.keys(inp).length==0){return 'OOR'}
-        return inp
-      }
-      let ret={}
-      for (let a in inp){
-        ret[a]=passJson(inp[a],depth-1)
-      }
-      if(Object.keys(ret).length==0){return {}}
-      return ret
+  if (typeof inp==='undefined') {return}
+  if (typeof inp==='function') {return 'func'}
+  if (typeof inp==='object') {
+    if(depth<0){
+      if(inp==null){return}
+      if(Object.keys(inp).length==0){return 'OOR'}
+      return inp
     }
-    return inp
+    let ret={}
+    for (let a in inp){
+      ret[a]=passJson(inp[a],depth-1)
+    }
+    if(Object.keys(ret).length==0){return {}}
+    return ret
   }
+  return inp
+}
 
 
 
