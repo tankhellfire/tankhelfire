@@ -215,32 +215,37 @@
       addEventListener("keydown",e=>{
         let numcode=e.keyCode-48
         if(['Space','KeyK'].includes(e.code)){
-          e.preventDefault
+          e.preventDefault()
           pausePlay()
           return
         }
         
         if(['KeyW','ArrowUp'].includes(e.code)){
+          e.preventDefault()
           volume.value=Number(volume.value)-.05
           setVolume()
           return
         }
         if(['KeyS','ArrowDown'].includes(e.code)){
+          e.preventDefault()
           volume.value=Number(volume.value)+.05
           setVolume()
           return
         }
         
         if(['KeyD','ArrowRight'].includes(e.code)){
+          e.preventDefault()
           audioPlayer.currentTime+=5
           return
         }
         if(['KeyA','ArrowLeft'].includes(e.code)){
+          e.preventDefault()
           audioPlayer.currentTime-=5
           return
         }
         
         if(0<=numcode && numcode<=9){
+          e.preventDefault()
           audioPlayer.currentTime=audioPlayer.duration/10*numcode
           return
         }
