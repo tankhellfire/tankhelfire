@@ -18,6 +18,13 @@
       window.THREE = await import('/lib/npm/three/build/three.module.js')
       
       statusCard.textContent='loading'
+      
+      Object.assign(utill,{
+        fullscreen:1,
+        pointerLock:1
+      });
+      
+      
       await new Promise(resolve => setTimeout(resolve, 0));
       
       THREE.Euler.DEFAULT_ORDER="YXZ"
