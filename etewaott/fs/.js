@@ -17,7 +17,16 @@ class syncFs {
       this.text.innerText = this.dir.name
       // alert("start")
       this.overVeiw=await pullDir(this.dir,4)
-      fs[0].directoryOverVeiw=
+      this.directoryOverVeiw={}
+      let i=0
+      for(let b of fs[1].overVeiw){
+        let c=fs[0].directoryOverVeiw
+
+        for (i = 0; i < b.path.length-1; i++) {
+          c=c[b.path[i]]??(c[b.path[i]]={})
+        }
+        c[b.path[i]]=b
+      }
       // alert("end")
     }
   }
