@@ -1,3 +1,5 @@
+if(typeof window==="undefined"){
+
 const CACHE_NAME = 'tankh-cache';
 
 let neverCache=[
@@ -79,3 +81,5 @@ self.addEventListener('activate', (event) => {
   console.log('//activating');
   event.waitUntil(clients.claim()); // Take control of all open pages
 });
+
+}else{navigator.serviceWorker.register('/sw.js', { scope: '/' })}
