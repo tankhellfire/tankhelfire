@@ -20,7 +20,7 @@ class syncFs {
       this.directoryOverVeiw={}
       let i=0
       for(let b of fs[1].overVeiw){
-        let c=fs[0].directoryOverVeiw
+        let c=this.directoryOverVeiw
 
         for (i = 0; i < b.path.length-1; i++) {
           c=c[b.path[i]]??(c[b.path[i]]={})
