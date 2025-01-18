@@ -16,7 +16,7 @@ class syncFs {
       this.dir = await window.showDirectoryPicker()
       this.text.innerText = this.dir.name
       // alert("start")
-      this.overVeiw=await pullDir(this.dir,4)
+      this.overVeiw=await pullDir(this.dir,10)
       this.directoryOverVeiw={}
       let i=0
       for(let fileNum=0;fileNum<this.overVeiw.length;fileNum++){
@@ -42,6 +42,14 @@ class syncFs {
     }
     return {val:c,file:this.overVeiw[c]}
   }
+// for(let fromFile of fs[0].overVeiw){
+//   let toFile=fs[1].getFromPath(fromFile.path)?.file
+//   if(fromFile?.info?.size===toFile?.info?.size&&fromFile?.info?.hash?.sha256===toFile?.info?.hash?.sha256){
+//       console.log('same')
+//       continue
+//   }
+//   console.log('diff',fromFile,toFile)
+// }
 
   dir;
 
