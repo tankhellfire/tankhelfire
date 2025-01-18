@@ -19,13 +19,14 @@ class syncFs {
       this.overVeiw=await pullDir(this.dir,4)
       this.directoryOverVeiw={}
       let i=0
-      for(let b of fs[1].overVeiw){
+      for(let fileNum in this.overVeiw){
+        let path=this.overVeiw[fileNum].path
         let c=this.directoryOverVeiw
 
-        for (i = 0; i < b.path.length-1; i++) {
-          c=c[b.path[i]]??(c[b.path[i]]={})
+        for (i = 0; i < path.length-1; i++) {
+          c=c[path[i]]??(c[path[i]]={})
         }
-        c[b.path[i]]=b
+        c[path[i]]=fileNum
       }
       // alert("end")
     }
