@@ -193,11 +193,11 @@
       }
       frame()
       
-      volume.addEventListener('input', () => {
+      volume.addEventListener('input',setVolume)
+      function setVolume() {
         audioPlayer.volume = 1-volume.value;
         volDisplay.textContent=(Math.floor(100-volume.value*100)+"%").padStart('3',0).substring(0,3)
       }
-      );
 
       // Play/Pause Button
       playPauseButton.addEventListener('click', pausePlay)
@@ -214,10 +214,32 @@
       
       addEventListener("keydown",e=>{
         let numcode=e.keyCode-48
-        if(e.code==="Space"){
+        if(['Space','KeyK'].includes(e.code)){
+          e.preventDefault
           pausePlay()
           return
         }
+        
+        if(['KeyW','ArrowUp'].includes(e.code)){
+          volume.value=Number(volume.value)-.05
+          setVolume()
+          return
+        }
+        if(['KeyS','ArrowDown'].includes(e.code)){
+          volume.value=Number(volume.value)+.05
+          setVolume()
+          return
+        }
+        
+        if(['KeyD','ArrowRight'].includes(e.code)){
+          audioPlayer.currentTime+=5
+          return
+        }
+        if(['KeyA','ArrowLeft'].includes(e.code)){
+          audioPlayer.currentTime-=5
+          return
+        }
+        
         if(0<=numcode && numcode<=9){
           audioPlayer.currentTime=audioPlayer.duration/10*numcode
           return
