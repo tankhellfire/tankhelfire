@@ -15,11 +15,11 @@ class syncFs {
     this.button.onclick = async () => {
       this.dir = await window.showDirectoryPicker()
       this.text.innerText = this.dir.name
-      alert("start")
+      // alert("start")
       try{
-        info.textContent=JSON.stringify(await(pullDir(this.dir,4)),null,' ')
+        this.overVeiw=await pullDir(this.dir,4)
       }catch(err){alert(err)}
-      alert("end")
+      // alert("end")
     }
   }
 
@@ -90,7 +90,7 @@ async function pullDir(handle, threads=1) {
     }
   }
   
-  alert("passing files")
+  // alert("passing files")
 
   for (let thread = 0; thread < threads; thread++) {
     wait.push(threadPassFile(thread))
