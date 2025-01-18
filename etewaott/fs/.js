@@ -19,7 +19,7 @@ class syncFs {
       this.overVeiw=await pullDir(this.dir,4)
       this.directoryOverVeiw={}
       let i=0
-      for(let fileNum in this.overVeiw){
+      for(let fileNum=0;fileNum<this.overVeiw.length;fileNum++){
         let path=this.overVeiw[fileNum].path
         let c=this.directoryOverVeiw
 
