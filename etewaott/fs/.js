@@ -1,4 +1,4 @@
-class syncFs {
+class Fs {
   constructor(id) {
     this.element = fileDirs.appendChild(document.createElement("div"))
     this.element.id = "dir" + id;
@@ -107,21 +107,23 @@ class syncFs {
   }
   makeFromPath(pathArr){
     let handle=this.dir
-    let directoryOverVeiw
+    let directory=this.overVeiw
     
     let i=0
     for (i=0;i<pathArr.length-1;i++) {
       handle=handle.getDirectoryHandle(pathArr[i],{make:1})
+      directory=directory[pathArr[i]]??(directory[pathArr[i]]={})
     }
-    return handle.getFileHandle(pathArr[i],{make:1})
+    directory=directory[pathArr[i]]??(this.overVeiw)
+    handle=handle.getFileHandle(pathArr[i],{make:1})
   }
-  setFromPath(pathArr){
-    let handle=this.getFromPath(pathArr)?.val
-    if(handle===undefined){
+//   setFromPath(pathArr){
+//     let handle=this.getFromPath(pathArr)?.val
+//     if(handle===undefined){
       
-    }
+//     }
 
-  }
+//   }
   
   push(to){
     for(let fromFile of this.overVeiw){
@@ -134,8 +136,13 @@ class syncFs {
     }
   }
 }
+class File{
+  constructor(id) {
+    
+  }
+}
 
-let fs = [new syncFs(0), new syncFs(1)]
+let fs = [new Fs(0), new Fs(1)]
 
 
 
