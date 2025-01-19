@@ -13,7 +13,7 @@ class Fs {
     this.text.innerText = "click to set location"
 
     this.button.onclick = async () => {
-      this.dir = await window.showDirectoryPicker({id:`/etewaott/fs/index.html ${id}`})
+      this.dir = await window.showDirectoryPicker({id:`etewaottFs${id}`})
       this.text.innerText = this.dir.name
       // alert("start")
       await this.makeOverVeiw()
@@ -49,27 +49,8 @@ class Fs {
         if (job === undefined) {
           break
         }
-        let {handle} = job
-
-        const fileGet = await handle.getFile()
-
-        const arrayBuffer = await fileGet.arrayBuffer();
-        const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-        job.info = {
-          kind: handle.kind,
-
-          lastModified: fileGet.lastModified,
-          name: fileGet.name,
-          size: fileGet.size,
-          type: fileGet.type,
-
-          hash: {
-            sha256: hashHex
-          }
-        }
+        job=new FsFile(job)
+        await job.updateInfo()
       }
     }
 
@@ -137,10 +118,6 @@ class FsFile{
   constructor({handle,path=[],info={}}) {
     this.info=info
     this.handle=handle
-    if(handle){
-      await this.updateInfo()
-    }
-    
     this.path=path
   }
   
@@ -152,8 +129,8 @@ class FsFile{
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-    job.info = {
-      kind: handle.kind,
+    this.info = {
+      kind: this.handle.kind,
 
       lastModified: fileGet.lastModified,
       name: fileGet.name,
