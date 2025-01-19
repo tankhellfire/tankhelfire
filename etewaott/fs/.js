@@ -83,23 +83,24 @@ class Fs {
         return undefined
       }
     }
-    return {val:c,file:this.overVeiw[c]}
+    return {id:c,file:this.overVeiw[c]}
   }
   
   async makeFromPath(pathArr){
     let handle=this.dir
-    let directory=this.overVeiw
+    let directory=this.directoryOverVeiw
     
     let i=0
     for (i=0;i<pathArr.length-1;i++) {
-      handle=await handle.getDirectoryHandle(pathArr[i],{make:1})
+      handle=await handle.getDirectoryHandle(pathArr[i],{create:1})
       directory=directory[pathArr[i]]??(directory[pathArr[i]]={})
     }
-    handle=await handle.getFileHandle(pathArr[i],{make:1})
-    directory=directory[pathArr[i]]??(this.overVeiw.push(new FsFile({
+    handle=await handle.getFileHandle(pathArr[i],{create:1})
+    let id=directory[pathArr[i]]??(directory[pathArr[i]]=this.overVeiw.push(new FsFile({
       handle,
       path:pathArr
-    })))
+    }))-1)
+    return {handle,id,file:this.overVeiw[id]}
   }
   
   push(to){
