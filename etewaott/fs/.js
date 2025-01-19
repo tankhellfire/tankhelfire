@@ -130,7 +130,7 @@ class FsFile{
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-    this.info = {
+    return this.info = {
       kind: this.handle.kind,
 
       lastModified: fileGet.lastModified,
@@ -144,8 +144,17 @@ class FsFile{
     }
   }
   
+  async read(){
+    return await this.handle.getFile()
+  }
+  
   async write(content){
-    this.handle.
+    let write=await this.handle.createWritable()
+    try{
+      await write.write(content)
+    }catch(err){console.error(err)}
+    await write.close()
+    return await this.updateInfo()
   }
 }
 
