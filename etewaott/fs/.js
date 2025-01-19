@@ -16,23 +16,84 @@ class syncFs {
       this.dir = await window.showDirectoryPicker()
       this.text.innerText = this.dir.name
       // alert("start")
-      this.overVeiw=await pullDir(this.dir,10)
+      await this.makeOverVeiw()
       this.directoryOverVeiw={}
-      this.makeDirectoryOverVeiw
+      this.makeDirectoryOverVeiw()
       // alert("end")
     }
   }
-  
-        let i=0
-      for(let fileNum=0;fileNum<this.overVeiw.length;fileNum++){
-        let path=this.overVeiw[fileNum].path
-        let c=this.directoryOverVeiw
+  async makeOverVeiw(threads=10){
+    let handle=this.dir
+    let files=this.overVeiw=[]
 
-        for (i = 0; i < path.length-1; i++) {
-          c=c[path[i]]??(c[path[i]]={})
-        }
-        c[path[i]]=fileNum
+    async function getAllPaths(handle, path=[]) {
+      let val = handle.values()
+      while (1) {
+        let {value, done} = await val.next()
+        if(done){break}
+        if(value.kind==="directory"){await getAllPaths(value, [...path, value.name]);continue}
+        if(value.kind==="file"){files.push({path:[...path, value.name],handle:value});continue}
+        console.warn(`unknown kind:"${value.kind}", @"${[...path, value.name].join('/')}" in`, value)
       }
+    }
+    await getAllPaths(handle)
+    let i = 0
+    let wait = []
+
+    async function threadPassFile(thread) {
+      while (1) {
+        let jobNum = i++
+        info.textContent=jobNum
+        console.log(thread, 'new job', jobNum)
+        let job = files[jobNum]
+        if (job === undefined) {
+          break
+        }
+        let {handle} = job
+
+        const fileGet = await handle.getFile()
+
+        const arrayBuffer = await fileGet.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        job.info = {
+          kind: handle.kind,
+
+          lastModified: fileGet.lastModified,
+          name: fileGet.name,
+          size: fileGet.size,
+          type: fileGet.type,
+
+          hash: {
+            sha256: hashHex
+          }
+        }
+      }
+    }
+
+    // alert("passing files")
+
+    for (let thread = 0; thread < threads; thread++) {
+      wait.push(threadPassFile(thread))
+    }
+    await Promise.all(wait)
+    return files
+  }
+    
+  makeDirectoryOverVeiw(){
+    let i=0
+    for(let fileNum=0;fileNum<this.overVeiw.length;fileNum++){
+      let path=this.overVeiw[fileNum].path
+      let c=this.directoryOverVeiw
+
+      for (i = 0; i < path.length-1; i++) {
+        c=c[path[i]]??(c[path[i]]={})
+      }
+      c[path[i]]=fileNum
+    }
+  }
   
   getFromPath(pathArr){
     let c=this.directoryOverVeiw
