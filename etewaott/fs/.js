@@ -143,6 +143,10 @@ class FsFile{
       }
     }
   }
+  
+  async write(content){
+    this.handle.
+  }
 }
 
 let fs = [new Fs(0), new Fs(1)]
