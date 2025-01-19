@@ -102,20 +102,26 @@ class Fs {
     return {handle,id,file:this.overVeiw[id]}
   }
   
-  sync(to){//await b.write(await (await a.read()).arrayBuffer())
+  async sync(to,first=1){//await b.write(await (await a.read()).arrayBuffer())
     for(let fromFile of this.overVeiw){
-      let toFile=to.makeFromPath(fromFile.path)?.file
+      let toFile=(await to.makeFromPath(fromFile.path))?.file
       if(fromFile?.info?.size===toFile?.info?.size&&fromFile?.info?.hash?.sha256===toFile?.info?.hash?.sha256){
         console.log('same')
         continue
       }
       if(fromFile.info.lastModified<toFile.info.lastModified){
-        
+        console.log('pushing',fromFile.path)
+        await fromFile.write(await (await toFile.read()).arrayBuffer())
       }else{
-        console.log(
+        await toFile.write(await (await fromFile.read()).arrayBuffer())
+        console.log('pulling',fromFile.path)
       }
       console.log('diff',fromFile,toFile)
     }
+    
+    if(first){
+      await to.sync(this,0)
+    } 
   }
 }
 
