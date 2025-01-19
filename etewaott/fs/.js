@@ -18,7 +18,12 @@ class syncFs {
       // alert("start")
       this.overVeiw=await pullDir(this.dir,10)
       this.directoryOverVeiw={}
-      let i=0
+      this.makeDirectoryOverVeiw
+      // alert("end")
+    }
+  }
+  
+        let i=0
       for(let fileNum=0;fileNum<this.overVeiw.length;fileNum++){
         let path=this.overVeiw[fileNum].path
         let c=this.directoryOverVeiw
@@ -28,11 +33,18 @@ class syncFs {
         }
         c[path[i]]=fileNum
       }
-      // alert("end")
-    }
-  }
   
   getFromPath(pathArr){
+    let c=this.directoryOverVeiw
+    
+    for (let path of pathArr) {
+      if((c=c[path])===undefined){
+        return undefined
+      }
+    }
+    return {val:c,file:this.overVeiw[c]}
+  }
+  setFromPath(pathArr){
     let c=this.directoryOverVeiw
     
     for (let path of pathArr) {
