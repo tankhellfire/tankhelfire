@@ -22,6 +22,7 @@ class Fs {
       // alert("end")
     }
   }
+  
   async makeOverVeiw(threads=10){
     let handle=this.dir
     let files=this.overVeiw=[]
@@ -60,8 +61,7 @@ class Fs {
     }
     await Promise.all(wait)
     return files
-  }
-    
+  } 
   makeDirectoryOverVeiw(){
     let i=0
     for(let fileNum=0;fileNum<this.overVeiw.length;fileNum++){
@@ -85,7 +85,6 @@ class Fs {
     }
     return {id:c,file:this.overVeiw[c]}
   }
-  
   async makeFromPath(pathArr){
     let handle=this.dir
     let directory=this.directoryOverVeiw
@@ -103,12 +102,12 @@ class Fs {
     return {handle,id,file:this.overVeiw[id]}
   }
   
-  push(to){
+  push(to){//await b.write(await (await a.read()).arrayBuffer())
     for(let fromFile of this.overVeiw){
       let toFile=to.getFromPath(fromFile.path)?.file
       if(fromFile?.info?.size===toFile?.info?.size&&fromFile?.info?.hash?.sha256===toFile?.info?.hash?.sha256){
-          console.log('same')
-          continue
+        console.log('same')
+        continue
       }
       console.log('diff',fromFile,toFile)
     }
