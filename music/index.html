@@ -222,13 +222,13 @@
         
         if(['KeyW','ArrowUp'].includes(e.code)){
           e.preventDefault()
-          volume.value=Number(volume.value)-.05
+          volume.value=Number(volume.value)-.01
           setVolume()
           return
         }
         if(['KeyS','ArrowDown'].includes(e.code)){
           e.preventDefault()
-          volume.value=Number(volume.value)+.05
+          volume.value=Number(volume.value)+.01
           setVolume()
           return
         }

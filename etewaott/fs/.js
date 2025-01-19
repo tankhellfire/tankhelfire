@@ -32,7 +32,7 @@ class Fs {
         let {value, done} = await val.next()
         if(done){break}
         if(value.kind==="directory"){await getAllPaths(value, [...path, value.name]);continue}
-        if(value.kind==="file"){files.push({path:[...path, value.name],handle:value});continue}
+        if(value.kind==="file"){files.push(new FsFile({path:[...path, value.name],handle:value}));continue}
         console.warn(`unknown kind:"${value.kind}", @"${[...path, value.name].join('/')}" in`, value)
       }
     }
@@ -49,7 +49,6 @@ class Fs {
         if (job === undefined) {
           break
         }
-        job=new FsFile(job)
         await job.updateInfo()
       }
     }
@@ -86,20 +85,21 @@ class Fs {
     }
     return {val:c,file:this.overVeiw[c]}
   }
-  makeFromPath(pathArr){
+  
+  async makeFromPath(pathArr){
     let handle=this.dir
     let directory=this.overVeiw
     
     let i=0
     for (i=0;i<pathArr.length-1;i++) {
-      handle=handle.getDirectoryHandle(pathArr[i],{make:1})
+      handle=await handle.getDirectoryHandle(pathArr[i],{make:1})
       directory=directory[pathArr[i]]??(directory[pathArr[i]]={})
     }
-    handle=handle.getFileHandle(pathArr[i],{make:1})
-    directory=directory[pathArr[i]]??(this.overVeiw.push({
+    handle=await handle.getFileHandle(pathArr[i],{make:1})
+    directory=directory[pathArr[i]]??(this.overVeiw.push(new FsFile({
       handle,
       path:pathArr
-    }))
+    })))
   }
   
   push(to){
