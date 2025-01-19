@@ -124,7 +124,7 @@ class Fs {
   async sync(to,first=1,ret={same:0,push:0,pull:0}){
     for(let fromFileNum in this.overVeiw){
       let fromFile=this.overVeiw[fromFileNum]
-      console.log(`${(fromFileNum/this.overVeiw.length*100).toFixed(2).padStart(6)}% ${fromFileNum.toString().padStart(this.overVeiw.length.toString().length)}/${a}`)
+      console.log(`${(fromFileNum/this.overVeiw.length*100).toFixed(2).padStart(6)}% ${fromFileNum.padStart(this.overVeiw.length.toString().length)}/${this.overVeiw.length}`)
       let toFile=(await to.makeFromPath(fromFile.path))?.file
       if(fromFile?.info?.size===toFile?.info?.size&&fromFile?.info?.hash?.sha256===toFile?.info?.hash?.sha256){
         ret.same++
