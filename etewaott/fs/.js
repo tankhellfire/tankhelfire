@@ -114,16 +114,12 @@ class Fs {
       handle=handle.getDirectoryHandle(pathArr[i],{make:1})
       directory=directory[pathArr[i]]??(directory[pathArr[i]]={})
     }
-    directory=directory[pathArr[i]]??(this.overVeiw)
     handle=handle.getFileHandle(pathArr[i],{make:1})
+    directory=directory[pathArr[i]]??(this.overVeiw.push({
+      handle,
+      path:pathArr
+    }))
   }
-//   setFromPath(pathArr){
-//     let handle=this.getFromPath(pathArr)?.val
-//     if(handle===undefined){
-      
-//     }
-
-//   }
   
   push(to){
     for(let fromFile of this.overVeiw){
@@ -136,9 +132,38 @@ class Fs {
     }
   }
 }
-class File{
-  constructor(id) {
+
+class FsFile{
+  constructor({handle,path=[],info={}}) {
+    this.info=info
+    this.handle=handle
+    if(handle){
+      await this.updateInfo()
+    }
     
+    this.path=path
+  }
+  
+  async updateInfo(){
+    const fileGet = await this.handle.getFile()
+
+    const arrayBuffer = await fileGet.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    job.info = {
+      kind: handle.kind,
+
+      lastModified: fileGet.lastModified,
+      name: fileGet.name,
+      size: fileGet.size,
+      type: fileGet.type,
+
+      hash: {
+        sha256: hashHex
+      }
+    }
   }
 }
 
