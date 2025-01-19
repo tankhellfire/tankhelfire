@@ -105,15 +105,22 @@ class syncFs {
     }
     return {val:c,file:this.overVeiw[c]}
   }
-  setFromPath(pathArr){
-    getFromPath()
-    let c=this.dir
+  makeFromPath(pathArr){
+    let handle=this.dir
+    let directoryOverVeiw
     
     let i=0
     for (i=0;i<pathArr.length-1;i++) {
-      c=c.getDirectoryHandle(pathArr[i],{make:1})
+      handle=handle.getDirectoryHandle(pathArr[i],{make:1})
     }
-    return {val:c,file:this.overVeiw[c]}
+    return handle.getFileHandle(pathArr[i],{make:1})
+  }
+  setFromPath(pathArr){
+    let handle=this.getFromPath(pathArr)?.val
+    if(handle===undefined){
+      
+    }
+
   }
   
   push(to){
