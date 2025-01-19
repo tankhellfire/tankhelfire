@@ -140,7 +140,9 @@ class Fs {
     }
     
     if(first){
+      ret={same:ret.same,push:ret.pull,pull:ret.push}
       await to.sync(this,0,ret)
+      ret={same:ret.same,push:ret.pull,pull:ret.push}
     }
     return ret
   }
