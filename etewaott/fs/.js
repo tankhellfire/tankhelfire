@@ -111,37 +111,34 @@ class Fs {
         continue
       }
       if(fromFile.info.lastModified<toFile.info.lastModified){
-        ret.push++
-      }else{
         ret.pull++
+      }else{
+        ret.push++
       }
     }
     return ret
   }
   
-  async sync(to,first=1){
-    let ret={same:0,push:0,pull:0}
+  async sync(to,first=1,ret={same:0,push:0,pull:0}){
     for(let fromFile of this.overVeiw){
       let toFile=(await to.makeFromPath(fromFile.path))?.file
       if(fromFile?.info?.size===toFile?.info?.size&&fromFile?.info?.hash?.sha256===toFile?.info?.hash?.sha256){
-        console.log('same')
         ret.same++
         continue
       }
       if(fromFile.info.lastModified<toFile.info.lastModified){
-        console.log('pushing',fromFile.path)
-        ret.push++
+        ret.pull++
         await fromFile.write(await (await toFile.read()).arrayBuffer())
       }else{
-        console.log('pulling',fromFile.path)
-        ret.pull++
+        ret.push++
         await toFile.write(await (await fromFile.read()).arrayBuffer())
       }
     }
     
     if(first){
-      await to.sync(this,0)
-    } 
+      await to.sync(this,0,ret)
+    }
+    return ret
   }
 }
 
