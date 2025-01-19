@@ -45,11 +45,11 @@ class Fs {
       while (1) {
         let jobNum = i++
         info.textContent=jobNum
-        console.log(thread, 'new job', jobNum)
         let job = files[jobNum]
         if (job === undefined) {
           break
         }
+        console.log(thread, 'new job', jobNum)
         await job.updateInfo()
       }
     }
