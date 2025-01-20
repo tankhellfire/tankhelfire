@@ -69,13 +69,22 @@ function fixUrl(url){
   if(end){
     if(!end.includes('.')) url.pathname+='/index.html'
   }else url.pathname+='index.html'
-  return url.href
+  return url
 }
 
-aysfunction cache(url){
-  
+async function cache(url){
   url=fixUrl(url)
   let req=fetch(url)
+  
+  if(!neverCache.includes(url.pathname)){
+    db.then(async db=>db.set(url.pathname,await (await req).clone().blob()).then(e=>console.log(`//updated cache "${url}"`)))
+
+    let res=await (await db).get(url.pathname)
+    if(res){
+      return new Response(res)
+    }
+  }
+  return (await req).clone()
   
 }
 
