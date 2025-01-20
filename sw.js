@@ -98,7 +98,7 @@ async function cache(a){
   
   let cachRes=(await db).get(url.pathname)
   if(cachRes){
-    return new Request(cachRes)
+    console.log(new Response(cachRes))
   }
   
   return res.clone()
