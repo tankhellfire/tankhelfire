@@ -2,9 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="assets/mouse.svg"/>
     <title>cache</title>
+    <meta name="color-scheme" content="light dark">
     <style>
       .select {
         -webkit-user-drag: none;
@@ -19,11 +18,13 @@
         user-select: none;
         /* Standard syntax */
       }
+      *{
+        margin:0;font-family:Consolas,monospace;
+      }
     </style>
-    <script src="/lib/utill.js"></script>
     <script src="/lib/lib.js"></script>
   </head>
-  <body style="margin: 0; height: 100vh; width: 100vw;font-family: Consolas, monospace;background-color: #000;color:#fff">
+  <body>
     <pre id="json"></pre>
     <script src="index.js"></script>
   </body>
