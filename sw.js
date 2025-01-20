@@ -91,10 +91,16 @@ async function cache(a){
     return res.clone()
   }
 
-  (await db).set(url.pathname,await res.clone().blob()).then(console.log(`//updated cache "${url}"`))
+  db.then(async e=>{
+    await e.set(url.pathname,await res.clone().blob())
+    console.log(`//updated cache "${url}"`)
+  })
   
+  let cachRes=(await db).get(url.pathname)
+  if(cachRes){
+    return new Request(cachRes)
+  }
   
-
   return res.clone()
 }
 
@@ -106,19 +112,7 @@ self.addEventListener('fetch', (e) => {
       console.log(`//redirecting "${e.request.url}"->"${url}"`)
       return e.respondWith(Response.redirect(url, 301))
     }
-    e.respondWith(
-      caches.match(url).then((cachedResponse) => {
-        const a=cache(url)
-
-
-        if(cachedResponse){
-          console.log(`//returned cache "${url}"`)
-          return cachedResponse
-        }
-        console.log(`//returned fetch "${url}"`)
-        return a;
-      })
-    )
+    e.respondWith(cache(url))
   }
   
 });
