@@ -53,19 +53,6 @@ class Db{
 
 }
 
-function fixUrl(url){
-  url=new URL(url,self.location.origin)
-  let end=url.pathname.split('/').pop()
-  if(end){
-    if(!end.includes('.')) url.pathname+='index.html'
-  }else window.location.pathname+='/index.html'
-  return url
-}
-function cache(url){
-  url
-}
-
-
 let db=new Db('tankhellfire','page-cache')
 
 let neverCache=[
@@ -75,6 +62,22 @@ let neverCache=[
 let alwaysCache=[
   '/txt',
 ]
+
+function fixUrl(url){
+  url=new URL(url,self.location.origin)
+  let end=url.pathname.split('/').pop()
+  if(end){
+    if(!end.includes('.')) url.pathname+='/index.html'
+  }else url.pathname+='index.html'
+  return url.href
+}
+
+aysfunction cache(url){
+  
+  url=fixUrl(url)
+  let req=fetch(url)
+  
+}
 
 
 self.addEventListener('install', (event) => {
