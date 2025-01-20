@@ -1,9 +1,9 @@
 let out={};
 
 (async()=>{
-  for(let a of await caches.keys()){
+  for(let a of (await caches.keys()).sort()){
     out[a]=[]
-    for(let b of (await (await caches.open(a)).keys()).map(a=>a.url)){
+    for(let b of (await (await caches.open(a)).keys()).map(a=>a.url).sort()){
       out[a].push(b)
     }
   }

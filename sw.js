@@ -1,6 +1,6 @@
 if(typeof window==="undefined"){
 
-const CACHE_NAME = 'page-load';
+const CACHE_NAME = 'page';
 
 let neverCache=[
   '/games/scratch/spacegamev5.html',
