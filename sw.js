@@ -91,23 +91,22 @@ async function cache(a){
     return res.clone()
   }
 
-  db.then(async e=>{
-    await e.set(url.pathname,res.clone())
-    console.log(`//updated cache "${url}"`)
-  })
+  (await db).set(url.pathname,await res.clone().blob()).then(console.log(`//updated cache "${url}"`))
+  
+  
 
   return res.clone()
 }
 
-self.addEventListener('fetch', (event) => {
-  const url=fixUrl(event.request.url)
+self.addEventListener('fetch', (e) => {
+  const url=fixUrl(e.request.url)
   
   if(url.hostname=='tankhellfire.glitch.me'){
-    if(url!=event.request.url){
-      console.log(`//redirecting "${event.request.url}"->"${url}"`)
-      return event.respondWith(Response.redirect(url, 301))
+    if(url!=e.request.url){
+      console.log(`//redirecting "${e.request.url}"->"${url}"`)
+      return e.respondWith(Response.redirect(url, 301))
     }
-    event.respondWith(
+    e.respondWith(
       caches.match(url).then((cachedResponse) => {
         const a=cache(url)
 
