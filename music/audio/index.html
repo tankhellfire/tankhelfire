@@ -1,0 +1,24 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>audio</title>
+    <meta name="color-scheme" content="light dark">
+    <script>
+      ( (a, b) => {
+        a.endsWith(b) || history.replaceState(null, '', a + (a.endsWith('/') ? '' : '/') + b)
+      }
+      )(document.location.pathname, 'index.html')
+    </script>
+    <style>
+      * {
+        margin: 0
+      }
+    </style>
+  </head>
+  <body style="font-family: Consolas, monospace;height:100vh">
+    <button id="add" style="position: absolute;">add dir</button>
+    <canvas id="timeline" width="800" height="40000"></canvas>
+    <script src="main.js"></script>
+  </body>
+</html>

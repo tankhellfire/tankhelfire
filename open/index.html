@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>File Opener</title>
+    <meta name="color-scheme" content="light dark">
+    <style>
+      * {
+        margin: 8px;
+      }
+      
+      div{
+        margin: 0px;
+      }
+    </style>
+  </head>
+  <body style="font-family: Consolas, monospace;">
+    <input type="file" id="fileInput"/>
+    <pre id="info" style="word-wrap: break-word; white-space: pre-wrap;">click "Choose File"</pre>
+    <div>
+      <button id="openInNewTab">open in new tab</button><button id="openInNewTabAsText">open in new tab as text</button>
+    </div>
+    <script>
+      let file
+      
+      openInNewTab.onclick=()=>{
+        window.open(URL.createObjectURL(file))
+      }
+      openInNewTabAsText.onclick=async()=>{
+        const newTab = window.open();
+        newTab.document.write(`
+<html>
+  <head>
+    <meta name="color-scheme" content="light dark">
+  </head>
+  <body>
+    <pre id="text" style="word-wrap: break-word; white-space: pre-wrap;">
+      
+    </pre>
+  </body>
+</html>
+        `)
+        newTab.text.textContent=await file.text()
+        newTab.document.close();
+      }
+      
+      
+      document.getElementById('fileInput').addEventListener('change', function(event) {
+        file = event.target.files[0];
+        if (file) {
+          console.log(file)
+          info.innerHTML=`<h2>${file.name}</h2>${file.size} B
+${file.type}
+${file.lastModifiedDate}`
+        }else{
+          info.innerHTML='click "Choose File"'
+        }
+      });
+    </script>
+  </body>
+</html>

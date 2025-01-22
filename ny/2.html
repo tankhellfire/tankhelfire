@@ -1,0 +1,251 @@
+<html><head>
+  <title>nython</title>
+  <meta name="description" content="np">
+  <meta charset="utf-8">
+  <meta property="og:image" content="https://cdn.discordapp.com/emojis/684135972757176353.webp">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <style>
+
+    
+    body, * {
+      font-family: monospace;
+      font-size: 14px;
+      line-height: 1.4em;
+border: none;
+outline: none;
+      background-color:#000000;
+      color:#a0a0a0;
+    }
+
+    button {
+      width: 50%;
+      height: 100%;
+border:1vw outset #a00000;
+    }
+
+    textarea {
+      width: 80%; 
+      height: 100%;
+      display: block;
+      white-space: nowrap;
+      overflow-wrap: normal;
+      overflow-x: scroll;
+  -ms-overflow-style: none; /* Hides scrollbar in Internet Explorer and Edge */
+  scrollbar-width: none; /* Hides scrollbar in Firefox */
+    }
+
+textarea::-webkit-scrollbar {
+  display: none; /* Hides scrollbar in Chrome, Safari, and Opera */
+}
+
+    
+  </style>
+</head>
+<body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#1E1F22;" class="vsc-initialized">
+<div style="display: flex;height:100%">
+<div style="width:20%">
+<div style="display: flex;height:10%">
+  <button id="run">run</button>
+  <button id="donload">donload</button>
+</div>
+<div id="display"></div>
+</div>
+  <textarea id="input" autocorrect="off" autocapitalize="off" spellcheck="false">input.innerHTML=sanitizeString(input.value)
+openStringAsNewTab(
+`&lt;html&gt;&lt;head&gt;
+  &lt;title&gt;nython&lt;/title&gt;
+  &lt;meta name="description" content="np"&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;meta property="og:image" content="https://cdn.discordapp.com/emojis/684135972757176353.webp"&gt;
+  &lt;meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"&gt;
+  &lt;style&gt;
+
+    
+    body, * {
+      font-family: monospace;
+      font-size: 14px;
+      line-height: 1.4em;
+border: none;
+outline: none;
+      background-color:#000000;
+      color:#a0a0a0;
+    }
+
+    button {
+      width: 50%;
+      height: 100%;
+border:1vw outset #a00000;
+    }
+
+    textarea {
+      width: 80%; 
+      height: 100%;
+      display: block;
+      white-space: nowrap;
+      overflow-wrap: normal;
+      overflow-x: scroll;
+  -ms-overflow-style: none; /* Hides scrollbar in Internet Explorer and Edge */
+  scrollbar-width: none; /* Hides scrollbar in Firefox */
+    }
+
+textarea::-webkit-scrollbar {
+  display: none; /* Hides scrollbar in Chrome, Safari, and Opera */
+}
+
+    
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#1E1F22;" class="vsc-initialized"&gt;
+&lt;div style="display: flex;height:100%"&gt;
+&lt;div style="width:20%"&gt;
+&lt;div style="display: flex;height:10%"&gt;
+  &lt;button id="run"&gt;run&lt;/button&gt;
+  &lt;button id="donload"&gt;donload&lt;/button&gt;
+&lt;/div&gt;
+&lt;div id="display"&gt;&lt;/div&gt;
+&lt;/div&gt;
+  &lt;textarea id="input" autocorrect="off" autocapitalize="off" spellcheck="false"&gt;${input.innerHTML}&lt;/textarea&gt;
+&lt;/div&gt;
+  &lt;script&gt;
+
+    function $(id){
+      return document.getElementById(id);
+    }
+
+    function sanitizeString(str){
+      return str
+.replaceAll('&amp;', '&amp;amp')
+.replaceAll('&lt;', '&amp;lt')
+.replaceAll('&gt;', '&amp;gt');
+    }
+
+run.onclick=(async()=&gt;{
+      try{
+        value = await eval('(async()=&gt;{'+$("input").value+'})()');
+        if(value){
+         alert('script returned with {'+value+'}');
+        }
+      }catch(er){alert(er)}
+})
+
+
+donload.onclick=(()=&gt;{
+display.innerHTML=''
+input.innerHTML=sanitizeString(input.value)
+downloadStringAsText(document.documentElement.outerHTML,'ny.html')
+})
+
+    function openStringAsNewTab(htmlContent){
+      const newTab = window.open();
+      newTab.document.write(htmlContent);
+      newTab.document.close();
+    }
+
+    function downloadStringAsText(content, filename){
+      const blob = new Blob([content],{ type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = url;
+      document.body.appendChild(link);//firefox
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+function update(){
+display.innerHTML=getAllFunctionsIncludingPrototype(display)
+
+function getAllFunctionsIncludingPrototype(obj) {
+  let props = [];
+  let currentObj = obj;
+
+ do {
+    props = props.concat(Object.getOwnPropertyNames(currentObj));
+  } while ((currentObj = Object.getPrototypeOf(currentObj)));
+let out='\\n'
+for(var i of sortAlphabetically(props)){
+out+=\`\${i} : \${typeof(obj[i])}\\n\`
+}
+
+  return out
+};
+
+function sortAlphabetically(arr) {
+    return arr.sort((a, b) =&gt; a.localeCompare(b));
+}
+requestAnimationFrame(update)
+}
+update()
+  &lt;/script&gt;&lt;/body&gt;&lt;/html&gt;`)</textarea>
+</div>
+  <script>
+
+    function $(id){
+      return document.getElementById(id);
+    }
+
+    function sanitizeString(str){
+      return str
+.replaceAll('&', '&amp')
+.replaceAll('<', '&lt')
+.replaceAll('>', '&gt');
+    }
+
+run.onclick=(async()=>{
+      try{
+        value = await eval('(async()=>{'+$("input").value+'})()');
+        if(value){
+         alert('script returned with {'+value+'}');
+        }
+      }catch(er){alert(er)}
+})
+
+
+donload.onclick=(()=>{
+display.innerHTML=''
+input.innerHTML=sanitizeString(input.value)
+downloadStringAsText(document.documentElement.outerHTML,'ny.html')
+})
+
+    function openStringAsNewTab(htmlContent){
+      const newTab = window.open();
+      newTab.document.write(htmlContent);
+      newTab.document.close();
+    }
+
+    function downloadStringAsText(content, filename){
+      const blob = new Blob([content],{ type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = url;
+      document.body.appendChild(link);//firefox
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+function update(){
+display.innerHTML=getAllFunctionsIncludingPrototype(display)
+
+function getAllFunctionsIncludingPrototype(obj) {
+  let props = [];
+  let currentObj = obj;
+
+ do {
+    props = props.concat(Object.getOwnPropertyNames(currentObj));
+  } while ((currentObj = Object.getPrototypeOf(currentObj)));
+let out='\n'
+for(var i of sortAlphabetically(props)){
+out+=`${i} : ${typeof(obj[i])}\n`
+}
+
+  return out
+};
+
+function sortAlphabetically(arr) {
+    return arr.sort((a, b) => a.localeCompare(b));
+}
+requestAnimationFrame(update)
+}
+update()
+  </script></body></html>

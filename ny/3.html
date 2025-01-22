@@ -1,0 +1,155 @@
+<html>
+  <head>
+    <title>nython</title>
+    <meta name="description" content="np" />
+    <meta charset="utf-8" />
+    <meta
+      property="og:image"
+      content="https://cdn.discordapp.com/emojis/684135972757176353.webp"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,user-scalable=no"
+    />
+    <style>
+      body,
+      * {
+        font-family: monospace;
+        font-size: 14px;
+        line-height: 1.4em;
+        border: none;
+        outline: none;
+        background-color: #000000;
+        color: #ffffff;
+      }
+
+      .button {
+        height: 100%;
+        border: 1vw outset #ff0000;
+      }
+
+      textarea {
+        width: 80%;
+        height: 100%;
+        display: block;
+        white-space: nowrap;
+        overflow-wrap: normal;
+        overflow-x: scroll;
+        -ms-overflow-style: none; /* Hides scrollbar in Internet Explorer and Edge */
+        scrollbar-width: none; /* Hides scrollbar in Firefox */
+      }
+
+      textarea::-webkit-scrollbar {
+        display: none; /* Hides scrollbar in Chrome, Safari, and Opera */
+      }
+    </style>
+  </head>
+  <body
+    style="
+      touch-action: manipulation;
+      overflow: hidden;
+      margin: 0;
+      background-color: #1e1f22;
+    "
+    class="vsc-initialized"
+  >
+    <div style="display: flex; height: 100%">
+      <div style="width: 20%">
+        <div style="display: flex; height: 10%">
+          <button class="button" id="run" style="width: 100%">run</button>
+          <button class="button" id="download" style="width: 100%">
+            donload
+          </button>
+        </div>
+        <div style="display: flex; height: 10%">
+          <button class="button" style="width: 100%" id="getSelf">
+            source
+          </button>
+        </div>
+        <div id="display"></div>
+      </div>
+      <textarea
+        id="input"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      ></textarea>
+    </div>
+    <script>
+      const originalHTML = document.documentElement.outerHTML;
+
+      function $(id) {
+        return document.getElementById(id);
+      }
+
+      function sanitizeString(str) {
+        return str
+          .replaceAll("\\", "\\\\")
+          .replaceAll("\`", "\\\`")
+          .replaceAll("\$", "\\\$");
+      }
+
+      $("run").onclick = async () => {
+        try {
+          value = await eval("(async()=>{" + $("input").value + "})()");
+          if (value) {
+            alert("script returned with {" + value + "}");
+          }
+        } catch (er) {
+          alert(er);
+        }
+      };
+
+      $("download").onclick = () => {
+        downloadStringAsText(input.value, "nython download.txt");
+      };
+
+      $("getSelf").onclick = () => {
+        input.value =
+          "openStringAsNewTab(\`" + sanitizeString(originalHTML) + "\`)";
+      };
+
+      function openStringAsNewTab(htmlContent) {
+        const newTab = window.open();
+        newTab.document.write(htmlContent);
+        newTab.document.close();
+      }
+
+      function downloadStringAsText(content, filename) {
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.download = filename;
+        link.href = url;
+        document.body.appendChild(link); //firefox
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+      function update() {
+        display.innerHTML = getAllFunctionsIncludingPrototype(display);
+
+        function getAllFunctionsIncludingPrototype(obj) {
+          let props = [];
+          let currentObj = obj;
+
+          do {
+            props = props.concat(Object.getOwnPropertyNames(currentObj));
+          } while ((currentObj = Object.getPrototypeOf(currentObj)));
+          let out = "\n";
+          for (var i of sortAlphabetically(props)) {
+            out += `${i} : ${typeof obj[i]}\n`;
+          }
+
+          return out;
+        }
+
+        function sortAlphabetically(arr) {
+          return arr.sort((a, b) => a.localeCompare(b));
+        }
+        requestAnimationFrame(update);
+      }
+      update();
+    </script>
+  </body>
+</html>

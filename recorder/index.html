@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sound Recorder</title>
+</head>
+<body>
+  <h1>Record Audio</h1>
+  
+  <button id="startBtn">Start Recording</button>
+  <button id="stopBtn" disabled>Stop Recording</button>
+  
+  <h2>Playback</h2>
+  <audio id="audioPlayback" controls></audio>
+
+  <script>
+    
+    
+    let mediaRecorder;
+    let audioChunks = [];
+    let recordInterval;
+
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const audioPlayback = document.getElementById('audioPlayback');
+
+    async function initAudioRecorder() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        // Event: Data available (audio chunks)
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
+        };
+
+        // Event: Recording stops
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+
+          // Download the audio file
+          const downloadLink = document.createElement('a');
+          downloadLink.href = audioUrl;
+          downloadLink.download = `recording_${Date.now()}.mp3`;
+          downloadLink.click();
+
+          // Optionally set for playback
+          audioPlayback.src = audioUrl;
+          audioChunks = [];
+        };
+
+        startBtn.addEventListener('click', () => {
+          mediaRecorder.start();
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+
+          // Automatically stop and restart recording every minute
+          recordInterval = setInterval(() => {
+            if (mediaRecorder.state === 'recording') {
+              mediaRecorder.stop();
+              mediaRecorder.start();
+            }
+          }, 60000); // 1 minute = 60,000 ms
+        });
+
+        stopBtn.addEventListener('click', () => {
+          clearInterval(recordInterval);
+          if (mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+        });
+      } catch (error) {
+        console.error("Error accessing the microphone", error);
+        alert("Microphone access denied or not supported.");
+      }
+    }
+
+    // Initialize the audio recorder
+    initAudioRecorder();
+  </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="color-scheme" content="light dark">
+    <link id="icon" rel="icon">
+    <title id="title">music</title>
+    <script src="/lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
+    <style>
+      body {
+        padding: 20px;
+        padding-top: 0px;
+        margin: 0 auto;
+      }
+
+      * {
+        font-family: Consolas, monospace;
+      }
+
+      .player-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .thumbnail {
+        height: 50vmin;
+        object-fit: cover;
+        display: none;
+        cursor: pointer;
+      }
+
+      .time-info {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .slider {
+        -webkit-appearance: none;
+        appearance: none;
+        background: #ddd;
+        outline: none;
+        border-radius: 4px;
+        touch-action: none;
+        /* Prevents screen scrolling on touch devices */
+        cursor: pointer;
+      }
+
+      .vertical {
+        writing-mode: vertical-rl;
+      }
+
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        background: #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .slider::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        background: #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .play-pause {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      .play-pause:active {
+        background-color: #0056b3;
+      }
+      
+      .select {
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+        user-drag: none;
+        -webkit-user-select: none;
+        /* Safari */
+        -ms-user-select: none;
+        /* IE 10 and IE 11 */
+        user-select: none;
+        /* Standard syntax */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="player-container">
+      <h2 id="h2Title">music</h2>
+      <div>
+        <button id="playPauseButton" class="play-pause">Play</button>
+        <input type="file" id="fileInput" accept="audio/*">
+      </div>
+      <div style="width: 100%;display: flex;justify-content: center;align-items: center;">
+        <img id="thumbnail" class="thumbnail select" alt="Thumbnail">
+        <input style="width:20px;height:50vmin" type="range" id="volume" class="slider vertical" min="0" max="1" step="0.01" value=".75">
+        <span id="volDisplay">25%</span>
+      </div>
+      <div class="time-info">
+        <span id="currentTime">0:00.00</span>
+        <span id="totalTime">0:00.00</span>
+      </div>
+      <input style="width:100%;height: 20px;" type="range" id="seekBar" class="slider" step="0.01">
+    </div>
+    <audio id="audioPlayer" loop hidden autoplay></audio>
+    <script>
+      const fileInput = document.getElementById('fileInput');
+      const audioPlayer = document.getElementById('audioPlayer');
+      const seekBar = document.getElementById('seekBar');
+      const currentTimeDisplay = document.getElementById('currentTime');
+      const totalTimeDisplay = document.getElementById('totalTime');
+      const thumbnail = document.getElementById('thumbnail');
+      const playPauseButton = document.getElementById('playPauseButton');
+
+      const mediaSession = navigator.mediaSession.metadata = new MediaMetadata()
+
+      function formatTime(seconds) {
+        try {
+          const minutes = Math.floor(seconds / 60);
+          const secs = seconds % 60;
+          return `${minutes}:${secs < 10 ? '0' : ''}${secs.toFixed(2)}`;
+        } catch (e) {
+          alert(e)
+        }
+      }
+
+      /*playPauseButton.addEventListener('click',*/loadMusic()
+      fileInput.addEventListener('change',loadMusic)
+      function loadMusic(){
+        const file = fileInput.files[0];
+        if (!file){return /*alert("no file")*/}
+        h2Title.textContent=title.textContent = mediaSession.title = file.name
+
+        const fileURL = URL.createObjectURL(file);
+        audioPlayer.src = fileURL;
+        //audioPlayer.load();
+        audioPlayer.volume = 1-volume.value
+
+        // Extract metadata using jsmediatags
+        jsmediatags.read(file, {
+          onSuccess: (tag) => {
+            const {picture} = tag.tags;
+            if (picture) {
+              const data = picture.data;
+              const format = picture.format;
+              const base64String = data.reduce( (acc, byte) => acc + String.fromCharCode(byte), '');
+              const thumbnailURL = `data:${format};base64,${btoa(base64String)}`;
+              icon.href = thumbnail.src = thumbnailURL;
+
+              thumbnail.style.display = 'block';
+              mediaSession.artwork = [{
+                src: thumbnailURL
+              }];
+            }
+          }
+          ,
+          onError: (error) => {
+            console.log('Error reading metadata:', error);
+          }
+        });
+
+        // Set up event listeners for the audio player
+        audioPlayer.addEventListener('loadedmetadata', () => {
+          seekBar.max = audioPlayer.duration;
+          totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
+        }
+        );
+
+        seekBar.addEventListener('input', () => {
+          audioPlayer.currentTime = seekBar.value;
+        }
+        );
+      };
+
+      function frame() {
+        seekBar.value = audioPlayer.currentTime;
+        currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
+        requestAnimationFrame(frame)
+      }
+      frame()
+      
+      volume.addEventListener('input',setVolume)
+      function setVolume() {
+        audioPlayer.volume = 1-volume.value;
+        volDisplay.textContent=(Math.floor(100-volume.value*100)+"%").padStart('3',0).substring(0,3)
+      }
+
+      // Play/Pause Button
+      playPauseButton.addEventListener('click', pausePlay)
+      thumbnail.addEventListener('click', pausePlay)
+      function pausePlay(){
+        if (audioPlayer.paused || audioPlayer.ended) {
+          audioPlayer.play();
+          playPauseButton.textContent = 'Pause';
+        } else {
+          audioPlayer.pause();
+          playPauseButton.textContent = 'Play';
+        }
+      }
+      
+      addEventListener("keydown",e=>{
+        let numcode=e.keyCode-48
+        if(['Space','KeyK'].includes(e.code)){
+          e.preventDefault()
+          pausePlay()
+          return
+        }
+        
+        if(['KeyW','ArrowUp'].includes(e.code)){
+          e.preventDefault()
+          volume.value=Number(volume.value)-.01
+          setVolume()
+          return
+        }
+        if(['KeyS','ArrowDown'].includes(e.code)){
+          e.preventDefault()
+          volume.value=Number(volume.value)+.01
+          setVolume()
+          return
+        }
+        
+        if(['KeyD','ArrowRight'].includes(e.code)){
+          e.preventDefault()
+          audioPlayer.currentTime+=5
+          return
+        }
+        if(['KeyA','ArrowLeft'].includes(e.code)){
+          e.preventDefault()
+          audioPlayer.currentTime-=5
+          return
+        }
+        
+        if(0<=numcode && numcode<=9){
+          e.preventDefault()
+          audioPlayer.currentTime=audioPlayer.duration/10*numcode
+          return
+        }
+      })
+    </script>
+  </body>
+</html>

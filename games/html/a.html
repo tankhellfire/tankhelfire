@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html oncontextmenu="return false;" style="/*cursor:none;*/">
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
+    <link rel="icon" href="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/cat%20pick.png?v=1706326820251" type="image/x-icon"/>
+    <title>Tankhellfire</title>
+  </head>
+  <body style="touch-action:manipulation;overflow:hidden;margin:0;background-color:#1E1F22;height:100vh;width:100vw;">
+    <img id="1" src="https://cdn.glitch.global/bed9cdd6-7e4b-4213-81e3-add8659ca6d7/spacegamev5.png?v=1706326842458" alt="spacegamev5.PNG" style="
+        height:10vmin;width:10vmin;
+        position:absolute;
+        left:0vmin;top:0vmin;
+        z-index:0;
+        transform:translate(-50%,-50%);
+      "/>
+    <img id="1" src="assets/joystick bace.svg" alt="cicle :D" style="
+        height:40vmin;width:40vmin;
+        position:absolute;
+        left:0vmin;top:0vmin;
+        z-index:0;
+        transform:translate(-50%,-50%);
+        display:none;
+      "/>
+    <img id="1" src="assets/joystick.svg" alt="cicle :D" style="
+        height:15vmin;width:15vmin;
+        position:absolute;
+        left:0vmin;top:0vmin;
+        z-index:0;
+        transform:translate(-50%,-50%);
+        display:none;
+      "/>
+  </body>
+  <script>
+    const main = document.body;
+
+    let vmin = 0
+    let ty = 0;
+    let upf = 0;
+    let keyState = {
+      w: 0,
+      a: 0,
+      s: 0,
+      d: 0
+    };
+    let mouse = {
+      mouse: {
+        x: 0,
+        y: 0,
+        click: {
+          now: 0,
+          last: 0
+        }
+      },
+      touch: {}
+    };
+
+    document.addEventListener("keydown", (event)=>{
+      if (keyState[event.key] != undefined) {
+        keyState[event.key] = 1;
+      }
+      ;
+    }
+    );
+    document.addEventListener("keyup", (event)=>{
+      if (keyState[event.key] != undefined) {
+        keyState[event.key] = 0;
+      }
+      ;
+    }
+    );
+
+    document.addEventListener("mousemove", (event)=>{
+      const currentElements = document.elementsFromPoint(event.clientX, event.clientY);
+      // mouse.mouse.x+=event.movementX;
+      // mouse.mouse.y+=event.movementY;
+      mouse.mouse.x = event.clientX;
+      mouse.mouse.y = event.clientY;
+      mouse.mouse.target = event.target;
+      mouse.mouse.targets = currentElements;
+    }
+    );
+    document.addEventListener("mousedown", (event)=>{
+      mouse.mouse.click.now = 1;
+    }
+    );
+    document.addEventListener("mouseup", (event)=>{
+      mouse.mouse.click.now = 0;
+    }
+    );
+
+    function handleTouchMove(event) {
+      mouse.touch = {};
+      for (const touch of event.touches) {
+        const currentElement = document.elementFromPoint(touch.clientX, touch.clientY);
+        const currentElements = document.elementsFromPoint(touch.clientX, touch.clientY);
+        mouse.touch[touch.identifier] = {
+          x: touch.clientX,
+          y: touch.clientY,
+          startTarget: touch.target,
+          target: currentElement,
+          targets: currentElements,
+          force: touch.force,
+        };
+      }
+    }
+    ;document.addEventListener("touchmove", handleTouchMove);
+    document.addEventListener("touchend", handleTouchMove);
+    //Math.random()
+    //main.children[1].style.zIndex
+    //while(performance.now()<ty+1000);
+    function clamp(x, min, max) {
+      if (x < min) {
+        return min
+      }
+      if (max < x) {
+        return max
+      }
+      return x
+    }
+
+    function gotoxy(element, x, y) {
+      element.style.left = x + 'px';
+      element.style.top = y + 'px';
+    }
+
+    let cx = 0;
+    let cy = 0;
+    let touchMove;
+    let move = [0, 0];
+
+    function uptade() {
+    // if (document.documentElement.requestFullscreen) {
+    //   document.documentElement.requestFullscreen();
+    // } else if (document.documentElement.webkitRequestFullscreen) {
+    //   // Safari
+    //   document.documentElement.webkitRequestFullscreen();
+    // } else if (document.documentElement.msRequestFullscreen) {
+    //   // IE11
+    //   document.documentElement.msRequestFullscreen();
+    // }
+      upf = (performance.now() - ty) / 1000;
+      ty = performance.now();
+      vmin = Math.min(window.innerWidth, window.innerHeight);
+
+      move = [0, 0];
+      if (keyState.d == 1) {
+        move[0] += 1
+      }
+      if (keyState.a == 1) {
+        move[0] -= 1
+      }
+      if (keyState.w == 1) {
+        move[1] -= 1
+      }
+      if (keyState.s == 1) {
+        move[1] += 1
+      }
+
+      if (Object.keys(mouse.touch).length > 0 && touchMove == undefined) {
+        touchMove = {
+          x: mouse.touch[Object.keys(mouse.touch)[0]].x,
+          y: mouse.touch[Object.keys(mouse.touch)[0]].y,
+          object: Object.keys(mouse.touch)[0]
+        };
+        main.children[1].style.display = 'block';
+        main.children[2].style.display = 'block';
+      }
+      if (touchMove != undefined) {
+        if (Object.keys(mouse.touch).includes(touchMove.object)) {
+          gotoxy(main.children[1], touchMove.x, touchMove.y);
+
+          let a = (mouse.touch[touchMove.object].x - touchMove.x) / (vmin * .2);
+          let b = (mouse.touch[touchMove.object].y - touchMove.y) / (vmin * .2);
+
+          let c = clamp(Math.sqrt(a * a + b * b), 1, Infinity);
+          a = a / c;
+          b = b / c;
+
+          gotoxy(main.children[2], touchMove.x + a * vmin * .2, touchMove.y + b * vmin * .2);
+          move[0] += a;
+          move[1] += b;
+        } else {
+          touchMove = undefined;
+          main.children[1].style.display = 'none';
+          main.children[2].style.display = 'none';
+        }
+      }
+      cx += move[0] * upf;
+      cy += move[1] * upf;
+      gotoxy(main.children[0], -cx * vmin + .5 * window.innerWidth, -cy * vmin + .5 * window.innerHeight);
+
+      mouse.mouse.click.last = mouse.mouse.click.now;
+      requestAnimationFrame(uptade);
+    }
+    uptade()
+  </script>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html oncontextmenu="return false;" style="cursor: none">
+  <head>
+    <meta name="viewport" content="interactive-widget=resizes-content" />
+    <link rel="icon" href="assets/mouse.svg" />
+    <title>mmo?</title>
+    <style>
+      .select {
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+        user-drag: none;
+        -webkit-user-select: none;
+        /* Safari */
+        -ms-user-select: none;
+        /* IE 10 and IE 11 */
+        user-select: none;
+        /* Standard syntax */
+      }
+    </style>
+    <script src="/lib/utill.js"></script>
+    <script src="/lib/lib.js"></script>
+  </head>
+  <body class="select" style="margin: 0; height: 100vh; width: 100vw;font-family: Consolas, monospace;">
+    <cliper
+      class="select"
+      style="
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+        position: absolute;
+        background-color: #1e1f22;
+      "
+    >
+      <main
+        class="select"
+        id="main"
+        style="
+          position: absolute;
+          height: 50vmax;
+          width: 50vmax;
+          top: 50vh;
+          left: 50vw;
+        "
+      >
+        <!-- <input id='text'></input> -->
+        <div class="select" id="mouse">
+          <img
+            class="select"
+            src="assets/mouse.svg"
+            alt="<mouse.png.svg>"
+            style="height: 20vmin; width: 20vmin"
+          />
+        </div>
+      </main>
+    </cliper>
+    <script src="game.js"></script>
+  </body>
+</html>

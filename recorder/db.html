@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sound Recorder</title>
+  <script src="/lib/lib.js"></script>
+  <style>
+    *{margin:0}
+    
+    table {
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      text-align: left;
+      padding: 8px;
+    }
+    th {
+      background-color: #A0A0A0;
+    }
+    .download {
+      padding: 5px 10px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body style="height: 100vh; width: 100vw;font-family: Consolas, monospace;background-color: #000;color:#fff">
+  <h1>Record Audio</h1>
+  
+  <button id="startBtn">Start Recording</button>
+  <button id="stopBtn" disabled>Stop Recording</button>
+  
+  <h2>Playback</h2>
+  <audio id="audioPlayback" controls></audio>
+  
+  <pre id="jsonPreview"></pre>
+
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Button</th>
+      </tr>
+    </thead>
+    <tbody id="tableList">
+    </tbody>
+  </table>
+  
+  <script>
+    let mediaRecorder;
+    let audioChunks = [];
+    let recordInterval;
+
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const audioPlayback = document.getElementById('audioPlayback');
+    
+    async function downloadTime(time){
+      const audioUrl = URL.createObjectURL(await dataBace.get(time));
+
+      // Download the audio file
+      const downloadLink = document.createElement('a');
+      downloadLink.href = audioUrl;
+      downloadLink.download = `recording_${Date.now()}.mp3`;
+      downloadLink.click();
+    }
+    
+    async function addToList(date){
+      let time=Number(date)
+      tableList.insertAdjacentHTML('beforeEnd',`<tr style="
+  background-color: rgb(${Math.floor(time)%100},${Math.floor(time/100)%100},${Math.floor(time/10000)%100});
+">
+        <td>${new Date(time)}</td>
+        <td><button class="download" onclick="downloadTime(${time})">download</button></td>
+        <td><button class="download" onclick="dataBace.del(${time}).then(reDraw)">del</button></td>
+      </tr>`)
+    }
+    async function reDraw(){
+      tableList.innerHTML=''
+      for(let a of await dataBace.keys()){
+        addToList(a)
+      }
+    }
+    
+    async function quota(){
+      function pass(inp,depth=0) {
+        if (typeof inp==='undefined') {return}
+        if (typeof inp==='function') {return 'func'}
+        if (typeof inp==='object') {
+          if(depth<0){
+            if(inp==null){return}
+            if(Object.keys(inp).length==0){return 'OOR'}
+            return inp
+          }
+          let ret={}
+          for (let a in inp){
+            ret[a]=pass(inp[a],depth-1)
+          }
+          if(Object.keys(ret).length==0){return {}}
+          return ret
+        }
+        return inp
+      }
+      jsonPreview.textContent=JSON.stringify(pass(await navigator.storage.estimate(),10),null,' ')
+    }
+    quota()
+
+    async function initAudioRecorder() {
+      try {
+        db=await lib('db.js')
+        dataBace=await new db('audio','records')
+        
+        reDraw()
+        
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        // Event: Data available (audio chunks)
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
+        };
+
+        // Event: Recording stops
+        mediaRecorder.onstop = () => {
+          let now=Date.now()
+          addToList(now)
+          dataBace.set(now,new Blob(audioChunks, { type: 'audio/mp3' })).then(quota);
+
+          audioChunks = [];
+        };
+
+        startBtn.addEventListener('click', () => {
+          mediaRecorder.start();
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+
+          // Automatically stop and restart recording every minute
+          recordInterval = setInterval(() => {
+            if (mediaRecorder.state === 'recording') {
+              mediaRecorder.stop();
+              mediaRecorder.start();
+            }
+          }, 1000); // 1 minute = 60,000 ms
+        });
+
+        stopBtn.addEventListener('click', () => {
+          clearInterval(recordInterval);
+          if (mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+        });
+      } catch (error) {
+        console.error("Error accessing the microphone", error);
+        alert("Microphone access denied or not supported.");
+      }
+    }
+
+    // Initialize the audio recorder
+    initAudioRecorder();
+  </script>
+</body>
+</html>

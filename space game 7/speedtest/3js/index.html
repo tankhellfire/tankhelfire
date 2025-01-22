@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" oncontextmenu="return false;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three.js Global Import</title>
+  <script src="/lib/utill.js"></script>
+  <script src="/lib/lib.js"></script>
+  <style>
+    *{margin:0}
+  </style>
+</head>
+<body style="height: 100vh; width: 100vw;font-family: Consolas, monospace;background-color: #000;color:#fff">
+  <h1 id="statusCard">awaiting js</h1>
+  <script>
+    (async () => {  
+      statusCard.textContent='importing'
+      window.THREE = await import('/lib/npm/three/build/three.module.js')
+      window.spaceGame7=await lib('spaceGame7/index.js')
+      statusCard.textContent='loading'
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+      
+      Object.assign(utill,{
+        fullscreen:1,
+        pointerLock:1
+        //keyPreventDefault:1
+      });
+      
+      
+      window.game = new spaceGame7.game({
+        objCount:window.location.hash.substr(1)
+      });
+      
+      
+      // Create a WebGLRenderer
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      // Set up an Orthographic Camera
+      const aspect = window.innerWidth / window.innerHeight;
+      const camera = new THREE.OrthographicCamera();
+      camera.position.z = 1;
+      
+      function onResize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        renderer.setSize(width, height);
+
+        const vmax = Math.max(width, height);
+        camera.left = -width/vmax;
+        camera.right = width/vmax;
+        camera.top = height/vmax;
+        camera.bottom = -height/vmax;
+        camera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', onResize);
+      onResize();
+
+      const scene = new THREE.Scene();
+      
+      window.map=[]
+      
+              const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load('/space game 7/assets/mouse.svg',(texture) => {
+          texture.minFilter = THREE.NearestFilter; // For scaling down
+          texture.magFilter = THREE.NearestFilter; // For scaling up
+          texture.generateMipmaps = false; // Disable mipmaps for sharper edges
+        });
+
+        const geometry = new THREE.PlaneGeometry(1, 1); // 1x1 units
+        const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+      
+      for(let obj of game.obj){
+
+
+        const plane = new THREE.Mesh(geometry, material);
+        scene.add(plane);
+        
+        map.push({obj,real:plane})
+      } 
+      
+      
+      async function update() {
+        game.physics(Date.now()/1000)
+        
+        for(let{obj,real}of map){
+          real.position.x=obj.x*3-1.5
+          real.position.y=obj.y*3-1.5
+          real.scale.x=obj.size
+          real.scale.y=obj.size
+          real.rotation.z=obj.dir*2*Math.PI
+        }
+        
+        renderer.render(scene, camera)
+        requestAnimationFrame(update);
+      }
+      update()
+      statusCard.remove()
+    })()
+  </script>
+</body>
+</html>

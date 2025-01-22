@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AES Encryption Example</title>
+</head>
+<body>
+    <h1>AES Encryption with Web Crypto API</h1>
+    <p>Open the console to see the output.</p>
+
+    <script>
+        async function generateKey() {
+            const key = await crypto.subtle.generateKey(
+                {
+                    name: "AES-GCM",
+                    length: 256,
+                },
+                true, // whether the key is extractable (i.e. can be used in exportKey)
+                ["encrypt", "decrypt"] // can "encrypt" and "decrypt" with this key
+            );
+            return key;
+        }
+
+        async function encryptData(key, data) {
+            const encoded = new TextEncoder().encode(data);
+            const iv = crypto.getRandomValues(new Uint8Array(12)); // Initialization vector
+
+            const encrypted = await crypto.subtle.encrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv,
+                },
+                key,
+                encoded
+            );
+
+            return {
+                iv: iv,
+                encryptedData: encrypted
+            };
+        }
+
+        async function decryptData(key, iv, encryptedData) {
+            const decrypted = await crypto.subtle.decrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv,
+                },
+                key,
+                encryptedData
+            );
+
+            const decoded = new TextDecoder().decode(decrypted);
+            return decoded;
+        }
+
+        async function runExample() {
+            const key = await generateKey();
+
+            const data = "Hello, world!";
+            console.log("Original data:", data);
+
+            const encryptedResult = await encryptData(key, data);
+            console.log("Encrypted data:", new Uint8Array(encryptedResult.encryptedData));
+
+            const decryptedData = await decryptData(key, encryptedResult.iv, encryptedResult.encryptedData);
+            console.log("Decrypted data:", decryptedData);
+        }
+
+        runExample().catch(console.error);
+    </script>
+</body>
+</html>
+
