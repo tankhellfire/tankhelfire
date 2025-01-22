@@ -44,12 +44,12 @@ class Fs {
     async function threadPassFile(thread) {
       while (1) {
         let jobNum = i++
-        info.textContent=jobNum
         let job = files[jobNum]
         if (job === undefined) {
           break
         }
-        console.log(thread, 'new job', jobNum)
+        percentLog(jobNum+1,files.length,thread)
+        info.textContent=jobNum
         await job.updateInfo()
       }
     }
@@ -106,7 +106,9 @@ class Fs {
     let ret={same:0,push:0,pull:0}
     for(let fromFileNum in this.overVeiw){
       let fromFile=this.overVeiw[fromFileNum]
-      console.log(`${(fromFileNum/this.overVeiw.length*100).toFixed(2)}% ${fromFileNum}/${this.overVeiw.length}`)
+      
+      percentLog(fromFileNum+1,this.overVeiw.length)
+      
       let toFile=to.getFromPath(fromFile.path)?.file
       if(fromFile?.info?.size===toFile?.info?.size&&fromFile?.info?.hash?.sha256===toFile?.info?.hash?.sha256){
         ret.same++
@@ -121,29 +123,32 @@ class Fs {
     return ret
   }
   
-  async sync(to,first=1,ret={same:0,push:0,pull:0}){
-    for(let fromFileNum in this.overVeiw){
-      let fromFile=this.overVeiw[fromFileNum]
-      console.log(`${(fromFileNum/this.overVeiw.length*100).toFixed(2).padStart(6)}% ${fromFileNum.padStart(this.overVeiw.length.toString().length)}/${this.overVeiw.length}`)
-      let toFile=(await to.makeFromPath(fromFile.path))?.file
-      if(fromFile?.info?.size===toFile?.info?.size&&fromFile?.info?.hash?.sha256===toFile?.info?.hash?.sha256){
-        ret.same++
-        continue
-      }
-      if(fromFile.info.lastModified<toFile.info.lastModified){
-        ret.pull++
-        await fromFile.write(await (await toFile.read()).arrayBuffer())
-      }else{
-        ret.push++
-        await toFile.write(await (await fromFile.read()).arrayBuffer())
-      }
-    }
+  async push(to,threads=10){
+    let ret={same:0,push:0,pull:0}
+    let i=0
     
-    if(first){
-      ret={same:ret.same,push:ret.pull,pull:ret.push}
-      await to.sync(this,0,ret)
-      ret={same:ret.same,push:ret.pull,pull:ret.push}
-    }
+    await Promise.all(Array.from({length:threads},async(a,threadId)=>{
+      while(1){
+        let fromFileNum=i++
+        let fromFile=this.overVeiw[fromFileNum]
+        if(!fromFile)break
+
+        percentLog(fromFileNum+1,this.overVeiw.length,threadId)
+        
+        let toFile=(await to.makeFromPath(fromFile.path))?.file
+        if(fromFile?.info?.size===toFile?.info?.size&&fromFile?.info?.hash?.sha256===toFile?.info?.hash?.sha256){
+          ret.same++
+          continue
+        }
+        if(fromFile.info.lastModified<toFile.info.lastModified){
+          ret.pull++
+          await fromFile.write(await (await toFile.read()).arrayBuffer())
+        }else{
+          ret.push++
+          await toFile.write(await (await fromFile.read()).arrayBuffer())
+        }
+      }
+    }))
     return ret
   }
 }
@@ -189,6 +194,10 @@ class FsFile{
     await write.close()
     return await this.updateInfo()
   }
+}
+
+function percentLog(value,max=1,id='') {
+  console.log(`${(value/max*100).toFixed(2).padStart(6)}% [${''.padEnd(value/max*50,'+').padEnd(50)}] ${value.toString().padStart(max.toString().length)}/${max} from ${id}`)
 }
 
 let fs = [new Fs(0), new Fs(1)]
