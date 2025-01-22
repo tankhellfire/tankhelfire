@@ -34,6 +34,7 @@
       .time-info {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         width: 100%;
       }
 
@@ -112,6 +113,11 @@
       </div>
       <div class="time-info">
         <span id="currentTime">0:00.00</span>
+        <div>
+          <span>pan</span>
+          <input style="/*width:100%;height: 20px;*/" type="range" id="pan" class="slider" min="-1" step=".01" max="1">
+          <span id="panReporter">pan</span>
+        </div>
         <span id="totalTime">0:00.00</span>
       </div>
       <input style="width:100%;height: 20px;" type="range" id="seekBar" class="slider" step="0.01">
@@ -198,6 +204,34 @@
         audioPlayer.volume = 1-volume.value;
         volDisplay.textContent=(Math.floor(100-volume.value*100)+"%").padStart('3',0).substring(0,3)
       }
+      
+      volume.addEventListener('pan',e=>{
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Create a MediaElementAudioSourceNode from the video element
+        const source = audioContext.createMediaElementSource(audioPlayer);
+
+        // Create a GainNode to downmix to mono
+        const gainNode = audioContext.createGain();
+        gainNode.channelCount = 1; // Force mono
+        gainNode.channelCountMode = 'explicit';
+
+        // Create a StereoPannerNode for right-ear-only panning
+        const panner = audioContext.createStereoPanner();
+        panner.pan.value = 1; // 1 = Right ear, -1 = Left ear, 0 = Center
+
+        // Connect nodes: video -> gainNode -> panner -> destination
+        source.connect(gainNode).connect(panner).connect(audioContext.destination);
+
+        // Unlock AudioContext on user interaction (required on some devices/browsers)
+        video.addEventListener('play', () => {
+          if (audioContext.state === 'suspended') {
+            audioContext.resume();
+          }
+        });
+        pan.value
+        panReporter
+      })
 
       // Play/Pause Button
       playPauseButton.addEventListener('click', pausePlay)
