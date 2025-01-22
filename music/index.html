@@ -116,7 +116,8 @@
         <div>
           <span>pan</span>
           <input style="/*width:100%;height: 20px;*/" type="range" id="pan" class="slider" min="-1" step=".01" max="1">
-          <span id="panReporter">pan</span>
+          <input type="checkbox" id="monoaudio" title="monoaudio">
+          <span id="panReporter">0.00</span>
         </div>
         <span id="totalTime">0:00.00</span>
       </div>
@@ -205,20 +206,22 @@
         volDisplay.textContent=(Math.floor(100-volume.value*100)+"%").padStart('3',0).substring(0,3)
       }
       
-      volume.addEventListener('pan',e=>{
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-        // Create a MediaElementAudioSourceNode from the video element
-        const source = audioContext.createMediaElementSource(audioPlayer);
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioContext.createMediaElementSource(audioPlayer);
+      
+      pan.addEventListener('input',e=>{
+        
+        
 
         // Create a GainNode to downmix to mono
-        const gainNode = audioContext.createGain();
-        gainNode.channelCount = 1; // Force mono
-        gainNode.channelCountMode = 'explicit';
+        if(monoaudio.checked){
+          gainNode.channelCount = 1; // Force mono
+          gainNode.channelCountMode = 'explicit'
+        }
 
         // Create a StereoPannerNode for right-ear-only panning
         const panner = audioContext.createStereoPanner();
-        panner.pan.value = 1; // 1 = Right ear, -1 = Left ear, 0 = Center
+        panReporter.textContent=(panner.pan.value = pan.value).toFixed(2); // 1 = Right ear, -1 = Left ear, 0 = Center
 
         // Connect nodes: video -> gainNode -> panner -> destination
         source.connect(gainNode).connect(panner).connect(audioContext.destination);
@@ -229,8 +232,8 @@
             audioContext.resume();
           }
         });
-        pan.value
-        panReporter
+        // pan.value
+        // panReporter
       })
 
       // Play/Pause Button
