@@ -65,6 +65,8 @@ let neverCache=[
 
 let alwaysCache=[
   '/txt',
+  '/ny',
+  '/open',
 ]
 
 function fixUrl(url){
