@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" oncontextmenu="return false;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three.js Global Import</title>
+  <script src="/lib/fs.js"></script>
+  <style>
+    *{margin:0}
+  </style>
+</head>
+<body style="font-family: Consolas, monospace;background-color: #000;color:#fff">
+  <h1 id="statusCard">awaiting js</h1>
+  <script>
+    (async()=>{
+      //statusCard.textContent='importing'
+      statusCard.textContent='loading'
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+
+      statusCard.remove()
+    })()
+  </script>
+</body>
+</html>
