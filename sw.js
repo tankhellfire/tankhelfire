@@ -77,15 +77,25 @@ async function cache(url){
   let req=fetch(url).catch(console.warn)
   
   if(!neverCache.includes(url.pathname)){
-    db.then(async db=>db.set(url.pathname,await (await req).clone().blob()).then(e=>console.log(`//updated cache "${url}"`))).catch(console.warn)
+    db.then(async db=>{
+      let res=await req
+      if(!res.ok){
+        return
+      }
+      await db.set(url.pathname,await res.clone().blob())
+      console.log(`//updated cache:
+"${url}"`)
+    }).catch(console.warn)
 
     let res=await (await db).get(url.pathname)
     if(res){
-      console.log(`//returned cache "${url}"`)
+      console.log(`//returned cache:
+"${url}"`)
       return new Response(res)
     }
   }
-  console.log(`//returned fetch "${url}"`)
+  console.log(`//returned fetch:
+"${url}"`)
   return (await req).clone()
   
 }
@@ -96,7 +106,9 @@ self.addEventListener('fetch',e=>{
   if(url.hostname!=='tankhellfire.glitch.me')return
   
   if(url!=e.request.url){
-    console.log(`//redirecting "${e.request.url}"->"${url}"`)
+    console.log(`//redirecting:
+"${e.request.url}" to
+"${url}"`)
     return e.respondWith(Response.redirect(url, 301))
   }
   
@@ -107,7 +119,6 @@ self.addEventListener('fetch',e=>{
 self.addEventListener('install',e=>{
   console.log('//installing');
   for(let a of alwaysCache){
-    console.log(`//always cache ${fixUrl(a)}`)
     cache(a)
   }
   self.skipWaiting(); // Activate immediately
