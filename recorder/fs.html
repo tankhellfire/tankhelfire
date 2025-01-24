@@ -13,6 +13,8 @@
   <h1 id="statusCard">awaiting js</h1>
   
   <button id="selectDir">select dir</button>
+  <button id="start">start</button>
+  
   
   <script>
     (async()=>{
@@ -21,9 +23,19 @@
       await new Promise(resolve => setTimeout(resolve, 0));
       
       window.fs=new Fs
+      fs.upToDate=0
       
       selectDir.onclick=async()=>{
-        fs.dirawait window.showDirectoryPicker({id:`etewaottFs${id}`})
+        fs.dir=await window.showDirectoryPicker({id:"recorder-fs"}).catch(console.error)
+        console.log(fs.dir)
+        fs.upToDate=0
+        if(fs.dir){
+          start.disabled = 0
+          selectDir.textContent=fs.dir.name
+        }else{
+          start.disabled = 1
+          selectDir.textContent="select dir"
+        }
       }
 
       statusCard.remove()
