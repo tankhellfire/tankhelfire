@@ -13,7 +13,7 @@
   <h1 id="statusCard">awaiting js</h1>
   
   <button id="selectDir">select dir</button>
-  <button id="start">start</button>
+  <button id="start" disabled>start</button>
   
   
   <script>
@@ -26,12 +26,12 @@
       fs.upToDate=0
       
       selectDir.onclick=async()=>{
-        fs.dir=await window.showDirectoryPicker({id:"recorder-fs"}).catch(console.error)
-        console.log(fs.dir)
+        fs.dir=await window.showDirectoryPicker({id:"recorder-fs"}).catch(console.warn)
         fs.upToDate=0
+        
         if(fs.dir){
           start.disabled = 0
-          selectDir.textContent=fs.dir.name
+          selectDir.textContent=`/${fs.dir.name}/`
         }else{
           start.disabled = 1
           selectDir.textContent="select dir"
