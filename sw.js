@@ -83,16 +83,26 @@ async function cache(url){
   let req=fetch(url).catch(console.warn)
   
   if(!neverCache.includes(url.pathname)){
-    db.then(async db=>{
-      let res=await req
-      if(!res.ok){
-        return
-      }
-      await db.set(url.pathname,await res.clone().blob())
-      clog(`//updated cache:
-"${url}"`,{clr:'#000',fs:'50%'})
-    }).catch(console.warn)
+    (async()=>{
+      
+    })()
 
+//     (await db).set(url.pathname,async()=>{
+//       let res=await req
+//       if(!res.ok){
+//         return
+//       }
+//       return res.clone().blob()
+//     })
+      
+//       if(!res.ok){
+//         return
+//       }
+//       await db
+//       clog(`//updated cache:
+// "${url}"`,{clr:'#000',fs:'50%'})
+//     }).catch(console.warn)
+  }
     let res=await (await db).get(url.pathname)
     if(res){
       clog(`//returned cache:
