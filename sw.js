@@ -1,4 +1,4 @@
-function clog(msg,options={}){//clr,bgclr,fs
+function clog(msg,options={}){//clr,bgclr,fs,ts
   if(Object.keys(options).length===0){
     console.log(msg)
     return
@@ -12,6 +12,9 @@ function clog(msg,options={}){//clr,bgclr,fs
   }
   if(options.fs){
     command+=`font-size: ${options.fs};`
+  }
+  if(options.ts){
+    command+=`text-shadow: ${options.ts};`
   }
   console.log("%c" + msg,command)
 }
@@ -102,18 +105,18 @@ async function cache(url){
       }
       await db.set(url.pathname,await res.clone().blob())
       clog(`//updated cache:
-"${url}"`,{bgclr:'#aa0',fs:'50%'})
+"${url}"`,{bgclr:'#ff0',fs:'50%',ol:"2px solid #000"})
     }).catch(console.warn)
 
     let res=await (await db).get(url.pathname)
     if(res){
       clog(`//returned cache:
-"${url}"`,{bgclr:'#0a0',fs:'50%'})
+"${url}"`,{bgclr:'#0f0',fs:'50%',ol:"2px solid #000"})
       return new Response(res)
     }
   }
   clog(`//returned fetch:
-"${url}"`,{bgclr:'#a00',fs:'50%'})
+"${url}"`,{bgclr:'#f00',fs:'50%',ol:"2px solid #000"})
   return (await req).clone()
   
 }
@@ -126,7 +129,7 @@ self.addEventListener('fetch',e=>{
   if(url!=e.request.url){
     clog(`//redirecting:
 "${e.request.url}" to
-"${url}"`,{bgclr:'#a00',fs:'50%'})
+"${url}"`,{bgclr:'#000',fs:'50%'})
     return e.respondWith(Response.redirect(url, 301))
   }
   
@@ -135,7 +138,7 @@ self.addEventListener('fetch',e=>{
 
 
 self.addEventListener('install',e=>{
-  clog('//installing',{bgclr:'#a00',fs:'50%'});
+  clog('//installing',{bgclr:'#000',fs:'50%'});
   for(let a of alwaysCache){
     cache(a)
   }
@@ -143,6 +146,6 @@ self.addEventListener('install',e=>{
 });
 
 self.addEventListener('activate',e=>{
-  clog('//activating',{bgclr:'#a00',fs:'50%'});
+  clog('//activating',{bgclr:'#000',fs:'50%'});
   e.waitUntil(clients.claim()); // Take control of all open pages
 });
