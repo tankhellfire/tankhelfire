@@ -19,6 +19,14 @@ function clog(msg,options={}){//clr,bgclr,fs,ts
   console.log("%c" + msg,command)
 }
 
+let outlineShadow=[]
+for(let i=0;i<1;i+=.01){
+  let x=Math.sin(i*2*Math.PI)*2
+  let y=Math.cos(i*2*Math.PI)*2
+  outlineShadow.push(`${x}px ${y}px 0 #000`)
+}
+outlineShadow=outlineShadow.join(', ')
+
 class Db{
   constructor(name,storeName){
     this.name=name;
@@ -105,18 +113,18 @@ async function cache(url){
       }
       await db.set(url.pathname,await res.clone().blob())
       clog(`//updated cache:
-"${url}"`,{bgclr:'#ff0',fs:'50%',ol:"2px solid #000"})
+"${url}"`,{bgclr:'#ff0',fs:'50%',ts:outlineShadow})
     }).catch(console.warn)
 
     let res=await (await db).get(url.pathname)
     if(res){
       clog(`//returned cache:
-"${url}"`,{bgclr:'#0f0',fs:'50%',ol:"2px solid #000"})
+"${url}"`,{clr:'#0f0',fs:'50%'})
       return new Response(res)
     }
   }
   clog(`//returned fetch:
-"${url}"`,{bgclr:'#f00',fs:'50%',ol:"2px solid #000"})
+"${url}"`,{clr:'#f00',fs:'50%'})
   return (await req).clone()
   
 }
