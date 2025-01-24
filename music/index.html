@@ -138,8 +138,41 @@
           alert(e)
         }
       }
+      async function scaleToPNG(data, format,size) {
+          // Decode the base64 string to an image
+          const base64String = data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
+          const originalImageURL = `data:${format};base64,${btoa(base64String)}`;
 
-      /*playPauseButton.addEventListener('click',*/loadMusic()
+          // Create an Image element
+          const img = new Image();
+          img.src = originalImageURL;
+
+          // Wait for the image to load
+          await new Promise((resolve) => {
+              img.onload = resolve;
+          });
+
+          const canvas = document.createElement('canvas');
+          canvas.width = size/9*16;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+
+          // Calculate the scaling factor to maintain aspect ratio
+          const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+
+          // Center the image on the canvas
+          const xOffset = (canvas.width - img.width * scale) / 2;
+          const yOffset = (canvas.height - img.height * scale) / 2;
+
+          // Draw the scaled image on the canvas
+          ctx.drawImage(img, xOffset, yOffset, img.width * scale, img.height * scale);
+
+          // Convert the canvas content to a PNG data URL
+          const pngDataURL = canvas.toDataURL('image/png');
+
+          return pngDataURL;
+      }
+
       fileInput.addEventListener('change',loadMusic)
       function loadMusic(){
         const file = fileInput.files[0];
@@ -153,13 +186,13 @@
 
         // Extract metadata using jsmediatags
         jsmediatags.read(file, {
-          onSuccess: (tag) => {
+          onSuccess: async(tag)=> {
             const {picture} = tag.tags;
             if (picture) {
               const data = picture.data;
               const format = picture.format;
-              const base64String = data.reduce( (acc, byte) => acc + String.fromCharCode(byte), '');
-              const thumbnailURL = `data:${format};base64,${btoa(base64String)}`;
+              // const base64String = data.reduce( (acc, byte) => acc + String.fromCharCode(byte), '');
+              const thumbnailURL = await scaleToPNG(data,format,720)//`data:${format};base64,${btoa(base64String)}`;
               icon.href = thumbnail.src = thumbnailURL;
 
               thumbnail.style.display = 'block';
