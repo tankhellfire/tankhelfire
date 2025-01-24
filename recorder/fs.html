@@ -11,12 +11,20 @@
 </head>
 <body style="font-family: Consolas, monospace;background-color: #000;color:#fff">
   <h1 id="statusCard">awaiting js</h1>
+  
+  <button id="selectDir">select dir</button>
+  
   <script>
     (async()=>{
       //statusCard.textContent='importing'
       statusCard.textContent='loading'
       await new Promise(resolve => setTimeout(resolve, 0));
       
+      window.fs=new Fs
+      
+      selectDir.onclick=async()=>{
+        fs.dirawait window.showDirectoryPicker({id:`etewaottFs${id}`})
+      }
 
       statusCard.remove()
     })()
