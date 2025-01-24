@@ -1,3 +1,18 @@
+function clog(msg,options={}){//clr,bgclr
+  if(Object.keys(options).length===0){
+    console.log(msg)
+    return
+  }
+  let command=""
+  if(options.clr){
+    command+=`color: ${options.clr};`
+  }
+  if(options.bgclr){
+    command+=`background-color: ${options.bgclr};`
+  }
+  console.log("%c" + msg,command)
+}
+
 class Db{
   constructor(name,storeName){
     this.name=name;
