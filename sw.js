@@ -1,4 +1,4 @@
-function clog(msg,options={}){//clr,bgclr
+function clog(msg,options={}){//clr,bgclr,fs
   if(Object.keys(options).length===0){
     console.log(msg)
     return
@@ -9,6 +9,9 @@ function clog(msg,options={}){//clr,bgclr
   }
   if(options.bgclr){
     command+=`background-color: ${options.bgclr};`
+  }
+  if(options.fs){
+    command+=`font-size: ${options.fs};`
   }
   console.log("%c" + msg,command)
 }
@@ -98,19 +101,19 @@ async function cache(url){
         return
       }
       await db.set(url.pathname,await res.clone().blob())
-      console.log(`//updated cache:
-"${url}"`)
+      clog(`//updated cache:
+"${url}"`,{bgclr:'#aa0',fs:'50%'})
     }).catch(console.warn)
 
     let res=await (await db).get(url.pathname)
     if(res){
-      console.log(`//returned cache:
-"${url}"`)
+      clog(`//returned cache:
+"${url}"`,{bgclr:'#0a0',fs:'50%'})
       return new Response(res)
     }
   }
-  console.log(`//returned fetch:
-"${url}"`)
+  clog(`//returned fetch:
+"${url}"`,{bgclr:'#a00',fs:'50%'})
   return (await req).clone()
   
 }
@@ -121,9 +124,9 @@ self.addEventListener('fetch',e=>{
   if(url.hostname!=='tankhellfire.glitch.me')return
   
   if(url!=e.request.url){
-    console.log(`//redirecting:
+    clog(`//redirecting:
 "${e.request.url}" to
-"${url}"`)
+"${url}"`,{bgclr:'#a00',fs:'50%'})
     return e.respondWith(Response.redirect(url, 301))
   }
   
@@ -132,7 +135,7 @@ self.addEventListener('fetch',e=>{
 
 
 self.addEventListener('install',e=>{
-  console.log('//installing');
+  clog('//installing',{bgclr:'#a00',fs:'50%'});
   for(let a of alwaysCache){
     cache(a)
   }
@@ -140,6 +143,6 @@ self.addEventListener('install',e=>{
 });
 
 self.addEventListener('activate',e=>{
-  console.log('//activating');
+  clog('//activating',{bgclr:'#a00',fs:'50%'});
   e.waitUntil(clients.claim()); // Take control of all open pages
 });
