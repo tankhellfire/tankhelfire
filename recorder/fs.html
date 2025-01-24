@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Three.js Global Import</title>
+  <title>recorder with fs out</title>
   <script src="/lib/fs.js"></script>
   <style>
     *{margin:0}
@@ -39,6 +39,7 @@
       }
 
       statusCard.remove()
+      console.log(`load time: ${performance.now()/1000}s`)
     })()
   </script>
 </body>

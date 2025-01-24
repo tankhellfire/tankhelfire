@@ -1,31 +1,6 @@
-function clog(msg,options={}){//clr,bgclr,fs,ts
-  if(Object.keys(options).length===0){
-    console.log(msg)
-    return
-  }
-  let command=""
-  if(options.clr){
-    command+=`color: ${options.clr};`
-  }
-  if(options.bgclr){
-    command+=`background-color: ${options.bgclr};`
-  }
-  if(options.fs){
-    command+=`font-size: ${options.fs};`
-  }
-  if(options.ts){
-    command+=`text-shadow: ${options.ts};`
-  }
-  console.log("%c" + msg,command)
+function clog(msg){//clr,bgclr,fs,ts
+  console.log("%c" + msg,"font-size:50%;color:#000")
 }
-
-let outlineShadow=[]
-for(let i=0;i<1;i+=.01){
-  let x=Math.sin(i*2*Math.PI)*2
-  let y=Math.cos(i*2*Math.PI)*2
-  outlineShadow.push(`${x}px ${y}px 0 #000`)
-}
-outlineShadow=outlineShadow.join(', ')
 
 class Db{
   constructor(name,storeName){
@@ -113,18 +88,18 @@ async function cache(url){
       }
       await db.set(url.pathname,await res.clone().blob())
       clog(`//updated cache:
-"${url}"`,{bgclr:'#ff0',fs:'50%',ts:outlineShadow})
+"${url}"`,{clr:'#000',fs:'50%'})
     }).catch(console.warn)
 
     let res=await (await db).get(url.pathname)
     if(res){
       clog(`//returned cache:
-"${url}"`,{clr:'#0f0',fs:'50%'})
+"${url}"`,{clr:'#000',fs:'50%'})
       return new Response(res)
     }
   }
   clog(`//returned fetch:
-"${url}"`,{clr:'#f00',fs:'50%'})
+"${url}"`,{clr:'#000',fs:'50%'})
   return (await req).clone()
   
 }
@@ -137,7 +112,7 @@ self.addEventListener('fetch',e=>{
   if(url!=e.request.url){
     clog(`//redirecting:
 "${e.request.url}" to
-"${url}"`,{bgclr:'#000',fs:'50%'})
+"${url}"`,{clr:'#000',fs:'50%'})
     return e.respondWith(Response.redirect(url, 301))
   }
   
@@ -146,7 +121,7 @@ self.addEventListener('fetch',e=>{
 
 
 self.addEventListener('install',e=>{
-  clog('//installing',{bgclr:'#000',fs:'50%'});
+  clog('//installing',{clr:'#000',fs:'50%'});
   for(let a of alwaysCache){
     cache(a)
   }
@@ -154,6 +129,6 @@ self.addEventListener('install',e=>{
 });
 
 self.addEventListener('activate',e=>{
-  clog('//activating',{bgclr:'#000',fs:'50%'});
+  clog('//activating',{clr:'#000',fs:'50%'});
   e.waitUntil(clients.claim()); // Take control of all open pages
 });
