@@ -15,6 +15,7 @@
   
   <button id="selectDir">select dir</button>
   <button id="start" disabled>start</button>
+  <button id="stop" disabled>stop</button>
   
   
   <script>
@@ -22,6 +23,10 @@
       //statusCard.textContent='importing'
       statusCard.textContent='loading'
       await new Promise(resolve => setTimeout(resolve, 0));
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      
       
       window.fs=new Fs
       
@@ -35,7 +40,13 @@
           start.disabled = 1
           selectDir.textContent="select dir"
         }
+        stop.disabled = 0
       }
+      
+      mediaRecorder.onstop=e=>{
+        await (await fs.makeFromPath(['m.txt'])).file.write(new Blob(audioChunks,{type:'audio/mp3'}))
+        audioChunks=[];
+      };
 
       statusCard.remove()
       console.log(`load time: ${performance.now()/1000}s`)
