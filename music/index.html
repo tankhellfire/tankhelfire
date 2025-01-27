@@ -193,8 +193,8 @@
               const format = picture.format;
               // const base64String = data.reduce( (acc, byte) => acc + String.fromCharCode(byte), '');
               const thumbnailURL = await scaleToPNG(data,format,720)//`data:${format};base64,${btoa(base64String)}`;
-              icon.href = thumbnail.src = thumbnailURL;
-
+              icon.href = thumbnail.src = thumbnailURL
+                
               thumbnail.style.display = 'block';
               mediaSession.artwork = [{
                 src: thumbnailURL
