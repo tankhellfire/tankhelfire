@@ -14,8 +14,8 @@
   <h1 id="statusCard">awaiting js</h1>
   
   <button id="selectDir">select dir</button>
-  <button id="start" disabled>start</button>
-  <button id="stop" disabled>stop</button>
+  <button id="startBut" disabled>start</button>
+  <button id="stopBut" disabled>stop</button>
   
   
   <script>
@@ -24,11 +24,12 @@
       statusCard.textContent='loading'
       await new Promise(resolve => setTimeout(resolve, 0));
       
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
+      
+      audioChunks=[]
+      mediaRecorder=0
       
       
-      window.fs=new Fs
+      fs=new Fs
       
       selectDir.onclick=async()=>{
         fs.dir=await window.showDirectoryPicker({id:"recorder-fs"}).catch(console.warn)
@@ -36,17 +37,55 @@
         if(fs.dir){
           start.disabled = 0
           selectDir.textContent=`/${fs.dir.name}/`
+          
+          
+          if(!mediaRecorder){
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = (event) => {
+              if (event.data.size > 0) {
+                audioChunks.push(event.data);
+              }
+            };
+
+            mediaRecorder.onstop=async()=>{
+              await (await fs.makeFromPath(['m.txt'])).file.write(new Blob(audioChunks,{type:'audio/mp3'}))
+              audioChunks=[];
+            };
+          }
+          
         }else{
           start.disabled = 1
           selectDir.textContent="select dir"
         }
-        stop.disabled = 0
+        stop.disabled = 1
       }
       
-      mediaRecorder.onstop=e=>{
-        await (await fs.makeFromPath(['m.txt'])).file.write(new Blob(audioChunks,{type:'audio/mp3'}))
-        audioChunks=[];
-      };
+      stopBut.addEventListener('click',e=>{
+        mediaRecorder.start();
+        start.disabled = 1;
+        stop.disabled = 0;
+
+        // Automatically stop and restart recording every minute
+        recordInterval = setInterval(() => {
+          if(mediaRecorder.state==='recording'){
+            mediaRecorder.stop();
+            mediaRecorder.start();
+          }
+        }, 60000); // 1 minute = 60,000 ms
+      });
+
+      stop.addEventListener('click',e=>{
+        clearInterval(recordInterval);
+        if(mediaRecorder.state === 'recording'){
+          mediaRecorder.stop()
+        }
+        start.disabled = 0;
+        stop.disabled = 1;
+      });
+      
+      
 
       statusCard.remove()
       console.log(`load time: ${performance.now()/1000}s`)
