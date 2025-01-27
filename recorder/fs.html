@@ -35,7 +35,7 @@
         fs.dir=await window.showDirectoryPicker({id:"recorder-fs"}).catch(console.warn)
         
         if(fs.dir){
-          start.disabled = 0
+          startBut.disabled = 0
           selectDir.textContent=`/${fs.dir.name}/`
           
           
@@ -43,29 +43,29 @@
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
 
-            mediaRecorder.ondataavailable = (event) => {
-              if (event.data.size > 0) {
-                audioChunks.push(event.data);
+            mediaRecorder.ondataavailable=e=>{
+              if(e.data.size>0){
+                audioChunks.push(e.data);
               }
             };
 
             mediaRecorder.onstop=async()=>{
-              await (await fs.makeFromPath(['m.txt'])).file.write(new Blob(audioChunks,{type:'audio/mp3'}))
+              await (await fs.makeFromPath([`${Date.now()}.mp3`])).file.write(new Blob(audioChunks,{type:'audio/mp3'}))
               audioChunks=[];
             };
           }
           
         }else{
-          start.disabled = 1
+          startBut.disabled = 1
           selectDir.textContent="select dir"
         }
-        stop.disabled = 1
+        stopBut.disabled = 1
       }
       
-      stopBut.addEventListener('click',e=>{
+      startBut.addEventListener('click',e=>{
         mediaRecorder.start();
-        start.disabled = 1;
-        stop.disabled = 0;
+        startBut.disabled = 1;
+        stopBut.disabled = 0;
 
         // Automatically stop and restart recording every minute
         recordInterval = setInterval(() => {
@@ -76,13 +76,13 @@
         }, 60000); // 1 minute = 60,000 ms
       });
 
-      stop.addEventListener('click',e=>{
+      stopBut.addEventListener('click',e=>{
         clearInterval(recordInterval);
         if(mediaRecorder.state === 'recording'){
           mediaRecorder.stop()
         }
-        start.disabled = 0;
-        stop.disabled = 1;
+        startBut.disabled = 0;
+        stopBut.disabled = 1;
       });
       
       
