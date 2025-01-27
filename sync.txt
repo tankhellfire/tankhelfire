@@ -1,0 +1,9 @@
+git remote add https://github.com/tankhellfire/tankhelfire.git
+
+git add .
+git commit -m "msg"
+
+git fetch tankhellfire-github
+git merge tankhellfire-github/main
+
+git push tankhellfire-github main
