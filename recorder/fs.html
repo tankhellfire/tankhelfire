@@ -50,7 +50,7 @@
             };
 
             mediaRecorder.onstop=async()=>{
-              await (await fs.makeFromPath([`${Date.now()}.mp3`])).file.write(new Blob(audioChunks,{type:'audio/mp3'}))
+              await (await fs.makeFromPath([`${Date.now()}.mp3`])).file.write(new Blob(audioChunks,{type:'audio/webm; codecs=opus'}))
               audioChunks=[];
             };
           }
