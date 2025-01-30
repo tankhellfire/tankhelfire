@@ -47,8 +47,7 @@ class Fs {
         if (job === undefined) {
           break
         }
-        percentLog(jobNum+1,files.length,thread)
-        info.textContent=jobNum
+        info.textContent=percentLog(jobNum+1,files.length,thread)
         await job.updateInfo()
       }
     }
@@ -197,7 +196,9 @@ class FsFile{
 }
 
 function percentLog(value,max=1,id='') {
-  console.log(`${(value/max*100).toFixed(2).padStart(6)}% [${''.padEnd(value/max*50,'+').padEnd(50)}] ${value.toString().padStart(max.toString().length)}/${max} from ${id}`)
+  let a=`${(value/max*100).toFixed(2).padStart(6)}% [${''.padEnd(value/max*50,'+').padEnd(50)}] ${value.toString().padStart(max.toString().length)}/${max} from ${id}`
+  console.log(a)
+  return a
 }
 
 let fs = [new Fs(0), new Fs(1)]
