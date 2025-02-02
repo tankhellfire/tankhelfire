@@ -238,7 +238,7 @@
       playPauseButton.addEventListener('click', pausePlay)
       thumbnail.addEventListener('click', pausePlay)
       function pausePlay(){
-        if(fileInput.files.length)return loadMusic()
+        if(fileInput.files.length&&audioPlayer.src==='')return loadMusic()
         else if (audioPlayer.paused || audioPlayer.ended) {
           audioPlayer.play();
           playPauseButton.textContent = 'Pause';
