@@ -139,13 +139,8 @@ class Fs {
           ret.same++
           continue
         }
-        if(fromFile.info.lastModified<toFile.info.lastModified){
-          ret.pull++
-          await fromFile.write(await (await toFile.read()).arrayBuffer())
-        }else{
-          ret.push++
-          await toFile.write(await (await fromFile.read()).arrayBuffer())
-        }
+        ret.push++
+        await toFile.write(await (await fromFile.read()).arrayBuffer())
       }
     }))
     return ret
@@ -202,10 +197,3 @@ function percentLog(value,max=1,id='') {
 }
 
 let fs = [new Fs(0), new Fs(1)]
-
-
-
-
-
-
-
