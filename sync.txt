@@ -1,5 +1,6 @@
 git remote add tankhellfire-github https://github.com/tankhellfire/tankhelfire.git
 
+git add .
 git commit -a -m "msg"
 
 git fetch tankhellfire-github
