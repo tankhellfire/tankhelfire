@@ -14,7 +14,7 @@
     <p id="noImage" style="color: red; display: none;">No thumbnail found in this MP3.</p>
   </div>
 
-  <script src="/lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
+  <script src="../lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
   <script>
     document.getElementById('fileInput').addEventListener('change', function(event) {
       const file = event.target.files[0];
@@ -22,6 +22,7 @@
       if (file) {
         jsmediatags.read(file, {
           onSuccess: function(tag) {
+            console.log(tag)
             const picture = tag.tags.picture;
 
             if (picture) {
