@@ -1,8 +1,6 @@
 class main extends AudioWorkletProcessor{
   constructor(){
     super();
-    this.gain=1.0;
-    this.a=1
 
     this.port.onmessage=e=>{
       if (e.data.gain!==undefined){
@@ -11,26 +9,16 @@ class main extends AudioWorkletProcessor{
     }
   }
 
-  process(inputList, outputList, parameters) {
-    const input = outputList[0];
-    const output = outputList[0];
-    const gain = parameters.gain;
+process(inputList, outputList, parameters) {
+  for (let channelNum = 0; channelNum < outputList[0].length; channelNum++) {
+    const outputChannel = outputList[0][channelNum];
 
-    for (let channelNum = 0; channelNum < input.length; channelNum++) {
-      const inputChannel = input[channelNum];
-      const outputChannel = output[channelNum];
-
-      // If gain.length is 1, it's a k-rate parameter, so apply
-      // the first entry to every frame. Otherwise, apply each
-      // entry to the corresponding frame.
-
-      for (let i = 0; i < inputChannel.length; i++) {
-        outputChannel[i] = Math.random()*.02;
-      }
+    for (let i = 0; i < outputChannel.length; i++) {
+      outputChannel[i] = Math.random() * 0.1; // Random noise for each channel
     }
-
-    return true;
   }
+  return true;
+}
 
 }
 

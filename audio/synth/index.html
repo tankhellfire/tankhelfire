@@ -25,7 +25,11 @@
 
         audioCtx=new AudioContext;
         await audioCtx.audioWorklet.addModule('audio.js');
-        workletNode=new AudioWorkletNode(audioCtx,'main');
+        const workletNode = new AudioWorkletNode(audioCtx, 'main', {
+          channelCount: 2,       // Set to 2 for stereo
+          channelCountMode: 'explicit', // Explicitly set the number of channels
+          channelInterpretation: 'speakers' // Correct interpretation for stereo output
+        });
 
         // workletNode.port.postMessage({
         //   gain: 0.5
@@ -33,6 +37,8 @@
         // Example of sending data
 
         workletNode.connect(audioCtx.destination);
+        
+        document.addEventListener('click',e=>audioCtx.resume())
 
         statusCard.remove()
         clog(`%cload time: ${performance.now() / 1000}s`, "color:#0f0")
