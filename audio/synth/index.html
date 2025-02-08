@@ -16,16 +16,17 @@
   </head>
   <body>
     <h1 id="statusCard">awaiting js</h1>
+    <audio autoplay src="https://tankhellfire.glitch.me/ipa/list/Alveolar_nasal.ogg.mp3"></audio>
     <script>
       (async () => {
         statusCard.textContent = 'importing'
         statusCard.textContent = 'loading'
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        let audioCtx = new AudioContext;
+        audioCtx = new AudioContext;
         await audioCtx.audioWorklet.addModule('audio.js');
         // Load worklet file
-        const workletNode = new AudioWorkletNode(audioCtx,'main');
+        workletNode = new AudioWorkletNode(audioCtx,'main');
 
         workletNode.port.postMessage({
           gain: 0.5
