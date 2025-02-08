@@ -25,7 +25,7 @@
         let audioCtx = new AudioContext;
         await audioCtx.audioWorklet.addModule('audio.js');
         // Load worklet file
-        const workletNode = new AudioWorkletNode(audioCtx,'custom-processor');
+        const workletNode = new AudioWorkletNode(audioCtx,'main');
 
         workletNode.port.postMessage({
           gain: 0.5

@@ -18,7 +18,7 @@ class main extends AudioWorkletProcessor {
     if (input.length > 0) {
       for (let channel = 0; channel < input.length; channel++) {
         for (let i = 0; i < input[channel].length; i++) {
-          output[channel][i] = input[channel][i] * this.gain;
+          output[channel][i] = input[channel][i] * this.gain+;
         }
       }
     }
