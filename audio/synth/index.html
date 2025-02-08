@@ -1,31 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" oncontextmenu="//return false;">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
+    <title>name</title>
+    <script src="../../new.js"></script>
+    <script src="../../lib/lib.js"></script>
     <style>
       * {
-        margin: 0 auto;
-        font-family: Consolas, monospace;
-      }
-      
-      .select {
-        -webkit-user-drag: none;
-        -khtml-user-drag: none;
-        -moz-user-drag: none;
-        -o-user-drag: none;
-        user-drag: none;
-        -webkit-user-select: none;
-        /* Safari */
-        -ms-user-select: none;
-        /* IE 10 and IE 11 */
-        user-select: none;
-        /* Standard syntax */
+        margin: 0;
+        font-family: Consolas,monospace
       }
     </style>
   </head>
   <body>
-    <script src=".js"></script>
+    <h1 id="statusCard">awaiting js</h1>
+    <script>
+      (async () => {
+        statusCard.textContent = 'importing'
+        statusCard.textContent = 'loading'
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        let audioCtx = new AudioContext;
+        await audioCtx.audioWorklet.addModule('audio.js');
+        // Load worklet file
+        const workletNode = new AudioWorkletNode(audioCtx,'custom-processor');
+
+        workletNode.port.postMessage({
+          gain: 0.5
+        });
+        // Example of sending data
+
+        workletNode.connect(audioCtx.destination);
+
+        statusCard.remove()
+        clog(`%cload time: ${performance.now() / 1000}s`, "color:#0f0")
+      }
+      )()
+    </script>
   </body>
 </html>
