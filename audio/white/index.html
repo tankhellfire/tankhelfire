@@ -16,34 +16,29 @@
   </head>
   <body>
     <h1 id="statusCard">awaiting js</h1>
-    <audio autoplay src="https://tankhellfire.glitch.me/ipa/list/Alveolar_nasal.ogg.mp3"></audio>
     <script>
-      (async () => {
+      (async()=>{
         statusCard.textContent = 'importing'
+        
         statusCard.textContent = 'loading'
         await new Promise(resolve => setTimeout(resolve, 0));
 
         audioCtx=new AudioContext;
         await audioCtx.audioWorklet.addModule('audio.js');
         const workletNode = new AudioWorkletNode(audioCtx, 'main', {
-          channelCount: 2,       // Set to 2 for stereo
-          channelCountMode: 'explicit', // Explicitly set the number of channels
-          channelInterpretation: 'speakers' // Correct interpretation for stereo output
+          channelCount: 2,
+          channelCountMode: 'explicit',
+          channelInterpretation: 'speakers'
         });
-
-        // workletNode.port.postMessage({
-        //   gain: 0.5
-        // });
-        // Example of sending data
-
         workletNode.connect(audioCtx.destination);
         
-        document.addEventListener('click',e=>audioCtx.resume())
 
         statusCard.remove()
         clog(`%cload time: ${performance.now() / 1000}s`, "color:#0f0")
-      }
-      )()
+        
+        document.addEventListener('click',e=>audioCtx.resume())
+        document.body.appendChild(document.createElement("div")).textContent='click to start'
+      })()
     </script>
   </body>
 </html>
