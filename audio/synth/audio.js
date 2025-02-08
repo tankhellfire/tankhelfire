@@ -11,20 +11,27 @@ class main extends AudioWorkletProcessor{
     }
   }
 
-  process(inputs,outputs,parameters){
+  process(inputList, outputList, parameters) {
+    const input = outputList[0];
+    const output = outputList[0];
+    const gain = parameters.gain;
 
-    for(let channal in outputs){
-      for(let a in channal){
-        outputs[channal][a]=Math.random()
+    for (let channelNum = 0; channelNum < input.length; channelNum++) {
+      const inputChannel = input[channelNum];
+      const outputChannel = output[channelNum];
+
+      // If gain.length is 1, it's a k-rate parameter, so apply
+      // the first entry to every frame. Otherwise, apply each
+      // entry to the corresponding frame.
+
+      for (let i = 0; i < inputChannel.length; i++) {
+        outputChannel[i] = Math.random()*.02;
       }
     }
 
-    if(this.a){
-      this.a=0
-      console.log(inputs,outputs);
-    }
     return true;
   }
+
 }
 
 registerProcessor('main', main);

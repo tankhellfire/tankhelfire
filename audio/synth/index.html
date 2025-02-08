@@ -27,9 +27,9 @@
         await audioCtx.audioWorklet.addModule('audio.js');
         workletNode=new AudioWorkletNode(audioCtx,'main');
 
-        workletNode.port.postMessage({
-          gain: 0.5
-        });
+        // workletNode.port.postMessage({
+        //   gain: 0.5
+        // });
         // Example of sending data
 
         workletNode.connect(audioCtx.destination);
