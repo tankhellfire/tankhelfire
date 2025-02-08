@@ -23,10 +23,9 @@
         statusCard.textContent = 'loading'
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        audioCtx = new AudioContext;
+        audioCtx=new AudioContext;
         await audioCtx.audioWorklet.addModule('audio.js');
-        // Load worklet file
-        workletNode = new AudioWorkletNode(audioCtx,'main');
+        workletNode=new AudioWorkletNode(audioCtx,'main');
 
         workletNode.port.postMessage({
           gain: 0.5
