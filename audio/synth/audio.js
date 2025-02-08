@@ -1,29 +1,28 @@
-class main extends AudioWorkletProcessor {
-  constructor() {
+class main extends AudioWorkletProcessor{
+  constructor(){
     super();
-    this.gain = 1.0;
+    this.gain=1.0;
+    this.a=1
 
-    this.port.onmessage = (event) => {
-      if (event.data.gain !== undefined) {
-        this.gain = event.data.gain;
+    this.port.onmessage=e=>{
+      if (e.data.gain!==undefined){
+        this.gain=e.data.gain;
       }
     }
-    ;
   }
 
-  process(inputs, outputs) {
-    console.log("Worklet is processing!");
-    const input = inputs[0];
-    const output = outputs[0];
+  process(inputs,outputs,parameters){
 
-    if (input.length > 0) {
-      for (let channel = 0; channel < input.length; channel++) {
-        for (let i = 0; i < input[channel].length; i++) {
-          output[channel][i]=Math.random();
-        }
+    for(let channal in outputs){
+      for(let a in channal){
+        outputs[channal][a]=Math.random()
       }
     }
 
+    if(this.a){
+      this.a=0
+      console.log(inputs,outputs);
+    }
     return true;
   }
 }
