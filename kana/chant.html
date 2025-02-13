@@ -26,7 +26,7 @@
       statusCard.textContent='loading'
       await new Promise(resolve => setTimeout(resolve, 0));
 
-      setOut=()=>out.textContent='`'+new enc.Cipher(input.value+'WE ARE IN CONTROL',enc.b95).setCharset(enc.chant).text+'`'
+      setOut=()=>out.textContent='`'+new enc.Cipher(input.value+'WE ARE IN CONTROL',new enc.Charset(b95+'\n')).setCharset(enc.chant).text+'`'
       input.addEventListener('input',setOut)
 
       input.value="sendMsg('# WE ARE IN CONTROL',req.d.channel_id)"
