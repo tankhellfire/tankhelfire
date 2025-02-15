@@ -16,13 +16,28 @@
   <script>
     (async()=>{
       statusCard.textContent='importing'
+
+
+      statusCard.textContent='fetching'
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       bz=await (await fetch('https://api.hypixel.net/v2/skyblock/bazaar')).json()
       
       statusCard.textContent='loading'
       await new Promise(resolve => setTimeout(resolve, 0));
 
-      document.body.appendChild(document.createElement('pre')).textContent=JSON.stringify(bz,null,2)
+      let out=''
+      Object.values(bz.products).map(({product_id,quick_status})=>out+=`${product_id}
+buy
+${quick_status.sellPrice}
+${quick_status.sellVolume}
+sell
+${quick_status.buyPrice}
+${quick_status.buyVolume}
+
+`
+      )
+      document.body.appendChild(document.createElement('pre')).textContent=out
       
       statusCard.remove()
       clog(`%cload time: ${performance.now()/1000}s`,"color:#0f0")

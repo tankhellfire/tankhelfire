@@ -7,7 +7,7 @@ git commit -a -m "msg"
 git fetch tankhellfire-github
 git merge tankhellfire-github/main
 
-git fetch tankhellfire-github
-git merge tankhellfire-github/main
+git fetch tankhellfire-glitch-me
+git merge tankhellfire-glitch-me/main
 
 git push tankhellfire-github main
