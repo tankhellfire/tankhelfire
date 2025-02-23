@@ -32,81 +32,108 @@
       Object.assign(utill,{
         fullscreen:1,
         pointerLock:1
-        //keyPreventDefault:1
       });
       
       
-      game=new spaceGame7.game({
-        objCount:window.location.hash.substr(1)
-      });
-      
-      
-      // Create a WebGLRenderer
+      THREE.Euler.DEFAULT_ORDER="YXZ"
+
+      scene=new THREE.Scene();
+      camera=new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+      fov=75;
+      camera.position.z=7;
+
       renderer=new THREE.WebGLRenderer({antialias:1});
-      renderer.setSize(window.innerWidth,window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
-      // Set up an Orthographic Camera
-      camera=new THREE.PerspectiveCamera();
-      camera.position.z=1;
+      // Add a cube
       
-      function onResize() {
-        const width=window.innerWidth;
-        const height=window.innerHeight;
+      let cubePose=[]
+      let hash=window.location.hash.substr(1)
+      if(hash){
+        if(hash.includes(',')){
+          cubePose=hash.split(';').map(a=>a.split(','))
+        }else{
+          for(let i=0;i<hash;i++){
+            cubePose.push([2*Math.random()-1,2*Math.random()-1,2*Math.random()-1])
+          }
+        }
+      }else{
+        cubePose=[
+          [0,0,0],[1,0,0],
+          [0,1,0],
+          [0,0,1],
+                  [1,1,1],
+        ]
+      }
 
-        renderer.setSize(width,height);
+      for (let props of cubePose) {
+        const geometry = new THREE.BoxGeometry(document.location.search.substr(1)||1,document.location.search.substr(1)||1,document.location.search.substr(1)||1);
+        const material = new THREE.MeshBasicMaterial
+        const edgeMaterial = new THREE.MeshBasicMaterial({color:'#000000'})
+        const edges = new THREE.EdgesGeometry(geometry); // Extract edges
+        const cube = new THREE.Mesh(geometry, material);
+        cube.material.color.r=Math.abs(props[0])
+        cube.material.color.g=Math.abs(props[1])
+        cube.material.color.b=Math.abs(props[2])
+
+        cube.position.x=props[0]*2
+        cube.position.y=props[1]*2
+        cube.position.z=-props[2]*2
+
+        const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+        cube.add(edgeLines); // Add edges as a child of the cube
+
+        scene.add(cube);
+      }
+
+      const rotspeed=[]
+      for(let a=0;a<scene.children.length+1;a++){
+        rotspeed.push([2*(2*Math.random()-1),2*(2*Math.random()-1),2*(2*Math.random()-1)])
+      }
+      // Animation loop
+      function animate() {
+        let n=0
+        requestAnimationFrame(animate);
+        let t=performance.now()*.001
+        for (let a of scene.children) {
+          a.rotation.x = t*rotspeed[n][0];
+          a.rotation.y = t*rotspeed[n][1];
+          a.rotation.z = t*rotspeed[n++][2];
+        }
+        scene.rotation.x = t*rotspeed[n][0];
+        scene.rotation.y = t*rotspeed[n][1];
+        scene.rotation.z = t*rotspeed[n++][2];
+        updateCanvas()
+        renderer.render(scene, camera);
+      }
+      animate();
+
+
+      function updateCanvas() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Calculate vmin (smallest dimension)
+        const vmin = Math.min(1, width/height)
+
+        // Set the renderer size to match the vmin dimension (smallest dimension)
+        renderer.setSize(width, height);
+
+        // Update the camera's aspect ratio to match the window's width / height
+        camera.aspect = width/height;
+
+        // Adjust the camera's FOV based on the window size
+        camera.zoom= vmin // Maintain a constant FOV
         camera.updateProjectionMatrix();
       }
-      window.addEventListener('resize', onResize);
-      onResize();
-
-      const scene = new THREE.Scene();
-      
-      window.map=[]
-      
-              const textureLoader = new THREE.TextureLoader();
-        const texture = textureLoader.load('/space game 7/assets/mouse.svg',(texture) => {
-          texture.minFilter = THREE.NearestFilter; // For scaling down
-          texture.magFilter = THREE.NearestFilter; // For scaling up
-          texture.generateMipmaps = false; // Disable mipmaps for sharper edges
-        });
-
-        const geometry = new THREE.PlaneGeometry(1, 1); // 1x1 units
-        const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
-      
-      for(let obj of game.obj){
 
 
-        const plane = new THREE.Mesh(geometry, material);
-        scene.add(plane);
-        
-        map.push({obj,real:plane})
-      } 
-      
-      
-      async function update() {
-        game.physics(Date.now()/1000)
-        
-        for(let{obj,real}of map){
-          real.position.x=obj.x
-          real.position.y=obj.y
-          real.scale.x=obj.size
-          real.scale.y=obj.size
-          real.rotation.z=obj.dir*2*Math.PI
-        }
-        
-        renderer.render(scene, camera)
-        requestAnimationFrame(update);
-      }
-      update()
-      
-game.obj[0].vx=0
-game.obj[0].vy=0
-game.obj[0].x=0
-game.obj[0].y=0
-game.obj[0].vdir=0
-game.obj[0].dir=0
-game.obj[0].size=1
+      // Initial update of canvas and camera aspect
+      updateCanvas();
+
+
+      // Resize canvas and camera on window resize
+      window.addEventListener('resize',updateCanvas);
       
       
       
