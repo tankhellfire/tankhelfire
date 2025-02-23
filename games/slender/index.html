@@ -38,7 +38,7 @@ Object.assign(utill,{
 THREE.Euler.DEFAULT_ORDER="YXZ"
 
 scene=new THREE.Scene();
-camera=new THREE.PerspectiveCamera(120,1,0.1,1000);
+camera=new THREE.PerspectiveCamera(60,1,0.1,1000);
 camera.position.z=1.5;
 
 renderer=new THREE.WebGLRenderer({antialias:1});
@@ -76,9 +76,15 @@ cube.add(edgeLines); // Add edges as a child of the cube
 scene.add(cube);
       
       
-function animate() {
-  requestAnimationFrame(animate);
+function animate(){
+  camera.rotation.z+=pointer[pointer.primary]?.mx??0
+  camera.rotation.x+=pointer[pointer.primary]?.my??0
+  
+  
   renderer.render(scene, camera);
+  
+  
+  requestAnimationFrame(animate);
 }
       
 
