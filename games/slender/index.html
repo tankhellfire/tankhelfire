@@ -90,11 +90,15 @@ async function animate(){
     }
   }
   
-  let move=new THREE.Vector3
+  let move=new THREE.Vector2
   if(key.KeyW?.down)move.x-=1
   if(key.KeyS?.down)move.x+=1
   if(key.KeyA?.down)move.y-=1
   if(key.KeyD?.down)move.y+=1
+  move.setLength(Math.min(move.length(),5))
+  let dpos=new THREE.Vector3(move.x,move.y)
+  
+  camera.position.add(dpos.)
   
   
   
