@@ -17,9 +17,13 @@
   <script>
     (async()=>{
       statusCard.textContent='importing'
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+      Three=await import("/lib/three/build/three.module.min.js")
       
       statusCard.textContent='loading'
       await new Promise(resolve => setTimeout(resolve, 0));
+      
       statusCard.remove()
       console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
     })()
