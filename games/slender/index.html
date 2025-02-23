@@ -15,132 +15,79 @@
 <body>
   <h1 id="statusCard">awaiting js</h1>
   <script>
-    (async()=>{
-      statusCard.textContent='importing'
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      [THREE,spaceGame7]=await Promise.all(
-      [import("/lib/three/build/three.module.min.js"),lib('spaceGame7/index.js')])
-      
-      
-      statusCard.textContent='loading'
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      
-      
-      
-      Object.assign(utill,{
-        fullscreen:1,
-        pointerLock:1
-      });
-      
-      
-      THREE.Euler.DEFAULT_ORDER="YXZ"
+(async()=>{
+statusCard.textContent='importing'
+await new Promise(resolve => setTimeout(resolve, 0));
 
-      scene=new THREE.Scene();
-      camera=new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-      fov=75;
-      camera.position.z=7;
-
-      renderer=new THREE.WebGLRenderer({antialias:1});
-      document.body.appendChild(renderer.domElement);
-
-      // Add a cube
-      
-      let cubePose=[]
-      let hash=window.location.hash.substr(1)
-      if(hash){
-        if(hash.includes(',')){
-          cubePose=hash.split(';').map(a=>a.split(','))
-        }else{
-          for(let i=0;i<hash;i++){
-            cubePose.push([2*Math.random()-1,2*Math.random()-1,2*Math.random()-1])
-          }
-        }
-      }else{
-        cubePose=[
-          [0,0,0],[1,0,0],
-          [0,1,0],
-          [0,0,1],
-                  [1,1,1],
-        ]
-      }
-
-      for (let props of cubePose) {
-        const geometry = new THREE.BoxGeometry(document.location.search.substr(1)||1,document.location.search.substr(1)||1,document.location.search.substr(1)||1);
-        const material = new THREE.MeshBasicMaterial
-        const edgeMaterial = new THREE.MeshBasicMaterial({color:'#000000'})
-        const edges = new THREE.EdgesGeometry(geometry); // Extract edges
-        const cube = new THREE.Mesh(geometry, material);
-        cube.material.color.r=Math.abs(props[0])
-        cube.material.color.g=Math.abs(props[1])
-        cube.material.color.b=Math.abs(props[2])
-
-        cube.position.x=props[0]*2
-        cube.position.y=props[1]*2
-        cube.position.z=-props[2]*2
-
-        const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
-        cube.add(edgeLines); // Add edges as a child of the cube
-
-        scene.add(cube);
-      }
-
-      const rotspeed=[]
-      for(let a=0;a<scene.children.length+1;a++){
-        rotspeed.push([2*(2*Math.random()-1),2*(2*Math.random()-1),2*(2*Math.random()-1)])
-      }
-      // Animation loop
-      function animate() {
-        let n=0
-        requestAnimationFrame(animate);
-        let t=performance.now()*.001
-        for (let a of scene.children) {
-          a.rotation.x = t*rotspeed[n][0];
-          a.rotation.y = t*rotspeed[n][1];
-          a.rotation.z = t*rotspeed[n++][2];
-        }
-        scene.rotation.x = t*rotspeed[n][0];
-        scene.rotation.y = t*rotspeed[n][1];
-        scene.rotation.z = t*rotspeed[n++][2];
-        updateCanvas()
-        renderer.render(scene, camera);
-      }
-      animate();
+[THREE,spaceGame7]=await Promise.all(
+[import("/lib/three/build/three.module.min.js"),lib('spaceGame7/index.js')])
 
 
-      function updateCanvas() {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-
-        // Calculate vmin (smallest dimension)
-        const vmin = Math.min(1, width/height)
-
-        // Set the renderer size to match the vmin dimension (smallest dimension)
-        renderer.setSize(width, height);
-
-        // Update the camera's aspect ratio to match the window's width / height
-        camera.aspect = width/height;
-
-        // Adjust the camera's FOV based on the window size
-        camera.zoom= vmin // Maintain a constant FOV
-        camera.updateProjectionMatrix();
-      }
-
-
-      // Initial update of canvas and camera aspect
-      updateCanvas();
-
-
-      // Resize canvas and camera on window resize
-      window.addEventListener('resize',updateCanvas);
+statusCard.textContent='loading'
+await new Promise(resolve => setTimeout(resolve, 0));
       
       
       
       
-      statusCard.remove()
-      console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
-    })()
+Object.assign(utill,{
+  fullscreen:1,
+  pointerLock:1
+});
+
+
+THREE.Euler.DEFAULT_ORDER="YXZ"
+
+scene=new THREE.Scene();
+camera=new THREE.PerspectiveCamera(120,1,0.1,1000);
+camera.position.z=2;
+
+renderer=new THREE.WebGLRenderer({antialias:1});
+
+
+function updateCanvas() {
+  const width=window.innerWidth;
+  const height=window.innerHeight;
+
+  const vmin=Math.min(1, width/height)
+
+  renderer.setSize(width, height);
+  camera.aspect=width/height;
+
+  camera.zoom=vmin
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize',updateCanvas);
+updateCanvas();
+      
+      
+const geometry = new THREE.BoxGeometry(1,1,1);
+const material = new THREE.MeshBasicMaterial
+const edgeMaterial = new THREE.MeshBasicMaterial({color:'#ffffff'})
+const edges = new THREE.EdgesGeometry(geometry); // Extract edges
+const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+let cube = new THREE.Mesh(geometry, material);
+cube.add(edgeLines); // Add edges as a child of the cube
+scene.add(cube);
+edgeMaterial.color='#ffffff'
+cube = new THREE.Mesh(geometry, material);
+cube.add(edgeLines); // Add edges as a child of the cube
+scene.add(cube);
+      
+      
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+      
+
+
+statusCard.remove()
+console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
+
+document.body.appendChild(renderer.domElement);
+animate();
+      
+})()
   </script>
 </body>
 </html>
