@@ -61,18 +61,17 @@ updateCanvas();
       
       
 const geometry = new THREE.BoxGeometry(1,1,1);
-const material = new THREE.MeshBasicMaterial
-const edgeMaterial = new THREE.MeshBasicMaterial({color:'#000000'})
+const material = new THREE.MeshBasicMaterial({color:'#00ff00'})
+const edgeMaterial = new THREE.MeshBasicMaterial({color:'#ff0000'})
 const edges = new THREE.EdgesGeometry(geometry); // Extract edges
-const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
-let cube = new THREE.Mesh(geometry, material);
-cube.add(edgeLines); // Add edges as a child of the cube
+let cube=new THREE.Mesh(geometry, material);
+cube.add(new THREE.LineSegments(edges, edgeMaterial));
 scene.add(cube);
   
-cube = new THREE.Mesh(geometry, material);
+cube=new THREE.Mesh(geometry, material);
 cube.position.z=-1
 cube.position.x=1
-cube.add(edgeLines); // Add edges as a child of the cube
+cube.add(new THREE.LineSegments(edges, edgeMaterial));
 scene.add(cube);
       
 time=performance.now()/1000
@@ -95,9 +94,9 @@ async function animate(){
   if(key.KeyS?.down)move.z+=1
   if(key.KeyA?.down)move.x-=1
   if(key.KeyD?.down)move.x+=1
-  move.setLength(Math.min(move.length(),5))
+  move.setLength(Math.min(move.length(),1)).multiplyScalar(5)
   
-  camera.position.add(move.multiplyScalar(dt))
+  camera.position.add(move.multiplyScalar(dt).applyAxisAngle(camera.up,camera.rotation.y))
   
   
   
