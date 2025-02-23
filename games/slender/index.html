@@ -19,10 +19,15 @@
       statusCard.textContent='importing'
       await new Promise(resolve => setTimeout(resolve, 0));
       
-      THREE=await import("/lib/three/build/three.module.min.js")
+      [THREE,spaceGame7]=await Promise.all(
+      [import("/lib/three/build/three.module.min.js"),lib('spaceGame7/index.js')])
+      
       
       statusCard.textContent='loading'
       await new Promise(resolve => setTimeout(resolve, 0));
+      
+      
+      
       
       Object.assign(utill,{
         fullscreen:1,
@@ -31,33 +36,33 @@
       });
       
       
-      window.game = new spaceGame7.game({
+      game=new spaceGame7.game({
         objCount:window.location.hash.substr(1)
       });
       
       
       // Create a WebGLRenderer
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer=new THREE.WebGLRenderer({antialias:1});
+      renderer.setSize(window.innerWidth,window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
       // Set up an Orthographic Camera
-      const aspect = window.innerWidth / window.innerHeight;
-      const camera = new THREE.OrthographicCamera();
-      camera.position.z = 1;
+      const aspect=window.innerWidth/window.innerHeight;
+      camera=new THREE.PerspectiveCamera();
+      camera.position.z=1;
       
       function onResize() {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+        const width=window.innerWidth;
+        const height=window.innerHeight;
 
-        renderer.setSize(width, height);
+        renderer.setSize(width,height);
 
-        const vmax = Math.max(width, height);
-        camera.left = -width/vmax;
-        camera.right = width/vmax;
-        camera.top = height/vmax;
-        camera.bottom = -height/vmax;
-        camera.updateProjectionMatrix();
+        const vmax=Math.max(width, height);
+        // camera.left=-width/vmax;
+        // camera.right=width/vmax;
+        // camera.top=height/vmax;
+        // camera.bottom=-height/vmax;
+        // camera.updateProjectionMatrix();
       }
       window.addEventListener('resize', onResize);
       onResize();
@@ -101,6 +106,9 @@
         requestAnimationFrame(update);
       }
       update()
+      
+      
+      
       
       statusCard.remove()
       console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
