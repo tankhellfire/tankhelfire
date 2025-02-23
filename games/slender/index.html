@@ -19,8 +19,15 @@
 statusCard.textContent='importing'
 await new Promise(resolve => setTimeout(resolve, 0));
 
-[THREE,spaceGame7]=await Promise.all(
-[import("/lib/three/build/three.module.min.js"),lib('spaceGame7/index.js')])
+[
+  THREE,
+  GLTFLoader,
+  spaceGame7
+]=await Promise.all([
+  import("/lib/three/build/three.module.min.js"),
+  import("/lib/three/examples/jsm/loaders/GLTFLoader.js"),
+  lib('spaceGame7/index.js')
+])
 
 
 statusCard.textContent='loading'
