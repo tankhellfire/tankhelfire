@@ -122,9 +122,9 @@ document.body.appendChild(renderer.domElement);
 animate();
   
   
-let a=(await new Promise(res=>(new GLTFLoader).load('/3d models/_map_.glb',res,console.log))).scene.children[0]
+let a=(await new Promise(res=>(new GLTFLoader).load('/3d models/Harold.glb',res,console.log))).scene.children[0]
 a.material=new THREE.MeshNormalMaterial();
-a.position.z=100
+a.position.z=50
 scene.add(a)
       
 })()
