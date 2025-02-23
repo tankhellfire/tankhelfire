@@ -15,7 +15,7 @@
   <script>
     (async () => {  
       statusCard.textContent='importing'
-      window.THREE = await import('/lib/npm/three/build/three.module.js')
+      window.THREE = await import('/lib/three/build/three.module.min.js')
       window.spaceGame7=await lib('spaceGame7/index.js')
       statusCard.textContent='loading'
       await new Promise(resolve => setTimeout(resolve, 0));
