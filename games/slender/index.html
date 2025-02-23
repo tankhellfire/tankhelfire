@@ -82,8 +82,9 @@ cube.add(new THREE.LineSegments(edges, edgeMaterial));
 scene.add(cube);
       
 time=performance.now()/1000
+dt=0
 async function animate(){
-  let dt=performance.now()/1000-time;//delta time
+  dt=performance.now()/1000-time;//delta time
   time=performance.now()/1000;
   
   
@@ -119,6 +120,12 @@ console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
 
 document.body.appendChild(renderer.domElement);
 animate();
+  
+  
+let a=(await new Promise(res=>(new GLTFLoader).load('/3d models/_map_.glb',res,console.log))).scene.children[0]
+a.material=new THREE.MeshNormalMaterial();
+a.position.z=100
+scene.add(a)
       
 })()
   </script>
