@@ -28,6 +28,16 @@ await new Promise(resolve => setTimeout(resolve, 0));
   import("/lib/three/examples/jsm/loaders/GLTFLoader.js"),
   lib('spaceGame7/index.js')
 ])
+  
+const loader = new THREE.CubeTextureLoader();
+const SkyBoxtexture = loader.load([
+  'path/to/skybox/px.jpg', // Right
+  'path/to/skybox/nx.jpg', // Left
+  'path/to/skybox/py.jpg', // Top
+  'path/to/skybox/ny.jpg', // Bottom
+  'path/to/skybox/pz.jpg', // Front
+  'path/to/skybox/nz.jpg'  // Back
+]);
 
 
 statusCard.textContent='loading'
@@ -50,7 +60,7 @@ camera=new THREE.PerspectiveCamera(90,1,0.1,1000);
 camera.position.z=1.5;
 
 renderer=new THREE.WebGLRenderer({antialias:1});
-
+  
 
 function updateCanvas() {
   const width=window.innerWidth;
@@ -66,6 +76,8 @@ function updateCanvas() {
 }
 window.addEventListener('resize',updateCanvas);
 updateCanvas();
+  
+scene.background=SkyBoxtexture;
       
       
 const geometry = new THREE.BoxGeometry(1,1,1);
