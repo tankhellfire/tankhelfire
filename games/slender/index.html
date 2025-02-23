@@ -39,7 +39,7 @@ THREE.Euler.DEFAULT_ORDER="YXZ"
 
 scene=new THREE.Scene();
 camera=new THREE.PerspectiveCamera(120,1,0.1,1000);
-camera.position.z=2;
+camera.position.z=1.5;
 
 renderer=new THREE.WebGLRenderer({antialias:1});
 
@@ -62,14 +62,16 @@ updateCanvas();
       
 const geometry = new THREE.BoxGeometry(1,1,1);
 const material = new THREE.MeshBasicMaterial
-const edgeMaterial = new THREE.MeshBasicMaterial({color:'#ffffff'})
+const edgeMaterial = new THREE.MeshBasicMaterial({color:'#000000'})
 const edges = new THREE.EdgesGeometry(geometry); // Extract edges
 const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
 let cube = new THREE.Mesh(geometry, material);
 cube.add(edgeLines); // Add edges as a child of the cube
 scene.add(cube);
-edgeMaterial.color='#ffffff'
+  
 cube = new THREE.Mesh(geometry, material);
+cube.position.z=-1
+cube.position.x=1
 cube.add(edgeLines); // Add edges as a child of the cube
 scene.add(cube);
       
