@@ -21,7 +21,7 @@ await new Promise(resolve => setTimeout(resolve, 0));
 
 [
   THREE,
-  GLTFLoader,
+  {GLTFLoader},
   spaceGame7
 ]=await Promise.all([
   import("/lib/three/build/three.module.min.js"),
