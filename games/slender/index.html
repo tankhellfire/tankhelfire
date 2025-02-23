@@ -47,7 +47,6 @@
       document.body.appendChild(renderer.domElement);
 
       // Set up an Orthographic Camera
-      const aspect=window.innerWidth/window.innerHeight;
       camera=new THREE.PerspectiveCamera();
       camera.position.z=1;
       
@@ -56,13 +55,7 @@
         const height=window.innerHeight;
 
         renderer.setSize(width,height);
-
-        const vmax=Math.max(width, height);
-        // camera.left=-width/vmax;
-        // camera.right=width/vmax;
-        // camera.top=height/vmax;
-        // camera.bottom=-height/vmax;
-        // camera.updateProjectionMatrix();
+        camera.updateProjectionMatrix();
       }
       window.addEventListener('resize', onResize);
       onResize();
@@ -95,8 +88,8 @@
         game.physics(Date.now()/1000)
         
         for(let{obj,real}of map){
-          real.position.x=obj.x*3-1.5
-          real.position.y=obj.y*3-1.5
+          real.position.x=obj.x
+          real.position.y=obj.y
           real.scale.x=obj.size
           real.scale.y=obj.size
           real.rotation.z=obj.dir*2*Math.PI
@@ -106,6 +99,14 @@
         requestAnimationFrame(update);
       }
       update()
+      
+game.obj[0].vx=0
+game.obj[0].vy=0
+game.obj[0].x=0
+game.obj[0].y=0
+game.obj[0].vdir=0
+game.obj[0].dir=0
+game.obj[0].size=1
       
       
       
