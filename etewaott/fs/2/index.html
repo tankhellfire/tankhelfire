@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <title>name</title>
-  <script src="../../../new.js"></script>
+  <script src="/new.js"></script>
   <script src="../../../lib/lib.js"></script>
   <script src="../../../lib/fs.js"></script>
   <style>
@@ -16,12 +16,16 @@
   <h1 id="statusCard">awaiting js</h1>
   <script>
     (async()=>{
+      sleep=ms=>new Promise(a=>setTimeout(a, ms));
       statusCard.textContent='importing'
+      await sleep()
       
-      if(typeof lib=='undefined')lib=await Object.getPrototypeOf(async()=>{}).constructor('exports',await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text()+';\nreturn exports')({})
+      if(typeof lib=='undefined')lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text())
       if(typeof Fs=='undefined')Fs=await lib('fs.js')
       
       statusCard.textContent='loading'
+      await sleep()
+      
       fs=[]
       newFs=()=>{
         let out={}
@@ -46,7 +50,6 @@
       newFs()
 
       
-      await new Promise(resolve => setTimeout(resolve, 0));
       statusCard.remove()
       console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
     })()
