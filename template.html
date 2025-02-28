@@ -15,10 +15,12 @@
   <h1 id="statusCard">awaiting js</h1>
   <script>
     (async()=>{
-      statusCard.textContent='importing'
+      loading=async(t)=>console.log(statusCard.textContent=t)
       
-      statusCard.textContent='loading'
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await loading('importing')
+      
+      await loading('loading')
+      
       statusCard.remove()
       console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
     })()

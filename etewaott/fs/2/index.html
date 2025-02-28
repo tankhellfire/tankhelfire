@@ -16,15 +16,20 @@
   <h1 id="statusCard">awaiting js</h1>
   <script>
     (async()=>{
-      sleep=ms=>new Promise(a=>setTimeout(a, ms));
-      statusCard.textContent='importing'
-      await sleep()
+      loading=async(t)=>console.log(statusCard.textContent=t)
       
-      if(typeof lib=='undefined')lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text())
-      if(typeof Fs=='undefined')Fs=await lib('fs.js')
+      await loading('importing')
       
-      statusCard.textContent='loading'
-      await sleep()
+      if(typeof lib=='undefined'){
+        await loading('importing/lib')
+        lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text())
+      }
+      if(typeof Fs=='undefined'){
+        await load('importing/fs')
+        Fs=await lib('fs.js')
+      }
+      
+      await loading('loading')
       
       fs=[]
       newFs=()=>{
