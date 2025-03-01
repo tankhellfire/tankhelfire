@@ -25,7 +25,7 @@
         lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text())
       }
       if(typeof Fs=='undefined'){
-        await load('importing/fs')
+        await loading('importing/fs')
         Fs=await lib('fs.js')
       }
       
@@ -47,7 +47,8 @@
         out.button.onclick = async () => {
           out.fs=new Fs(await window.showDirectoryPicker({id:`etewaottFs${out.id}`}))
           let a=0
-          await out.fs.setup({progressFunc:(e=>{out.text.innerText=++a})})
+          await out.fs.setup()
+          // await out.refreshAll()
           out.text.innerText = out.fs.handle.name
         }
       }
