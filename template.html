@@ -18,6 +18,11 @@
       loading=async(t)=>console.log(statusCard.textContent=t)
       
       await loading('importing')
+
+      // if(typeof lib=='undefined'){
+      //   await loading('importing/lib')
+      //   lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text())
+      // }
       
       await loading('loading')
       
