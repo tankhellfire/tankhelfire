@@ -1,0 +1,246 @@
+<html>
+  <head>
+    <link rel="icon" id="icon" />
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #1e1f22;
+      }
+      .container {
+        display: flex;
+        width: 100vw;
+        height: 100vh;
+      }
+      #canvas {
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        width: 100vmin;
+        height: 100vmin;
+      }
+      #color {
+        flex-grow: 1;
+      }
+      @media (orientation: portrait) {
+        .container {
+          flex-direction: column;
+        }
+        #color {
+          width: 100%;
+          height: auto;
+        }
+      }
+      @media (orientation: landscape) {
+        #color {
+          height: 100%;
+          width: auto;
+        }
+      }
+    </style>
+    <!-- <script src="/lib/getUser.js"></script> -->
+    <script src="/lib/lib.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <canvas id="canvas" width="200" height="200"></canvas>
+      <input type="color" id="color" name="color" value="#000000" />
+    </div>
+
+    <script>
+      (async()=>{
+        // if(typeof lib=='undefined'){
+        //   await loading('importing/lib')
+        //   lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text())
+        // }
+
+      let bitcanva = Math.ceil(Math.log2(canvas.height * canvas.width * 3));
+
+      function hexToRgb(hex) {
+        // Remove the hash symbol if present
+        hex = hex.replace(/^#/, "");
+
+        return [
+          parseInt(hex.substring(0, 2), 16),
+          parseInt(hex.substring(2, 4), 16),
+          parseInt(hex.substring(4, 6), 16),
+        ];
+      }
+
+      function readNBits(uint8Array, bitOffset, n) {
+        const byteOffset = Math.floor(bitOffset / 8);
+        const bitStart = bitOffset % 8;
+        const dataView = new DataView(uint8Array.buffer);
+
+        let value = 0;
+        for (let i = 0; i < n; i++) {
+          const byteIndex = byteOffset + Math.floor((bitStart + i) / 8);
+          const bitIndex = (bitStart + i) % 8;
+          const bit = (dataView.getUint8(byteIndex) >> bitIndex) & 1;
+          value |= bit << i;
+        }
+
+        return value;
+      }
+      function writeNBits(uint8Array, bitOffset, n, value) {
+        const byteOffset = Math.floor(bitOffset / 8);
+        const bitStart = bitOffset % 8;
+        const dataView = new DataView(uint8Array.buffer);
+
+        for (let i = 0; i < n; i++) {
+          const byteIndex = byteOffset + Math.floor((bitStart + i) / 8);
+          const bitIndex = (bitStart + i) % 8;
+          const bit = (value >> i) & 1;
+          const currentByte = dataView.getUint8(byteIndex);
+          dataView.setUint8(
+            byteIndex,
+            (currentByte & ~(1 << bitIndex)) | (bit << bitIndex)
+          );
+        }
+      }
+
+      const ctx = canvas.getContext("2d");
+      const imgdata = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const img = imgdata.data;
+
+      function draw() {
+        ctx.putImageData(imgdata, 0, 0);
+
+        // Convert canvas to data URL
+        const imgDataUrl = canvas.toDataURL("image/png");
+
+        // Set the favicon
+        const link = document.createElement("link");
+        icon.href = imgDataUrl;
+      }
+
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const url = `${protocol}//${window.location.host}/ws`;
+      let connection;
+      connect();
+
+      let connectCount=0
+      function connect() {
+        
+        let start = 1;
+        connection = new WebSocket('wss://onecanvas.glitch.me/ws');
+
+        connection.onopen = () => {
+          connection.send(JSON.stringify({Lno:1}))
+          console.log("Connected to the server");
+
+
+          connection.onerror = (error) => {
+            console.error("WebSocket Error:", error);
+            connect();
+          };
+
+          connection.onclose = (event) => {
+            console.warn(
+              "WebSocket connection closed:",
+              event.code,
+              event.reason
+            );
+            connect();
+          };
+
+          connection.onmessage = (e) => {
+            if (start) {
+              start = 0;
+              e.data.arrayBuffer().then((data) => {
+                res = new Uint8Array(data);
+
+                let a = 0;
+                for (let i = 0; i < canvas.width * canvas.height * 4; i++) {
+                  if (i % 4 == 3) {
+                    img[i] = 255;
+                    continue;
+                  }
+                  img[i] = res[a];
+                  a++;
+                }
+                draw();
+              });
+            } else {
+              e.data.arrayBuffer().then((res) => {
+                let b = new Uint8Array(res);
+                let a = readNBits(b, 0, bitcanva);
+                // console.log(a)
+
+                // console.log(b.length)
+                drawPx(
+                  a,
+                  readNBits(b, bitcanva, 8),
+                  readNBits(b, bitcanva + 8, 8),
+                  readNBits(b, bitcanva + 16, 8)
+                );
+              });
+            }
+          };
+        };
+      }
+
+      function drawPx(pixel, r, g, b) {
+        console.log("drawing", pixel);
+
+        writeNBits(img, pixel * 32, 8, r);
+        writeNBits(img, pixel * 32 + 8, 8, g);
+        writeNBits(img, pixel * 32 + 16, 8, b);
+
+        draw();
+      }
+
+      async function post(pixel, r, g, b) {
+        drawPx(pixel, r, g, b);
+
+        let res = new Uint8Array(Math.ceil((bitcanva + 24) / 8));
+        writeNBits(res, 0, bitcanva, pixel);
+        writeNBits(res, bitcanva, 8, r);
+        writeNBits(res, bitcanva + 8, 8, g);
+        writeNBits(res, bitcanva + 16, 8, b);
+
+        connection.send(res);
+
+        //         await fetch("/canvas", {
+        //           method: "POST",
+        //           headers: {
+        //             "Content-Type": "application/octet-stream",
+        //           },
+        //           body: res,
+        //         });
+      }
+      let isdraw = 0;
+      function pendrage(event) {
+        let x = Math.floor((event.x / canvas.clientWidth) * canvas.width);
+        let y = Math.floor((event.y / canvas.clientHeight) * canvas.height);
+        console.log(x, y, x + y * canvas.width);
+        let clr = hexToRgb(color.value);
+        post(x + y * canvas.width, clr[0], clr[1], clr[2]);
+      }
+      canvas.addEventListener("mousedown", () => {
+        pendrage(event);
+        isdraw = 1;
+      });
+      canvas.addEventListener("mouseup", (event) => {
+        isdraw = 0;
+      });
+      canvas.addEventListener("mousemove", (event) => {
+        if (isdraw) {
+          pendrage(event);
+        }
+      });
+
+      //       canvas.addEventListener("click", (event) => {
+      //         let x = Math.floor((event.x / canvas.clientWidth) * canvas.width);
+      //         let y = Math.floor((event.y / canvas.clientHeight) * canvas.height);
+      //         console.log(x, y, x + y * canvas.width);
+      //         let clr = hexToRgb(color.value);
+      //         post(x + y * canvas.width, clr[0], clr[1], clr[2]);
+      // });
+      })()
+    </script>
+  </body>
+</html>

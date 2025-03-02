@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Client</title>
+</head>
+<body>
+  <h1>WebSocket Client</h1>
+  <script>
+    
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const url = `${protocol}//${window.location.host}/ws`;
+const connection = new WebSocket(url);
+
+connection.onopen = () => {
+  console.log('Connected to the server');
+  connection.send('Hello, server!');
+};
+
+connection.onerror = (error) => {
+  console.error('WebSocket Error:', error);
+};
+
+connection.onclose = (event) => {
+  console.log('WebSocket connection closed:', event.code, event.reason);
+};
+
+connection.onmessage = (e) => {
+  console.log('Received:', e.data);
+};
+  </script>
+</body>
+</html>

@@ -11,3 +11,19 @@ git fetch tankhellfire-glitch-me
 git merge tankhellfire-glitch-me/main
 
 git push tankhellfire-github main
+
+
+
+[System.Environment]::SetEnvironmentVariable("GIT_DIR", "C:\Users\tt\local\tankhellfire_git\.git", "User")
+[System.Environment]::SetEnvironmentVariable("GIT_WORK_TREE", "C:\Users\tt\OneDrive\Documents\D\tankhellfire", "User")
+
+[System.Environment]::SetEnvironmentVariable("GIT_DIR", $null, "User")
+[System.Environment]::SetEnvironmentVariable("GIT_WORK_TREE", $null, "User")
+
+[System.Environment]::GetEnvironmentVariable("GIT_DIR", "User")
+[System.Environment]::GetEnvironmentVariable("GIT_WORK_TREE", "User")
+
+
+Remove-Item Env:GIT_DIR
+Remove-Item Env:GIT_WORK_TREE
+

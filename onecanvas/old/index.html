@@ -1,0 +1,176 @@
+<html>
+  <head>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #1e1f22;
+      }
+      .container {
+        display: flex;
+        width: 100vw;
+        height: 100vh;
+      }
+      #canvas {
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        width: 100vmin;
+        height: 100vmin;
+      }
+      #color {
+        flex-grow: 1;
+      }
+      @media (orientation: portrait) {
+        .container {
+          flex-direction: column;
+        }
+        #color {
+          width: 100%;
+          height: auto;
+        }
+      }
+      @media (orientation: landscape) {
+        #color {
+          height: 100%;
+          width: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <canvas id="canvas" width="100" height="100"></canvas>
+      <input type="color" id="color" name="color" value="#000" />
+    </div>
+
+    <script>
+      function hexToRgb(hex) {
+        // Remove the hash symbol if present
+        hex = hex.replace(/^#/, "");
+
+        return [
+          parseInt(hex.substring(0, 2), 16),
+          parseInt(hex.substring(2, 4), 16),
+          parseInt(hex.substring(4, 6), 16),
+        ];
+      }
+
+      function readNBits(uint8Array, bitOffset, n) {
+        const byteOffset = Math.floor(bitOffset / 8);
+        const bitStart = bitOffset % 8;
+        const dataView = new DataView(uint8Array.buffer);
+
+        let value = 0;
+        for (let i = 0; i < n; i++) {
+          const byteIndex = byteOffset + Math.floor((bitStart + i) / 8);
+          const bitIndex = (bitStart + i) % 8;
+          const bit = (dataView.getUint8(byteIndex) >> bitIndex) & 1;
+          value |= bit << i;
+        }
+
+        return value;
+      }
+      function writeNBits(uint8Array, bitOffset, n, value) {
+        const byteOffset = Math.floor(bitOffset / 8);
+        const bitStart = bitOffset % 8;
+        const dataView = new DataView(uint8Array.buffer);
+
+        for (let i = 0; i < n; i++) {
+          const byteIndex = byteOffset + Math.floor((bitStart + i) / 8);
+          const bitIndex = (bitStart + i) % 8;
+          const bit = (value >> i) & 1;
+          const currentByte = dataView.getUint8(byteIndex);
+          dataView.setUint8(
+            byteIndex,
+            (currentByte & ~(1 << bitIndex)) | (bit << bitIndex)
+          );
+        }
+      }
+
+      const ctx = canvas.getContext("2d");
+      const imgdata = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const img = imgdata.data;
+
+      get();
+
+      function draw() {
+        ctx.putImageData(imgdata, 0, 0);
+      }
+
+      async function get() {
+        let res = await fetch("/canvas");
+        res = await res.arrayBuffer();
+        res = new Uint8Array(res);
+
+        let a = 0;
+        for (let i = 0; i < canvas.width * canvas.height * 4; i++) {
+          if (i % 4 == 3) {
+            img[i] = 255;
+            continue;
+          }
+          img[i] = res[a];
+          a++;
+        }
+        ctx.putImageData(imgdata, 0, 0);
+      }
+
+      async function post(pixel, r, g, b) {
+        let bitcanva = Math.ceil(Math.log2(canvas.height * canvas.width * 3));
+        writeNBits(img, pixel * 32, 8, r);
+        writeNBits(img, pixel * 32 + 8, 8, g);
+        writeNBits(img, pixel * 32 + 16, 8, b);
+
+        draw();
+
+        let res = new Uint8Array(Math.ceil((bitcanva + 24) / 8));
+        writeNBits(res, 0, bitcanva, pixel);
+        writeNBits(res, bitcanva, 8, r);
+        writeNBits(res, bitcanva + 8, 8, g);
+        writeNBits(res, bitcanva + 16, 8, b);
+
+        await fetch("/canvas", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/octet-stream",
+          },
+          body: res,
+        });
+      }
+
+      async function set() {
+        let req = new Uint8Array(canvas.height * canvas.width * 3);
+
+        let a = 0;
+        for (let i in img) {
+          if (i % 4 == 3) {
+            continue;
+          }
+          req[a] = img[i];
+          a++;
+        }
+
+        await fetch("/post", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/octet-stream",
+          },
+          body: req,
+        });
+      }
+
+      canvas.addEventListener("click", (event) => {
+        let x = Math.floor((event.x / canvas.clientWidth) * canvas.width);
+        let y = Math.floor((event.y / canvas.clientHeight) * canvas.height);
+        console.log(x, y, x + y * canvas.width);
+        let clr = hexToRgb(color.value);
+        post(x + y * canvas.width, clr[0], clr[1], clr[2]);
+      });
+
+      setInterval(get, 500);
+    </script>
+  </body>
+</html>
