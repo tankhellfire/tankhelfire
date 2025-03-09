@@ -5,52 +5,180 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <title>name</title>
-  <script src="../new.js"></script>
+  <script src="/new.js"></script>
   <script src="../lib/lib.js"></script>
   
-  <link rel="preload" href="https://api.hypixel.net/v2/skyblock/bazaar" as="fetch" type="application/json">
-  <link rel="preload" href="collections.json" as="fetch" type="application/json">
-  <link rel="preload" href="craft.json" as="fetch" type="application/json">
+  <link rel="preload" href="https://api.hypixel.net/v2/skyblock/bazaar" as="fetch" type="application/json" crossorigin="anonymous">
+  <link rel="preload" href="collections.json" as="fetch" type="application/json" crossorigin="anonymous">
+  <link rel="preload" href="craft.json" as="fetch" type="application/json" crossorigin="anonymous">
   
   <style>
     *{margin:0;font-family:Consolas,monospace}
+    .g{color: #0f0;}
+    .o{color:#f50}
+    #display{
+      transform-origin:top left;
+      width:max-content;
+      height:max-content;
+    }
   </style>
 </head>
 <body>
-  <h1 id="statusCard">awaiting js</h1>
+  <div id="display">
+    <input type="text" id="inputMoney" placeholder="investment" value="1,000,000">
+    <input type="text" id="inputMaxItem" placeholder="xax items" value="1,344">
+    <button id="reload">reload</button>
+    <pre id="statusCard">awaiting js</pre>
+    <pre id="view"></pre>
+  </div>
   <script>
-    (async()=>{//https://api.mojang.com/users/profiles/minecraft/TankheIIfire
-      statusCard.textContent='importing'
+(async()=>{//https://api.mojang.com/users/profiles/minecraft/TankheIIfire
+let timer=performance.now()/1000
+statusCard.textContent=`importing ${performance.now()/1000-timer}`
 
+localePad=function(number,len=10,char=' ',locale=navigator.language??'en-US'){
+  let a=number.toLocaleString(locale,{maximumFractionDigits:2,minimumFractionDigits:2});
+  return ''.padStart(len-a.split('.')[0].length,char)+a
+}
 
-      statusCard.textContent='fetching'
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      [bazaar,collections]=await Promise.all([
-        fetch('https://api.hypixel.net/v2/skyblock/bazaar').then(e=>e.json()),
-        fetch('collections.json').then(e=>e.json()).catch(e=>fetch('https://tankhellfire.glitch.me/hyp/collections.json').then(e=>e.json())),//https://api.hypixel.net/v2/resources/skyblock/collections
-        fetch('craft.json').then(e=>e.json()).catch(e=>fetch('https://tankhellfire.glitch.me/hyp/craft.json').then(e=>e.json()))//https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json
-      ])
-      
-      statusCard.textContent='loading'
-      await new Promise(resolve => setTimeout(resolve, 0));
+scaleContent=e=>{
+  display.style.transform=`scale(${Math.floor(window.innerWidth)/Math.ceil(display.offsetWidth)*.85})`
+}
+window.addEventListener('resize', scaleContent)
+scaleContent()
 
-      let out=''
-      Object.values(bazaar.products).map(({product_id,quick_status})=>out+=`${product_id}
-buy
-${quick_status.sellPrice}
-${quick_status.sellVolume}
-sell
-${quick_status.buyPrice}
-${quick_status.buyVolume}
+statusCard.textContent=`fetching ${performance.now()/1000-timer}`
+await new Promise(resolve => setTimeout(resolve, 0));
+scaleContent();
 
-`
-      )
-      document.body.appendChild(document.createElement('pre')).textContent=out
-      
-      statusCard.remove()
-      console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
-    })()
+[bazaar,collections,craft,items]=await Promise.all([
+  fetch('https://api.hypixel.net/v2/skyblock/bazaar').then(e=>e.json()).catch(e=>0),
+  fetch('collections.json').then(e=>e.json())
+    .catch(e=>fetch('https://tankhellfire.glitch.me/hyp/collections.json').then(e=>e.json())
+    .catch(e=>fetch('https://api.hypixel.net/v2/resources/skyblock/collections').then(e=>e.json()))),
+  fetch('craft.json').then(e=>e.json())
+    .catch(e=>fetch('https://tankhellfire.glitch.me/hyp/craft.json').then(e=>e.json())
+    .catch(e=>fetch('https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json').then(e=>e.json()))),
+  fetch('items.json').then(e=>e.json())
+    .catch(e=>fetch('https://tankhellfire.glitch.me/hyp/items.json').then(e=>e.json())
+    .catch(e=>fetch('https://api.hypixel.net/v2/resources/skyblock/items').then(e=>e.json())))
+])
+
+statusCard.textContent=`loading ${performance.now()/1000-timer}`
+await new Promise(resolve => setTimeout(resolve, 0));
+scaleContent();
+
+(calc=e=>{
+  rewards=[]
+  for(let c in collections.collections){//collections
+    for(let i in collections.collections[c].items){//item
+      let n=collections.collections[c].items[i].name//name
+      for(let t in collections.collections[c].items[i].tiers){//tier
+        for(let r in collections.collections[c].items[i].tiers[t].unlocks){//reward
+          rewards.push([{c,n,t},collections.collections[c].items[i].tiers[t].unlocks[r]])
+        }
+      }
+    }
+  }
+  list={}
+  for(let a of Object.values(bazaar.products)){
+    list[a.product_id]={
+      id:a.product_id,
+      bz:{
+        sell:[a.quick_status.sellPrice,a.quick_status.sellVolume,a.sell_summary],
+        buy:[a.quick_status.buyPrice,a.quick_status.buyVolume,a.buy_summary]
+      }
+    }
+  }
+  for(let i of items.items){
+    let item=list[i.id]
+    if(!item)continue
+    item.name=i.name
+    item.npc=i.npc_sell_price
+  }
+  for(let i in craft){
+    let item=list[i]
+    if(!item){continue}
+    if(!item.name&&craft[i].name)item.name==craft[i].name
+    item.rarity=craft[i].base_rarity
+    item.wiki=craft[i].wiki
+    if(craft[i].recipe){
+      let out=[]
+      for(let t=0;t<9;t++){
+        out.push(Object.values(craft[i].recipe)[t].split(':'))
+      }
+  
+      (item.recipes??(item.recipes=[])).push({
+        craft:out,
+        count:craft[i].recipe.count??1,
+      })
+    }
+  }
+  listName={}
+  for(let a in list){
+    listName[list[a].name]=list[a]
+  }
+  for(let a of rewards){
+    if(!a[1].includes(' Recipe'))continue
+    let item=listName[a[1].substr(0,a[1].length-7)]
+    if(!item)continue
+    item.requirement=a[0]
+  }
+})()
+calc();
+  
+(updateBest=e=>{
+  let invest=Number(inputMoney.value.replace(/[^0-9.]/g, ''))
+  let itemMax=Number(inputMaxItem.value.replace(/[^0-9.]/g, ''))
+  
+  let a=[]
+  for(let b in list){
+    let item=list[b]
+    if(!item.npc)continue
+    if(item.bz.buy[1]<=0)continue
+  
+    let buyQ=0
+    let buyP=0
+    for(let i=0;i<item.bz.buy[2].length;i++){
+      let batch=item.bz.buy[2][i]
+      if(item.npc<=batch.pricePerUnit)break
+      let itemQ=Math.min(batch.amount,itemMax-buyQ,Math.floor((invest-buyP)/batch.pricePerUnit))
+      if(itemQ==0)break
+      buyQ+=itemQ
+      buyP+=itemQ*batch.pricePerUnit
+    }
+    if(buyQ==0)continue
+  
+    
+    a.push([
+      item.npc*buyQ-buyP,
+  `buying <b class="g">${item.name}</b> and selling to npc
+  buy price <b class="o">${localePad(buyP,16+5)}</b>
+  buy amount <b class="o">${localePad(buyQ,16+4)}</b>
+  npc sell price <b class="o">${localePad(item.npc,16)}</b>
+  profit <b class="o">${localePad(item.npc*buyQ-buyP,16+8)}</b>`
+    ])
+  }
+  
+  view.innerHTML=a.sort((a,b)=>b[0]-a[0]).map(e=>e[1]).join('\n\n')
+  scaleContent()
+})()
+inputMoney.onchange=updateBest
+inputMaxItem.onchange=updateBest
+
+reload.onclick=e=>{
+  let timer=performance.now()/1000
+  statusCard.textContent=`fetching ${performance.now()/1000-timer}`;
+  (fetch('https://api.hypixel.net/v2/skyblock/bazaar').then(e=>e.json()).catch(e=>0)).then(e=>{
+    bazaar=e
+    calc()
+    updateBest()
+    statusCard.textContent=`done ${performance.now()/1000-timer}`
+  })
+}
+statusCard.textContent=`done ${performance.now()/1000-timer}`
+console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
+})()
   </script>
 </body>
 </html>
