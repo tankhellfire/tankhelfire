@@ -14,20 +14,24 @@
 <body>
   <h1 id="statusCard">awaiting js</h1>
   <script>
-    (async()=>{
+    (async()=>{//https://api.mojang.com/users/profiles/minecraft/TankheIIfire
       statusCard.textContent='importing'
 
 
       statusCard.textContent='fetching'
       await new Promise(resolve => setTimeout(resolve, 0));
       
-      bz=await (await fetch('https://api.hypixel.net/v2/skyblock/bazaar')).json()
+      [bazaar,collections]=await Promise.all([
+        fetch('https://api.hypixel.net/v2/skyblock/bazaar').then(e=>e.json()),
+        fetch('https://api.hypixel.net/v2/resources/skyblock/collections').then(e=>e.json()),
+        fetch('craft.json').then(e=>e.json()).catch(e=>fetch('https://tankhellfire.glitch.me/hyp/craft.json').then(e=>e.json()))//https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json
+      ])
       
       statusCard.textContent='loading'
       await new Promise(resolve => setTimeout(resolve, 0));
 
       let out=''
-      Object.values(bz.products).map(({product_id,quick_status})=>out+=`${product_id}
+      Object.values(bazaar.products).map(({product_id,quick_status})=>out+=`${product_id}
 buy
 ${quick_status.sellPrice}
 ${quick_status.sellVolume}
@@ -40,7 +44,7 @@ ${quick_status.buyVolume}
       document.body.appendChild(document.createElement('pre')).textContent=out
       
       statusCard.remove()
-      clog(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
+      console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
     })()
   </script>
 </body>
