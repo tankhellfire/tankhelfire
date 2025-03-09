@@ -152,11 +152,15 @@ calc();
     
     a.push([
       item.npc*buyQ-buyP,
-  `buying <b class="g">${item.name}</b> and selling to npc
-  buy price <b class="o">${localePad(buyP,16+5)}</b>
-  buy amount <b class="o">${localePad(buyQ,16+4)}</b>
-  npc sell price <b class="o">${localePad(item.npc,16)}</b>
-  profit <b class="o">${localePad(item.npc*buyQ-buyP,16+8)}</b>`
+`buying <b class="g">${item.name}</b> and selling to npc
+${item.wiki}
+  buy PQ <b class="o">${localePad(buyP,13)}</b>
+  
+  buy Q <b class="o">${localePad(buyQ,14)}</b>
+  buy P <b class="o">${localePad(item.bz.buy[2][0].pricePerUnit,14)}</b>
+  npc sP <b class="o">${localePad(item.npc,13)}</b>
+  
+  profit <b class="o">${localePad(item.npc*buyQ-buyP,13)}</b>`
     ])
   }
   
