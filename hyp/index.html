@@ -23,7 +23,7 @@
       
       [bazaar,collections]=await Promise.all([
         fetch('https://api.hypixel.net/v2/skyblock/bazaar').then(e=>e.json()),
-        fetch('collections.json').then(e=>e.json()).catch(e=>fetch('https://tankhellfire.glitch.me/hyp/collections.json').then(e=>e.json())),
+        fetch('collections.json').then(e=>e.json()).catch(e=>fetch('https://tankhellfire.glitch.me/hyp/collections.json').then(e=>e.json())),//https://api.hypixel.net/v2/resources/skyblock/collections
         fetch('craft.json').then(e=>e.json()).catch(e=>fetch('https://tankhellfire.glitch.me/hyp/craft.json').then(e=>e.json()))//https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json
       ])
       
