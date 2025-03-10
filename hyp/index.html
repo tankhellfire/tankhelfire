@@ -24,10 +24,11 @@
   </style>
 </head>
 <body>
+  <input type="text" id="inputMoney" placeholder="investment" value="1,000,000">
+  <input type="text" id="inputMaxItem" placeholder="max items" value="1,344">
+  <input type="text" id="tax" placeholder="tax .01%" value="1.25">
+  <button id="reload">reload</button>
   <div id="display">
-    <input type="text" id="inputMoney" placeholder="investment" value="1,000,000">
-    <input type="text" id="inputMaxItem" placeholder="xax items" value="1,344">
-    <button id="reload">reload</button>
     <pre id="statusCard">awaiting js</pre>
     <pre id="view"></pre>
   </div>
@@ -130,6 +131,7 @@ calc();
 (updateBest=e=>{
   let invest=Number(inputMoney.value.replace(/[^0-9.]/g, ''))
   let itemMax=Number(inputMaxItem.value.replace(/[^0-9.]/g, ''))
+  let trueTax=Number(tax.value.replace(/[^0-9.]/g, ''))+1
   
   let a=[]
   for(let b in list){
@@ -141,11 +143,11 @@ calc();
     let buyP=0
     for(let i=0;i<item.bz.buy[2].length;i++){
       let batch=item.bz.buy[2][i]
-      if(item.npc<=batch.pricePerUnit)break
-      let itemQ=Math.min(batch.amount,itemMax-buyQ,Math.floor((invest-buyP)/batch.pricePerUnit))
+      if(item.npc<=batch.pricePerUnit*trueTax)break
+      let itemQ=Math.min(batch.amount,itemMax-buyQ,Math.floor((invest-buyP)/batch.pricePerUnit*trueTax))
       if(itemQ==0)break
       buyQ+=itemQ
-      buyP+=itemQ*batch.pricePerUnit
+      buyP+=itemQ*batch.pricePerUnit*trueTax
     }
     if(buyQ==0)continue
   
@@ -157,7 +159,7 @@ ${item.wiki}
   buy PQ <b class="o">${localePad(buyP,13)}</b>
   
   buy Q <b class="o">${localePad(buyQ,14)}</b>
-  buy P <b class="o">${localePad(item.bz.buy[2][0].pricePerUnit,14)}</b>
+  buy P <b class="o">${localePad(buyP/buyQ,14)}</b>
   npc sP <b class="o">${localePad(item.npc,13)}</b>
   
   profit <b class="o">${localePad(item.npc*buyQ-buyP,13)}</b>`
