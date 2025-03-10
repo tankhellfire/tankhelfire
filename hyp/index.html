@@ -131,7 +131,7 @@ calc();
 (updateBest=e=>{
   let invest=Number(inputMoney.value.replace(/[^0-9.]/g, ''))
   let itemMax=Number(inputMaxItem.value.replace(/[^0-9.]/g, ''))
-  let trueTax=Number(tax.value.replace(/[^0-9.]/g, ''))+1
+  let trueTax=Number(tax.value.replace(/[^0-9.]/g, ''))/100+1
   
   let a=[]
   for(let b in list){
