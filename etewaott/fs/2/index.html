@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <title>name</title>
+  <title>fs</title>
   <script src="/new.js"></script>
   <script src="../../../lib/lib.js"></script>
   <script src="../../../lib/fs.js"></script>
@@ -20,11 +20,11 @@
       
       await loading('importing')
       
-      if(typeof lib=='undefined'){
-        await loading('importing/lib')
-        lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text())
-      }
       if(typeof Fs=='undefined'){
+        if(typeof lib=='undefined'){
+          await loading('importing/lib')
+          lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text())
+        }
         await loading('importing/fs')
         Fs=await lib('fs.js')
       }
