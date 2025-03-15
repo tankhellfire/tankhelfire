@@ -1,4 +1,4 @@
-class Fs {
+ class Fs {
   constructor(id) {
     this.element = fileDirs.appendChild(document.createElement("div"))//
     this.element.id = "dir" + id;//
