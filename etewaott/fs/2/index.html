@@ -46,7 +46,6 @@
 
         out.button.onclick = async () => {
           out.fs=new Fs(await window.showDirectoryPicker({id:`etewaottFs${out.id}`}))
-          let a=0
           await out.fs.setup()
           // await out.refreshAll()
           out.text.innerText = out.fs.handle.name
