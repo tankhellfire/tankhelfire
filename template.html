@@ -15,7 +15,7 @@
   <h1 id="statusCard">awaiting js</h1>
   <script>
     (async()=>{
-      loading=async(t)=>console.log(statusCard.textContent=t)
+      loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
       
       await loading('importing')
 
