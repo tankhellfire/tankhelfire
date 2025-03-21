@@ -14,7 +14,7 @@
 </head>
 <body>
   <h1 id="statusCard">awaiting js</h1>
-  <input type="text" id="dpi" placeholder="dpi" value="300">
+  <input type="text" id="dpi" placeholder="dpi" value="6">
   <canvas id="can" style="image-rendering:pixelated;"></canvas>
   <script>
 (async()=>{
@@ -60,25 +60,13 @@ draw=()=>{
   }
 }
 
-await loading('please click')
-
-let h=e=>{
-  document.removeEventListener("click",h);
-  (async()=>{
-
-
 await loading('loading')
-numImg=await bti(await(await showOpenFilePicker())[0].getFile())
+numImg=await bti(await fetch('0-9.png').catch(e=>fetch('https://tankhellfire.glitch.me/img/0-9.png')).then(e=>e.blob()))
 
 draw()
 dpi.onchange=draw
 
 statusCard.remove()
-
-
-  })()
-}
-document.addEventListener("click",h)
   
 })()
   </script>
