@@ -47,7 +47,7 @@
   D.text.innerText="click to set location"
   
   D.button.onclick=async()=>{
-    D.fs=new Fs((await fsdb.get('D'))??await fsdb.set('D',new Fs(await window.showDirectoryPicker({id:`D`}))))
+    D.fs=new Fs((await fsdb.get('D'))??await fsdb.set('D',await window.showDirectoryPicker({id:`D`})))
     
     D.text.innerText='setting up'
     D.text.innerText=`${D.fs.handle.name} ${await D.fs.setup()}`
