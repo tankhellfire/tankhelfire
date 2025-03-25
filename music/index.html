@@ -141,6 +141,7 @@
       const playPauseButton = document.getElementById('playPauseButton');
       DDir=undefined
       songList=undefined
+      songNum=null
 
       const mediaSession = navigator.mediaSession.metadata = new MediaMetadata()
 
@@ -192,17 +193,22 @@
 
       getRandomSong.onclick=async()=>{
         if(!songList)return;
-        loadMusic(await DDir.get(songList[Math.floor(Math.random()*songList.length)].local.path).read())
+        loadMusic(await DDir.get(songList[songNum++%songList.length]).read())
       }
       
       openFs.onclick=async()=>{
         let a=new Fs(await window.showDirectoryPicker({id:`D`}))
         let t=await a.setup()
-        songList=a.metadata.filter(e=>e?.public?.tankhellfire?.music).sort((a,b)=>(a.local.path.join('/')>b.local.path.join('/'))*2-1)
+        songList=a.metadata.filter(e=>e?.public?.tankhellfire?.music).map(e=>e.local.path)
+        for(let i=songList.length-1;0<i;i--){
+          let j=Math.floor(Math.random()*(i + 1));
+          [songList[i],songList[j]]=[songList[j],songList[i]]
+        }
+        songNum=0
         DDir=a
         FsOpt.hidden=0
         FsName.innerText=DDir.handle.name
-        FsTime.innerText=Math.round(t*100)/100
+        FsTime.innerText=t
       }
 
       
