@@ -119,10 +119,14 @@
       <input style="width:100%;height: 20px;" type="range" id="seekBar" class="slider" step="0.01">
       <div id="FsDiv">
         <button id="openFs" title="import a repo (etewaott)">D</button>
-        <div id="FsOpt" style="padding:20px" hidden>
-          <span id="FsName" title="file sys name">uhh</span>
-          <span id="FsTime" title="load time(s)">uhh</span>
-          <input type="text" id="MusicTag" title="MusicTag" placeholder="MusicTag" value="music">
+        <div id="FsOpt" hidden>
+          <div style="padding:20px" >
+            <span id="FsName" title="file sys name">uhh</span>
+            <span id="FsTime" title="load time(s)">uhh</span>
+          </div>
+          <div style="padding:20px">
+            <button id="getRandomSong" title="get a random song">rand</button>
+          </div>
         </div>
       </div>
     </div>
@@ -136,6 +140,7 @@
       const thumbnail = document.getElementById('thumbnail');
       const playPauseButton = document.getElementById('playPauseButton');
       DDir=undefined
+      songList=undefined
 
       const mediaSession = navigator.mediaSession.metadata = new MediaMetadata()
 
@@ -183,19 +188,29 @@
           return pngDataURL;
       }
 
+
+
+      getRandomSong.onclick=async()=>{
+        if(!songList)return;
+        loadMusic(await DDir.get(songList[Math.floor(Math.random()*songList.length)].local.path).read())
+      }
       
-      fileInput.addEventListener('change',loadMusic)
       openFs.onclick=async()=>{
-        let a=new Fs(await window.showDirectoryPicker({id:`etewaottFsD`}))
+        let a=new Fs(await window.showDirectoryPicker({id:`D`}))
         let t=await a.setup()
+        songList=a.metadata.filter(e=>e?.public?.tankhellfire?.music).sort((a,b)=>(a.local.path.join('/')>b.local.path.join('/'))*2-1)
         DDir=a
         FsOpt.hidden=0
         FsName.innerText=DDir.handle.name
         FsTime.innerText=Math.round(t*100)/100
       }
+
       
-      function loadMusic(){
-        const file = fileInput.files[0];
+
+      
+      
+      fileInput.addEventListener('change',e=>loadMusic(fileInput.files[0]))
+      function loadMusic(file){
         if (!file){return /*alert("no file")*/}
         h2Title.textContent=title.textContent = mediaSession.title = file.name
 
@@ -258,7 +273,7 @@
       playPauseButton.addEventListener('click', pausePlay)
       thumbnail.addEventListener('click', pausePlay)
       function pausePlay(){
-        if(fileInput.files.length&&audioPlayer.src==='')return loadMusic()
+        if(fileInput.files.length&&audioPlayer.src==='')return loadMusic(fileInput.files[0])
         else if (audioPlayer.paused || audioPlayer.ended) {
           audioPlayer.play();
           playPauseButton.textContent = 'Pause';
