@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="en" oncontextmenu="return false"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="light dark"><title>
+pig
+</title><script src="/new.js"></script><style>
+    *{margin:0;padding:0;overflow:hidden;background-color:#000;font-family:Consolas,monospace}
+    video{position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:fill;}
+</style></head><body>
+<video autoplay loop muted><source src="../assets/vod/pig.mp4" type="video/mp4"></video>
+<script>
+[move,size]=[]
+window.onmousedown=e=>move=1
+window.onmouseup=e=>move=0
+this.onmousemove=e=>{
+move&&this.moveBy(e.movementX,e.movementY);
+size&&this.resizeBy(e.movementX,e.movementY);
+}
+this.onkeydown=e=>{
+e.key=='d'&&this.open('index.html','',`popup=1,width=${this.innerWidth},height=${this.innerHeight},left=${this.screenX},top=${this.screenY}`);
+e.key=='c'&&this.close();
+e.key=='w'&&(move=1);
+e.key=='s'&&(size=1);
+}
+this.onkeyup=e=>{
+e.key=='w'&&(move=0);
+e.key=='s'&&(size=0);
+}
+</script></body></html>

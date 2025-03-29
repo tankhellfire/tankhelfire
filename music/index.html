@@ -100,7 +100,7 @@
       }
     </style>
   </head>
-  <body>
+  <body style="padding:20px;padding-top:0px">
     <div class="player-container">
       <h2 id="h2Title">music</h2>
       <div>
@@ -120,12 +120,15 @@
       <div id="FsDiv">
         <button id="openFs" title="import a repo (etewaott)">D</button>
         <div id="FsOpt" hidden>
-          <div style="padding:20px" >
+          <div>
             <span id="FsName" title="file sys name">uhh</span>
             <span id="FsTime" title="load time(s)">uhh</span>
           </div>
-          <div style="padding:20px">
+          <div>
             <button id="getRandomSong" title="get a random song">rand</button>
+          </div>
+          <div>
+            <span style="display:block;overflow: hidden;white-space: nowrap;width: calc( 100vw - 40px )" id="upList"></span>
           </div>
         </div>
       </div>
@@ -190,10 +193,29 @@
       }
 
 
+      updateUpList=()=>{
+        songNum%=songList.length
+        let ad=(n,s='-')=>{
+          let e=songList[n]
+          b.push(s+e[e.length-1])
+        }
+        let b=[]
+        let c=0
+        for(let a=Math.max(songNum-5,0);a<songNum;a++){
+          ad(a)
+        }
+        ad(songNum,'+')
+        for(let a=songNum+1;a<songNum+5;a++){
+          ad(a)
+        }
+        upList.innerText=b.join('\n')
+      }
+
 
       getRandomSong.onclick=async()=>{
         if(!songList)return;
-        loadMusic(await DDir.get(songList[songNum++%songList.length]).read())
+        updateUpList()
+        loadMusic(await DDir.get(songList[songNum++]).read())
       }
       
       openFs.onclick=async()=>{
@@ -209,6 +231,7 @@
         FsOpt.hidden=0
         FsName.innerText=DDir.handle.name
         FsTime.innerText=t
+        updateUpList()
       }
 
       
