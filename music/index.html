@@ -125,231 +125,256 @@
             <span id="FsTime" title="load time(s)">uhh</span>
           </div>
           <div>
-            <button id="getRandomSong" title="get a random song">rand</button>
+            <button id="lastSong" title="play the last song">Last</button>
+            <button id="nextSong" title="play the next song">Next</button>
           </div>
           <div>
-            <span style="display:block;overflow: hidden;white-space: nowrap;width: calc( 100vw - 40px )" id="upList"></span>
+            <div id="upList"></span>
           </div>
         </div>
       </div>
     </div>
     <audio id="audioPlayer" loop hidden autoplay></audio>
-    <script>
-      const fileInput = document.getElementById('fileInput');
-      const audioPlayer = document.getElementById('audioPlayer');
-      const seekBar = document.getElementById('seekBar');
-      const currentTimeDisplay = document.getElementById('currentTime');
-      const totalTimeDisplay = document.getElementById('totalTime');
-      const thumbnail = document.getElementById('thumbnail');
-      const playPauseButton = document.getElementById('playPauseButton');
-      DDir=undefined
-      songList=undefined
-      songNum=null
+<script>
+const fileInput = document.getElementById('fileInput');
+const audioPlayer = document.getElementById('audioPlayer');
+const seekBar = document.getElementById('seekBar');
+const currentTimeDisplay = document.getElementById('currentTime');
+const totalTimeDisplay = document.getElementById('totalTime');
+const thumbnail = document.getElementById('thumbnail');
+const playPauseButton = document.getElementById('playPauseButton');
+DDir=undefined
+songList=undefined
+songNum=null
 
-      const mediaSession = navigator.mediaSession.metadata = new MediaMetadata()
+const mediaSession = navigator.mediaSession.metadata = new MediaMetadata()
 
-      function formatTime(seconds) {
-        try {
-          const minutes = Math.floor(seconds / 60);
-          const secs = seconds % 60;
-          return `${minutes}:${secs < 10 ? '0' : ''}${secs.toFixed(2)}`;
-        } catch (e) {
-          alert(e)
-        }
+function formatTime(seconds) {
+  try {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs.toFixed(2)}`;
+  } catch (e) {
+    alert(e)
+  }
+}
+async function scaleToPNG(data, format,size) {
+    // Decode the base64 string to an image
+    const base64String = data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
+    const originalImageURL = `data:${format};base64,${btoa(base64String)}`;
+
+    // Create an Image element
+    const img = new Image();
+    img.src = originalImageURL;
+
+    // Wait for the image to load
+    await new Promise((resolve) => {
+        img.onload = resolve;
+    });
+
+    const canvas = document.createElement('canvas');
+    canvas.width = size/9*16;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    // Calculate the scaling factor to maintain aspect ratio
+    const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+
+    // Center the image on the canvas
+    const xOffset = (canvas.width - img.width * scale) / 2;
+    const yOffset = (canvas.height - img.height * scale) / 2;
+
+    // Draw the scaled image on the canvas
+    ctx.drawImage(img, xOffset, yOffset, img.width * scale, img.height * scale);
+
+    // Convert the canvas content to a PNG data URL
+    const pngDataURL = canvas.toDataURL('image/png');
+
+    return pngDataURL;
+}
+
+navigator.mediaSession.setActionHandler('previoustrack',lastSong.onclick=e=>null)
+navigator.mediaSession.setActionHandler('nexttrack',nextSong.onclick=e=>loadSongId(songNum+1))
+
+function adjustRange(a,b,c,d){
+  if(a<c){
+    b=c+b-a;
+    a=c;
+  }
+  if(d<b){
+    a=Math.max(d-b+a,c);
+    b=d;
+  }
+  return [a,b];
+}
+updateUpList=id=>{
+  upList.innerText=''
+  
+  let [min,max]=adjustRange(
+    songNum-4,songNum+5,
+    0,songList.length
+  )
+  
+  for(let a=min;a<max;a++){
+    let n=songList[a]
+
+    if(upList.children.length)upList.appendChild(document.createElement('br'))
+    let ele=document.createElement('span')
+    
+    ele.innerText=n[n.length-1]
+    ele.style.color=`hwb(${a*200} ${(songNum==a)?100:0} 0)`
+
+    ele.onclick=e=>loadSongId(a)
+    
+    upList.appendChild(ele)
+  }
+}
+
+loadSongId=id=>{
+  if(id<0||songList.length<=id)return 0;
+  if(!songList)return 0;
+
+  navigator.mediaSession.setActionHandler('previoustrack',lastSong.onclick=0<id?
+    e=>loadSongId(songNum-1):null
+  )
+  navigator.mediaSession.setActionHandler('nexttrack',nextSong.onclick=id<songList.length-1?
+    e=>loadSongId(songNum+1):null
+  )
+  
+  songNum=id
+  updateUpList(id)
+  return DDir.get(songList[id]).read().then(res=>loadMusic(res))
+}
+
+openFs.onclick=async()=>{
+  let a=new Fs(await window.showDirectoryPicker({id:`D`}))
+  let t=await a.setup()
+  songList=a.metadata.filter(e=>e?.public?.tankhellfire?.music).map(e=>e.local.path)
+  for(let i=songList.length-1;0<i;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [songList[i],songList[j]]=[songList[j],songList[i]]
+  }
+  songNum=-1
+  DDir=a
+  FsOpt.hidden=0
+  FsName.innerText=DDir.handle.name
+  FsTime.innerText=t
+  updateUpList(0)
+}
+
+
+fileInput.addEventListener('change',e=>loadMusic(fileInput.files[0]))
+function loadMusic(file){
+  if (!file){return /*alert("no file")*/}
+  h2Title.textContent=title.textContent = mediaSession.title = file.name
+
+  const fileURL = URL.createObjectURL(file);
+  audioPlayer.src = fileURL;
+  //audioPlayer.load();
+  audioPlayer.volume = 1-volume.value
+
+  // Extract metadata using jsmediatags
+  jsmediatags.read(file, {
+    onSuccess: async(tag)=> {
+      const {picture} = tag.tags;
+      if (picture) {
+        const data = picture.data;
+        const format = picture.format;
+        // const base64String = data.reduce( (acc, byte) => acc + String.fromCharCode(byte), '');
+        const thumbnailURL = await scaleToPNG(data,format,720)//`data:${format};base64,${btoa(base64String)}`;
+        icon.href = thumbnail.src = thumbnailURL
+          
+        thumbnail.style.display = 'block';
+        mediaSession.artwork = [{
+          src: thumbnailURL
+        }];
       }
-      async function scaleToPNG(data, format,size) {
-          // Decode the base64 string to an image
-          const base64String = data.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
-          const originalImageURL = `data:${format};base64,${btoa(base64String)}`;
+    }
+    ,
+    onError: (error) => {
+      console.log('Error reading metadata:', error);
+    }
+  });
 
-          // Create an Image element
-          const img = new Image();
-          img.src = originalImageURL;
+  // Set up event listeners for the audio player
+  audioPlayer.addEventListener('loadedmetadata', () => {
+    seekBar.max = audioPlayer.duration;
+    totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
+  }
+  );
 
-          // Wait for the image to load
-          await new Promise((resolve) => {
-              img.onload = resolve;
-          });
+  seekBar.addEventListener('input', () => {
+    audioPlayer.currentTime = seekBar.value;
+  }
+  );
+};
 
-          const canvas = document.createElement('canvas');
-          canvas.width = size/9*16;
-          canvas.height = size;
-          const ctx = canvas.getContext('2d');
+function frame() {
+  seekBar.value = audioPlayer.currentTime;
+  currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
+  requestAnimationFrame(frame)
+}
+frame()
 
-          // Calculate the scaling factor to maintain aspect ratio
-          const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-
-          // Center the image on the canvas
-          const xOffset = (canvas.width - img.width * scale) / 2;
-          const yOffset = (canvas.height - img.height * scale) / 2;
-
-          // Draw the scaled image on the canvas
-          ctx.drawImage(img, xOffset, yOffset, img.width * scale, img.height * scale);
-
-          // Convert the canvas content to a PNG data URL
-          const pngDataURL = canvas.toDataURL('image/png');
-
-          return pngDataURL;
-      }
+volume.addEventListener('input',setVolume)
+function setVolume() {
+  audioPlayer.volume = 1-volume.value;
+  volDisplay.textContent=(Math.floor(100-volume.value*100)+"%").padStart('3',0).substring(0,3)
+}
 
 
-      updateUpList=()=>{
-        songNum%=songList.length
-        let ad=(n,s='-')=>{
-          let e=songList[n]
-          b.push(s+e[e.length-1])
-        }
-        let b=[]
-        let c=0
-        for(let a=Math.max(songNum-5,0);a<songNum;a++){
-          ad(a)
-        }
-        ad(songNum,'+')
-        for(let a=songNum+1;a<songNum+5;a++){
-          ad(a)
-        }
-        upList.innerText=b.join('\n')
-      }
+// Play/Pause Button
+playPauseButton.addEventListener('click', pausePlay)
+thumbnail.addEventListener('click', pausePlay)
+function pausePlay(){
+  if(fileInput.files.length&&audioPlayer.src==='')return loadMusic(fileInput.files[0])
+  else if (audioPlayer.paused || audioPlayer.ended) {
+    audioPlayer.play();
+    playPauseButton.textContent = 'Pause';
+  } else {
+    audioPlayer.pause();
+    playPauseButton.textContent = 'Play';
+  }
+}
 
-
-      getRandomSong.onclick=async()=>{
-        if(!songList)return;
-        updateUpList()
-        loadMusic(await DDir.get(songList[songNum++]).read())
-      }
-      
-      openFs.onclick=async()=>{
-        let a=new Fs(await window.showDirectoryPicker({id:`D`}))
-        let t=await a.setup()
-        songList=a.metadata.filter(e=>e?.public?.tankhellfire?.music).map(e=>e.local.path)
-        for(let i=songList.length-1;0<i;i--){
-          let j=Math.floor(Math.random()*(i + 1));
-          [songList[i],songList[j]]=[songList[j],songList[i]]
-        }
-        songNum=0
-        DDir=a
-        FsOpt.hidden=0
-        FsName.innerText=DDir.handle.name
-        FsTime.innerText=t
-        updateUpList()
-      }
-
-      
-
-      
-      
-      fileInput.addEventListener('change',e=>loadMusic(fileInput.files[0]))
-      function loadMusic(file){
-        if (!file){return /*alert("no file")*/}
-        h2Title.textContent=title.textContent = mediaSession.title = file.name
-
-        const fileURL = URL.createObjectURL(file);
-        audioPlayer.src = fileURL;
-        //audioPlayer.load();
-        audioPlayer.volume = 1-volume.value
-
-        // Extract metadata using jsmediatags
-        jsmediatags.read(file, {
-          onSuccess: async(tag)=> {
-            const {picture} = tag.tags;
-            if (picture) {
-              const data = picture.data;
-              const format = picture.format;
-              // const base64String = data.reduce( (acc, byte) => acc + String.fromCharCode(byte), '');
-              const thumbnailURL = await scaleToPNG(data,format,720)//`data:${format};base64,${btoa(base64String)}`;
-              icon.href = thumbnail.src = thumbnailURL
-                
-              thumbnail.style.display = 'block';
-              mediaSession.artwork = [{
-                src: thumbnailURL
-              }];
-            }
-          }
-          ,
-          onError: (error) => {
-            console.log('Error reading metadata:', error);
-          }
-        });
-
-        // Set up event listeners for the audio player
-        audioPlayer.addEventListener('loadedmetadata', () => {
-          seekBar.max = audioPlayer.duration;
-          totalTimeDisplay.textContent = formatTime(audioPlayer.duration);
-        }
-        );
-
-        seekBar.addEventListener('input', () => {
-          audioPlayer.currentTime = seekBar.value;
-        }
-        );
-      };
-
-      function frame() {
-        seekBar.value = audioPlayer.currentTime;
-        currentTimeDisplay.textContent = formatTime(audioPlayer.currentTime);
-        requestAnimationFrame(frame)
-      }
-      frame()
-      
-      volume.addEventListener('input',setVolume)
-      function setVolume() {
-        audioPlayer.volume = 1-volume.value;
-        volDisplay.textContent=(Math.floor(100-volume.value*100)+"%").padStart('3',0).substring(0,3)
-      }
-      
-
-      // Play/Pause Button
-      playPauseButton.addEventListener('click', pausePlay)
-      thumbnail.addEventListener('click', pausePlay)
-      function pausePlay(){
-        if(fileInput.files.length&&audioPlayer.src==='')return loadMusic(fileInput.files[0])
-        else if (audioPlayer.paused || audioPlayer.ended) {
-          audioPlayer.play();
-          playPauseButton.textContent = 'Pause';
-        } else {
-          audioPlayer.pause();
-          playPauseButton.textContent = 'Play';
-        }
-      }
-      
-      addEventListener("keydown",e=>{
-        let numcode=e.keyCode-48
-        if(['Space','KeyK'].includes(e.code)){
-          e.preventDefault()
-          pausePlay()
-          return
-        }
-        
-        if(['KeyW','ArrowUp'].includes(e.code)){
-          e.preventDefault()
-          volume.value=Number(volume.value)-.01
-          setVolume()
-          return
-        }
-        if(['KeyS','ArrowDown'].includes(e.code)){
-          e.preventDefault()
-          volume.value=Number(volume.value)+.01
-          setVolume()
-          return
-        }
-        
-        if(['KeyD','ArrowRight'].includes(e.code)){
-          e.preventDefault()
-          audioPlayer.currentTime+=5
-          return
-        }
-        if(['KeyA','ArrowLeft'].includes(e.code)){
-          e.preventDefault()
-          audioPlayer.currentTime-=5
-          return
-        }
-        
-        if(0<=numcode && numcode<=9){
-          e.preventDefault()
-          audioPlayer.currentTime=audioPlayer.duration/10*numcode
-          return
-        }
-      })
-    </script>
+addEventListener("keydown",e=>{
+  let numcode=e.keyCode-48
+  if(['Space','KeyK'].includes(e.code)){
+    e.preventDefault()
+    pausePlay()
+    return
+  }
+  
+  if(['KeyW','ArrowUp'].includes(e.code)){
+    e.preventDefault()
+    volume.value=Number(volume.value)-.01
+    setVolume()
+    return
+  }
+  if(['KeyS','ArrowDown'].includes(e.code)){
+    e.preventDefault()
+    volume.value=Number(volume.value)+.01
+    setVolume()
+    return
+  }
+  
+  if(['KeyD','ArrowRight'].includes(e.code)){
+    e.preventDefault()
+    audioPlayer.currentTime+=5
+    return
+  }
+  if(['KeyA','ArrowLeft'].includes(e.code)){
+    e.preventDefault()
+    audioPlayer.currentTime-=5
+    return
+  }
+  
+  if(0<=numcode && numcode<=9){
+    e.preventDefault()
+    audioPlayer.currentTime=audioPlayer.duration/10*numcode
+    return
+  }
+})
+</script>
   </body>
 </html>
