@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="color-scheme" content="light dark">
+    <link id="icon" rel="icon">
+    <title id="title">music</title>
+    <script src="../lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
+    <script src="../lib/fs.js"></script>
+    <style>
+      * {
+        font-family: Consolas, monospace;
+        padding:0;
+        margin:0;
+        touch-action:none;
+        /*cursor:pointer;*/
+      }
+      
+      .select {
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+        user-drag: none;
+        -webkit-user-select: none;
+        /* Safari */
+        -ms-user-select: none;
+        /* IE 10 and IE 11 */
+        user-select: none;
+        /* Standard syntax */
+      }
+    </style>
+  </head>
+  <body>
+    <h2 id="h2Title">music</h2>
+    
+    <button id="playPauseButton" class="play-pause">Play</button>
+    <input type="file" id="fileInput" accept="audio/*">
+    
+    <img id="thumbnail" class="thumbnail select" alt="Thumbnail">
+    <input type="range" id="volume" class="slider vertical" min="0" max="1" step="0.01" value=".25">
+    <span id="volDisplay">25%</span>
+    
+    <span id="currentTime">0:00.00</span>
+    <span id="totalTime">0:00.00</span>
+    
+    <input type="range" id="seekBar" class="slider" step="0.01">
+      
+    <button id="openFs" title="import a repo (etewaott)">D</button>
+    
+    
+    <div id="FsOpt" hidden>
+    <span id="FsName" title="file sys name">uhh</span>
+    <span id="FsTime" title="load time(s)">uhh</span>
+    <button id="lastSong" title="play the last song">Last</button>
+    <button id="nextSong" title="play the next song">Next</button>
+    <div id="upList"></div>
+    </div>
+      
+    <audio id="audioPlayer" loop hidden autoplay></audio>
+<script>
+DDir=undefined
+songList=undefined
+songNum=null
+
+KnuthShuffle=arr=>{
+for(let i=arr.length-1;0<i;i--){
+  let j=Math.floor(Math.random()*(i+1));
+  [arr[i],arr[j]]=[arr[j],arr[i]]
+}
+return arr
+}
+
+mediaSession=navigator.mediaSession.metadata=new MediaMetadata()
+
+function formatTime(seconds){
+  let secs=seconds%60;
+  return `${Math.floor(seconds/60)}:${secs<10?'0':''}${secs.toFixed(2)}`;
+}
+async function scaleToPNG(data,format,size){
+  let img=new Image()
+  img.src=`data:${format};base64,${btoa(data.reduce((acc,byte)=>acc+String.fromCharCode(byte),''))}`
+
+  await new Promise(res=>img.onload=res)
+
+  let canvas=document.createElement('canvas')
+  canvas.width=size/9*16
+  canvas.height=size
+
+  let scale=Math.min(canvas.width/img.width,canvas.height/img.height)
+
+  canvas.getContext('2d').drawImage(
+    img,
+    (canvas.width-img.width*scale)/2,(canvas.height-img.height*scale)/2,
+    img.width*scale,img.height*scale
+  )
+  return canvas.toDataURL('image/png')
+}
+
+updateUpList=id=>{
+  upList.innerText=''
+  
+  for(let a=0;a<songList.length;a++){
+    let n=songList[a]
+
+    if(upList.children.length)upList.appendChild(document.createElement('br'))
+    let ele=document.createElement('span')
+    
+    ele.innerText=n[n.length-1]
+
+    let str=n.join('/')
+    let hash=0
+    for(let i=0;i<str.length;i++){
+      hash=(hash<<5)-hash+str.charCodeAt(i)
+      hash=hash&hash
+    }
+    
+    ele.style.color=`oklch(1 ${(songNum==a)?0:1} ${Math.abs(hash%360)})`
+
+    ele.onclick=e=>loadSongId(a)
+    
+    upList.appendChild(ele)
+  }
+}
+
+loadSongId=id=>{
+  if(id<0||songList.length<=id)return 0;
+  if(!songList)return 0;
+
+  navigator.mediaSession.setActionHandler('previoustrack',lastSong.onclick=0<id?
+    e=>loadSongId(songNum-1):null
+  )
+  navigator.mediaSession.setActionHandler('nexttrack',nextSong.onclick=id<songList.length-1?
+    e=>loadSongId(songNum+1):null
+  )
+  
+  songNum=id
+  updateUpList(id)
+  return DDir.get(songList[id]).read().then(res=>loadMusic(res))
+}
+
+openFs.onclick=async()=>{
+  let a=new Fs(await window.showDirectoryPicker({id:`D`}))
+  let t=await a.setup()
+  songList=KnuthShuffle(a.metadata.filter(e=>e?.public?.tankhellfire?.music).map(e=>e.local.path))
+  songNum=-1
+  DDir=a
+  FsOpt.hidden=0
+  FsName.innerText=DDir.handle.name
+  FsTime.innerText=t
+  updateUpList(0)
+}
+
+fileInput.addEventListener('change',(loadMusic=file=>{
+  if(!file)return;
+  h2Title.textContent=title.textContent=mediaSession.title=file.name
+
+  audioPlayer.src=fileURL=URL.createObjectURL(file)
+  
+  audioPlayer.volume=1-volume.value
+
+  jsmediatags.read(file,{
+    onSuccess:async(tag)=>{
+      let {picture} = tag.tags;
+      if(picture){
+        thumbnail.style.display='block';
+        
+        mediaSession.artwork=[{
+          src:icon.href=thumbnail.src=await scaleToPNG(picture.data,picture.format,screen.height)
+        }];
+      }
+    },
+    onError:e=>console.error('Error reading metadata:',e)
+  })
+
+  // Set up event listeners for the audio player
+  audioPlayer.addEventListener('loadedmetadata',e=>totalTime.textContent=formatTime(seekBar.max=audioPlayer.duration))
+
+  seekBar.addEventListener('input',e=>audioPlayer.currentTime=seekBar.value)
+})(fileInput.files[0]))
+
+
+navigator.mediaSession.setActionHandler('previoustrack',lastSong.onclick=e=>null)
+navigator.mediaSession.setActionHandler('nexttrack',nextSong.onclick=e=>loadSongId(songNum+1))
+
+volume.addEventListener('input',setVolume=e=>
+  volDisplay.textContent=(100*(audioPlayer.volume=volume.value)+"%").padStart('3',0).substring(0,3)
+)
+
+playPauseButton.addEventListener('click',pausePlay=e=>{
+  if(fileInput.files.length&&audioPlayer.src==='')return loadMusic(fileInput.files[0])
+  else if(audioPlayer.paused||audioPlayer.ended){
+    audioPlayer.play()
+    playPauseButton.textContent='Pause'
+  }else{
+    audioPlayer.pause()
+    playPauseButton.textContent='Play'
+  }
+})
+thumbnail.addEventListener('click',pausePlay)
+
+addEventListener("keydown",e=>{
+  let numcode=e.keyCode-48
+  if(['Space','KeyK'].includes(e.code)){
+    e.preventDefault()
+    return pausePlay()
+  }
+  
+  if(['KeyW','ArrowUp'].includes(e.code)){
+    e.preventDefault()
+    volume.value=Number(volume.value)-.01
+    return setVolume()
+  }
+  if(['KeyS','ArrowDown'].includes(e.code)){
+    e.preventDefault()
+    volume.value=Number(volume.value)+.01
+    return setVolume()
+  }
+  
+  if(['KeyD','ArrowRight'].includes(e.code)){
+    e.preventDefault()
+    return audioPlayer.currentTime+=5
+  }
+  if(['KeyA','ArrowLeft'].includes(e.code)){
+    e.preventDefault()
+    return audioPlayer.currentTime-=5
+  }
+  
+  if(0<=numcode&&numcode<=9){
+    e.preventDefault()
+    return audioPlayer.currentTime=audioPlayer.duration/10*numcode
+  }
+});
+
+
+(frame=e=>{
+  seekBar.value = audioPlayer.currentTime;
+  currentTime.textContent = formatTime(audioPlayer.currentTime);
+  requestAnimationFrame(frame)
+})()
+</script>
+  </body>
+</html>
