@@ -13,8 +13,6 @@
         font-family: Consolas, monospace;
         padding:0;
         margin:0;
-        touch-action:none;
-        /*cursor:pointer;*/
       }
       
       .select {
@@ -36,26 +34,28 @@
     <h2 id="h2Title">music</h2>
     
     <button id="playPauseButton" class="play-pause">Play</button>
+    
     <input type="file" id="fileInput" accept="audio/*">
     
     <img id="thumbnail" class="thumbnail select" alt="Thumbnail">
+    
     <input type="range" id="volume" class="slider vertical" min="0" max="1" step="0.01" value=".25">
     <span id="volDisplay">25%</span>
     
     <span id="currentTime">0:00.00</span>
-    <span id="totalTime">0:00.00</span>
-    
     <input type="range" id="seekBar" class="slider" step="0.01">
-      
+    <span id="totalTime">0:00.00</span>
+
+    
     <button id="openFs" title="import a repo (etewaott)">D</button>
     
-    
     <div id="FsOpt" hidden>
-    <span id="FsName" title="file sys name">uhh</span>
-    <span id="FsTime" title="load time(s)">uhh</span>
-    <button id="lastSong" title="play the last song">Last</button>
-    <button id="nextSong" title="play the next song">Next</button>
-    <div id="upList"></div>
+      <span id="FsName" title="file sys name">uhh</span>
+      <span id="FsTime" title="load time(s)">uhh</span>
+      <button id="shuffleButton" title="shuffle the queue">shuffle</button>
+      <button id="lastSong" title="play the last song">Last</button>
+      <button id="nextSong" title="play the next song">Next</button>
+      <div id="upList"></div>
     </div>
       
     <audio id="audioPlayer" loop hidden autoplay></audio>
@@ -65,11 +65,11 @@ songList=undefined
 songNum=null
 
 KnuthShuffle=arr=>{
-for(let i=arr.length-1;0<i;i--){
-  let j=Math.floor(Math.random()*(i+1));
-  [arr[i],arr[j]]=[arr[j],arr[i]]
-}
-return arr
+  for(let i=arr.length-1;0<i;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]]
+  }
+  return arr
 }
 
 mediaSession=navigator.mediaSession.metadata=new MediaMetadata()
@@ -80,7 +80,7 @@ function formatTime(seconds){
 }
 async function scaleToPNG(data,format,size){
   let img=new Image()
-  img.src=`data:${format};base64,${btoa(data.reduce((acc,byte)=>acc+String.fromCharCode(byte),''))}`
+  img.src=URL.createObjectURL(new Blob([new Uint8Array(data)],{type:format}))
 
   await new Promise(res=>img.onload=res)
 
@@ -95,7 +95,9 @@ async function scaleToPNG(data,format,size){
     (canvas.width-img.width*scale)/2,(canvas.height-img.height*scale)/2,
     img.width*scale,img.height*scale
   )
-  return canvas.toDataURL('image/png')
+  return new Promise(res=>
+    canvas.toBlob(blob=>res(URL.createObjectURL(blob)),'image/png')
+  )
 }
 
 updateUpList=id=>{
@@ -143,7 +145,7 @@ loadSongId=id=>{
 openFs.onclick=async()=>{
   let a=new Fs(await window.showDirectoryPicker({id:`D`}))
   let t=await a.setup()
-  songList=KnuthShuffle(a.metadata.filter(e=>e?.public?.tankhellfire?.music).map(e=>e.local.path))
+  songList=a.metadata.filter(e=>e?.public?.tankhellfire?.music).map(e=>e.local.path)
   songNum=-1
   DDir=a
   FsOpt.hidden=0
@@ -184,6 +186,8 @@ fileInput.addEventListener('change',(loadMusic=file=>{
 navigator.mediaSession.setActionHandler('previoustrack',lastSong.onclick=e=>null)
 navigator.mediaSession.setActionHandler('nexttrack',nextSong.onclick=e=>loadSongId(songNum+1))
 
+shuffleButton.onclick=e=>KnuthShuffle(songList)+updateUpList()
+
 volume.addEventListener('input',setVolume=e=>
   volDisplay.textContent=(100*(audioPlayer.volume=volume.value)+"%").padStart('3',0).substring(0,3)
 )
@@ -206,15 +210,15 @@ addEventListener("keydown",e=>{
     e.preventDefault()
     return pausePlay()
   }
-  
+
   if(['KeyW','ArrowUp'].includes(e.code)){
     e.preventDefault()
-    volume.value=Number(volume.value)-.01
+    volume.value=Number(volume.value)+.01
     return setVolume()
   }
   if(['KeyS','ArrowDown'].includes(e.code)){
     e.preventDefault()
-    volume.value=Number(volume.value)+.01
+    volume.value=Number(volume.value)-.01
     return setVolume()
   }
   
