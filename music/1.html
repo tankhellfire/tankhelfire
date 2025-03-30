@@ -116,7 +116,7 @@ updateUpList=id=>{
       hash=hash&hash
     }
     
-    ele.style.color=`oklch(1 ${(songNum==a)?0:1} ${Math.abs(hash%360)})`
+    ele.style.color=`hwb(${Math.abs(hash%360)} ${(songNum==a)?100:0} 0)`
 
     ele.onclick=e=>loadSongId(a)
     
@@ -156,10 +156,10 @@ fileInput.addEventListener('change',(loadMusic=file=>{
   if(!file)return;
   h2Title.textContent=title.textContent=mediaSession.title=file.name
 
+  setVolume()
+  
   audioPlayer.src=fileURL=URL.createObjectURL(file)
   
-  audioPlayer.volume=1-volume.value
-
   jsmediatags.read(file,{
     onSuccess:async(tag)=>{
       let {picture} = tag.tags;
@@ -171,7 +171,7 @@ fileInput.addEventListener('change',(loadMusic=file=>{
         }];
       }
     },
-    onError:e=>console.error('Error reading metadata:',e)
+    onError:e=>console.error('Error reading metadata:',e,icon.href=thumbnail.src='')
   })
 
   // Set up event listeners for the audio player
