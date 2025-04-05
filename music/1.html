@@ -53,6 +53,7 @@
       <span id="FsName" title="file sys name">uhh</span>
       <span id="FsTime" title="load time(s)">uhh</span>
       <button id="shuffleButton" title="shuffle the queue">shuffle</button>
+      <button id="sortByTimeButton" title="sort By Time">sort By Time</button>
       <button id="lastSong" title="play the last song">Last</button>
       <button id="nextSong" title="play the next song">Next</button>
       <div id="upList"></div>
@@ -63,6 +64,25 @@
 DDir=undefined
 songList=undefined
 songNum=null
+
+songStartTime=null
+startedSong=null
+
+
+
+updateSongPlayTime=e=>{
+  if(songList&&startedSong)Fs.deepAssign(startedSong,{local:{tankhellfire:{music:{
+    watchTime:(startedSong?.local?.tankhellfire?.music?.watchTime??0)+performance.now()-songStartTime
+  }}}})
+  songStartTime=performance.now()
+  startedSong=songList[songNum]
+}
+  
+audioPlayer.onplay=e=>{
+  songList&&songList[songNum]&&(songStartTime=performance.now())
+  startedSong=songList[songNum]
+}
+audioPlayer.onpause=updateSongPlayTime
 
 KnuthShuffle=arr=>{
   for(let i=arr.length-1;0<i;i--){
@@ -104,7 +124,7 @@ updateUpList=id=>{
   upList.innerText=''
   
   for(let a=0;a<songList.length;a++){
-    let n=songList[a]
+    let n=songList[a].local.path
 
     if(upList.children.length)upList.appendChild(document.createElement('br'))
     let ele=document.createElement('span')
@@ -139,13 +159,13 @@ loadSongId=id=>{
   
   songNum=id
   updateUpList(id)
-  return DDir.get(songList[id]).read().then(res=>loadMusic(res))
+  return DDir.get(songList[id].local.path).read().then(res=>loadMusic(res))
 }
 
 openFs.onclick=async()=>{
   let a=new Fs(await window.showDirectoryPicker({id:`D`}))
   let t=await a.setup()
-  songList=a.metadata.filter(e=>e?.public?.tankhellfire?.music).map(e=>e.local.path)
+  songList=a.metadata.filter(e=>e?.public?.tankhellfire?.music)
   songNum=-1
   DDir=a
   FsOpt.hidden=0
@@ -156,6 +176,7 @@ openFs.onclick=async()=>{
 
 fileInput.addEventListener('change',(loadMusic=file=>{
   if(!file)return;
+  updateSongPlayTime()
   h2Title.textContent=title.textContent=mediaSession.title=file.name
 
   setVolume()
@@ -186,10 +207,21 @@ fileInput.addEventListener('change',(loadMusic=file=>{
 navigator.mediaSession.setActionHandler('previoustrack',lastSong.onclick=e=>null)
 navigator.mediaSession.setActionHandler('nexttrack',nextSong.onclick=e=>loadSongId(songNum+1))
 
-shuffleButton.onclick=e=>KnuthShuffle(songList)+updateUpList()
+shuffleButton.onclick=e=>{
+  let a=songList[songNum]
+  songNum=KnuthShuffle(songList).indexOf(a)
+  updateUpList()
+}
+
+sortByTimeButton.onclick=e=>{
+  updateSongPlayTime()
+  let a=songList[songNum]
+  songNum=KnuthShuffle(songList).sort((a,b)=>(a?.local?.tankhellfire?.music?.watchTime??0)-(b?.local?.tankhellfire?.music?.watchTime??0)).indexOf(a)
+  updateUpList()
+}
 
 volume.addEventListener('input',setVolume=e=>
-  volDisplay.textContent=(100*(audioPlayer.volume=volume.value)+"%").padStart('3',0).substring(0,3)
+  volDisplay.textContent=((100*(audioPlayer.volume=volume.value)).toFixed(0).padStart('2',0)+'%').substring(0,3)
 )
 
 playPauseButton.addEventListener('click',pausePlay=e=>{
