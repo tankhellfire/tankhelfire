@@ -1,4 +1,6 @@
 git remote add tankhellfire-github https://github.com/tankhellfire/tankhelfire.git
+git remote set-url tankhellfire-github https://your-username:your-token@github.com/tankhellfire/tankhelfire.git
+
 
 git add .
 git commit -a -m "msg"
