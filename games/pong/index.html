@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" oncontextmenu="//return false;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>n player pong</title>
+  <script src="/new.js"></script>
+  <script src="/lib/lib.js"></script>
+  <script src="../../lib/games/pong.js"></script>
+
+  <link rel="icon" type="image/png" sizes="60x60" href="../../assets/fin cat 16x.png">
+  
+  <link rel="alternate icon" type="image/png" sizes="32x32" href="https://tankhellfire.glitch.me/assets/fin cat 16x.png">
+  
+  <style>
+    *{margin:0;font-family:Consolas,monospace}
+  </style>
+</head>
+<body>
+  <h1 id="statusCard">awaiting js</h1>
+  <script>
+    (async()=>{
+      loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
+      
+      await loading('importing')
+
+      if(typeof lib=='undefined'){
+        lib=async(...e)=>(lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text()))(...e)
+      }
+      
+      await loading('loading')
+      
+      statusCard.remove()
+      console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
+    })()
+  </script>
+</body>
+</html>
