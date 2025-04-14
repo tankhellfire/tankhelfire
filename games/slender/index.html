@@ -19,6 +19,10 @@
 statusCard.textContent='importing'
 await new Promise(resolve => setTimeout(resolve, 0));
 
+if(typeof lib=='undefined'){
+  lib=async(...e)=>(lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text()))(...e)
+}
+  
 [
   THREE,
   {GLTFLoader},

@@ -19,21 +19,30 @@
 </head>
 <body>
   <h1 id="statusCard">awaiting js</h1>
-  <script>
-    (async()=>{
-      loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
-      
-      await loading('importing')
+<script>
+(async()=>{
+  loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
+  
+  await loading('importing')
 
-      if(typeof lib=='undefined'){
-        lib=async(...e)=>(lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text()))(...e)
-      }
-      
-      await loading('loading')
-      
-      statusCard.remove()
-      console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
-    })()
-  </script>
+  if(typeof lib=='undefined'){
+    lib=async(...e)=>(lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text()))(...e)
+  }
+  if(typeof Pong=='undefined'){
+    Pong=lib('games/pong.js')
+  }
+
+  [
+    Pong
+  ]=await Promise.all([
+    Pong
+  ])
+  
+  await loading('loading')
+  
+  statusCard.remove()
+  console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
+})()
+</script>
 </body>
 </html>
