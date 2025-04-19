@@ -39,6 +39,14 @@
   ])
   
   await loading('loading')
+
+  host=new Pong()
+  clients=[]
+  
+  for(let i=0;i<10;i++){
+    clients.push(new Pong({host:{send:e=>{host.receive(e,i)}}}))
+    host.addPlayer(e=>{clients[i].receive(e,null)})
+  }
   
   statusCard.remove()
   console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")

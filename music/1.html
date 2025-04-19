@@ -61,7 +61,7 @@
       
     <audio id="audioPlayer" loop hidden autoplay></audio>
 <script>
-DDir=undefined
+DDir=undefined//setInterval(e=>console.log(DDir.saveMetadata()),1000*60)
 songList=undefined
 songNum=null
 
@@ -69,6 +69,7 @@ songStartTime=null
 startedSong=null
 
 updateSongPlayTime=e=>{
+  if(!songList)return;
   if(songList&&startedSong)Fs.deepAssign(startedSong,{local:{tankhellfire:{music:{
     watchTime:(startedSong?.local?.tankhellfire?.music?.watchTime??0)+performance.now()-songStartTime
   }}}})
@@ -77,6 +78,7 @@ updateSongPlayTime=e=>{
 }
   
 audioPlayer.onplay=e=>{
+  if(!songList)return;
   songList&&songList[songNum]&&(songStartTime=performance.now())
   startedSong=songList[songNum]
 }
@@ -172,7 +174,7 @@ openFs.onclick=async()=>{
   updateUpList(0)
 }
 
-fileInput.addEventListener('change',(loadMusic=file=>{
+loadMusic=file=>{
   if(!file)return;
   updateSongPlayTime()
   h2Title.textContent=title.textContent=mediaSession.title=file.name
@@ -199,7 +201,9 @@ fileInput.addEventListener('change',(loadMusic=file=>{
   audioPlayer.addEventListener('loadedmetadata',e=>totalTime.textContent=formatTime(seekBar.max=audioPlayer.duration))
 
   seekBar.addEventListener('input',e=>audioPlayer.currentTime=seekBar.value)
-})(fileInput.files[0]))
+}
+  
+fileInput.addEventListener('change',e=>loadMusic(fileInput.files[0]))
 
 
 navigator.mediaSession.setActionHandler('previoustrack',lastSong.onclick=e=>null)
