@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>time</title>
+  <script src="../new.js"></script>
+  <style>
+    *{margin:0;font-family:Consolas,monospace;width:max-content;transform-origin:top left}
+  </style>
+</head>
+<body>
+  <h1 id=a>awaiting js</h1>
+  <script>
+    f=e=>{
+      a.textContent=((1746619200000-Date.now())/86400000).toFixed(6)
+      a.style.transform='scale('+Math.min(Math.ceil(window.innerWidth)/Math.floor(a.offsetWidth),Math.ceil(window.innerHeight)/Math.floor(a.offsetHeight))*.9+')'
+      requestAnimationFrame(f)
+    }
+    f()
+  </script>
+</body>
+</html>
