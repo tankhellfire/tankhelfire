@@ -22,7 +22,12 @@
       statusCard.textContent='loading'
       await new Promise(resolve=>setTimeout(resolve,0));
       
-      navigator.vibrate([200, 100, 200])
+      (async()=>{
+        while(1){
+          await new Promise(resolve=>setTimeout(resolve,10000-Date.now()%10000));
+          navigator.vibrate([200])
+        }
+      })()
       
       statusCard.remove()
       console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
