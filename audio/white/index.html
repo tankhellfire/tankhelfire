@@ -16,29 +16,115 @@
   </head>
   <body>
     <h1 id="statusCard">awaiting js</h1>
-    <script>
-      (async()=>{
-        statusCard.textContent = 'importing'
-        
-        statusCard.textContent = 'loading'
-        await new Promise(resolve => setTimeout(resolve, 0));
+    <canvas id="glcanvas"></canvas>
+<script>
+  (async()=>{
+    statusCard.textContent = 'importing'
+    
+    statusCard.textContent = 'loading'
+    await new Promise(resolve => setTimeout(resolve, 0));
 
-        audioCtx=new AudioContext;
-        await audioCtx.audioWorklet.addModule('audio.js');
-        const workletNode = new AudioWorkletNode(audioCtx, 'main', {
-          channelCount: 2,
-          channelCountMode: 'explicit',
-          channelInterpretation: 'speakers'
+    audioCtx=new AudioContext;
+    await audioCtx.audioWorklet.addModule('audio.js');
+    const workletNode = new AudioWorkletNode(audioCtx, 'main', {
+      channelCount: 2,
+      channelCountMode: 'explicit',
+      channelInterpretation: 'speakers'
+    });
+    workletNode.connect(audioCtx.destination);
+
+
+    function resizeCanvas(){
+      glcanvas.width=window.innerWidth;
+      glcanvas.height=window.innerHeight;
+      gl.viewport(0,0,glcanvas.width,glcanvas.height);
+    }
+    window.addEventListener("resize",resizeCanvas);
+
+
+
+    gl=glcanvas.getContext("webgl")
+
+    vert = `
+    attribute vec2 position;
+    void main() {
+        gl_Position = vec4(position, 0.0, 1.0);
+    }
+    `;
+    frag=`
+    precision mediump float;
+    uniform float time;
+    uniform vec2 resolution;
+    
+    float rand(vec2 co) {
+        return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+    }
+    
+    void main() {
+        vec2 uv = gl_FragCoord.xy / resolution.xy;
+        float r = rand(uv * time);
+        float g = rand(uv * (time + 5.0));
+        float b = rand(uv * (time + 10.0));
+        gl_FragColor = vec4(r, g, b, 1.0);
+    }
+    `;
+    
+    function compileShader(type,source){
+      let shader=gl.createShader(type);
+      gl.shaderSource(shader,source);
+      gl.compileShader(shader);
+      if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(shader));
+      return shader;
+    }
+    
+    program=gl.createProgram();
+    gl.attachShader(program,compileShader(gl.VERTEX_SHADER,vert));
+    gl.attachShader(program,compileShader(gl.FRAGMENT_SHADER,frag));
+    gl.linkProgram(program);
+    gl.useProgram(program);
+    
+    vertices=new Float32Array([-1,-1,1,-1,-1,1,1,1]);
+    buffer=gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
+    gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);
+    
+    position=gl.getAttribLocation(program,"position");
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
+    
+    timeUniform=gl.getUniformLocation(program,"time");
+    resolutionUniform=gl.getUniformLocation(program,"resolution");
+    
+    startTime=performance.now();
+    function draw(){
+      let t=(performance.now()-startTime)/1000;
+      gl.uniform1f(timeUniform,t);
+      gl.uniform2f(resolutionUniform,glcanvas.width,glcanvas.height);
+      gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+      requestAnimationFrame(draw);
+    }
+    
+    glcanvas.addEventListener("click",e=>{
+      if(document.fullscreenElement!==glcanvas){
+        glcanvas.requestFullscreen().then(e=>{
+          resizeCanvas();
+          glcanvas.requestPointerLock();
         });
-        workletNode.connect(audioCtx.destination);
-        
+      }else{
+        glcanvas.requestPointerLock();
+      }
+    });
+    
+    resizeCanvas();
+    draw();
+    
 
-        statusCard.remove()
-        clog(`%cload time: ${performance.now() / 1000}s`, "color:#0f0")
-        
-        document.addEventListener('click',e=>audioCtx.resume())
-        document.body.appendChild(document.createElement("div")).textContent='click to start'
-      })()
-    </script>
+    statusCard.remove()
+    clog(`%cload time: ${performance.now() / 1000}s`, "color:#0f0")
+    
+    document.addEventListener('click',e=>audioCtx.resume())
+    document.body.appendChild(document.createElement("div")).textContent='click to start'
+  })()
+</script>
   </body>
 </html>

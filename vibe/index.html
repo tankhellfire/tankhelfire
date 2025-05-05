@@ -27,7 +27,7 @@
           await new Promise(resolve=>setTimeout(resolve,10000-Date.now()%10000));
           navigator.vibrate([200])
         }
-      })()
+      })().catch(e=>alert(e))
       
       statusCard.remove()
       console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
