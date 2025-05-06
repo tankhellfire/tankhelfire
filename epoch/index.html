@@ -14,7 +14,7 @@
   <h1 id=a>awaiting js</h1>
   <script>
     f=e=>{
-      a.textContent=((1746619200000-Date.now())/86400000).toFixed(6)
+      a.textContent=(28-(Date.now()/86400000+.5)%28).toFixed(6)
       a.style.transform='scale('+Math.min(Math.ceil(window.innerWidth)/Math.floor(a.offsetWidth),Math.ceil(window.innerHeight)/Math.floor(a.offsetHeight))*.9+')'
       requestAnimationFrame(f)
     }
