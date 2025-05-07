@@ -14,11 +14,14 @@
   <h1 id=a>awaiting js</h1>
   <script>
     f=e=>{
-      a.textContent=(28-(Date.now()/86400000+.5)%28).toFixed(6)
+      a.innerHTML=(28-(Date.now()/86400000+.5)%28).toFixed(6)+'<br>'+(Math.floor((Date.now()/86400000+.5)/28)-720)
       a.style.transform='scale('+Math.min(Math.ceil(window.innerWidth)/Math.floor(a.offsetWidth),Math.ceil(window.innerHeight)/Math.floor(a.offsetHeight))*.9+')'
       requestAnimationFrame(f)
     }
     f()
+//(28-(Date.now()/86400000+.5)%28)
+//Math.floor((Date.now()/86400000+.5)/28)-720
+//n*2419200+20159.5*86400
   </script>
 </body>
 </html>
