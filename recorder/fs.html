@@ -19,86 +19,62 @@
   
   
   <script>
-setInterval(() => {
-// Dispatch a dummy mousemove event to simulate activity
-  document.dispatchEvent(new MouseEvent('mousemove', {
-    bubbles: true,
-    cancelable: true,
-    clientX: 0,
-    clientY: 0
-  }));
-}, 3000); // Trigger every 3 seconds (adjust as needed)
-    (async()=>{
-      //statusCard.textContent='importing'
-      statusCard.textContent='loading'
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      
-      audioChunks=[]
-      mediaRecorder=0
-      
-      
-      fs=new Fs
-      
-      selectDir.onclick=async()=>{
-        fs.dir=await window.showDirectoryPicker({id:"recorder-fs"}).catch(console.warn)
-        
-        if(fs.dir){
-          startBut.disabled = 0
-          selectDir.textContent=`/${fs.dir.name}/`
-          
-          
-          if(!mediaRecorder){
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
+(async()=>{
+  loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
+  await loading('loading')
+  
+  audioChunks=[]
+  mediaRecorder=0
+  fs=null
+  
+  selectDir.onclick=async()=>{
+    console.log('fs load time',await(fs=new Fs(await window.showDirectoryPicker({id:"recorder-fs"}).catch(console.warn))).setup())
+    
+    startBut.disabled=0
+    selectDir.textContent=`/${fs.handle.name}/`
+    
+    if(!mediaRecorder){
+      let stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      mediaRecorder=new MediaRecorder(stream);
 
-            mediaRecorder.ondataavailable=e=>{
-              if(e.data.size>0){
-                audioChunks.push(e.data);
-              }
-            };
+      mediaRecorder.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data)}
 
-            mediaRecorder.onstop=async()=>{
-              await (await fs.makeFromPath([`${Date.now()}.mp3`])).file.write(new Blob(audioChunks,{type:'audio/webm; codecs=opus'}))
-              audioChunks=[];
-            };
-          }
-          
-        }else{
-          startBut.disabled = 1
-          selectDir.textContent="select dir"
-        }
-        stopBut.disabled = 1
-      }
-      
-      startBut.addEventListener('click',e=>{
+      mediaRecorder.onstop=async()=>{
+        await(await fs.get([`${Date.now()}.webm`])).write(new Blob(audioChunks,{type:'audio/webm; codecs=opus'}))
+        audioChunks=[];
+      };
+    }
+    stopBut.disabled = 1
+  }
+  
+  startBut.addEventListener('click',e=>{
+    mediaRecorder.start();
+    startBut.disabled = 1;
+    stopBut.disabled = 0;
+
+    // Automatically stop and restart recording every minute
+    recordInterval=setInterval(e=>{
+      if(mediaRecorder.state==='recording'){
+        mediaRecorder.stop();
         mediaRecorder.start();
-        startBut.disabled = 1;
-        stopBut.disabled = 0;
+      }
+    }, 60000); // 1 minute = 60,000 ms
+  });
 
-        // Automatically stop and restart recording every minute
-        recordInterval = setInterval(() => {
-          if(mediaRecorder.state==='recording'){
-            mediaRecorder.stop();
-            mediaRecorder.start();
-          }
-        }, 60000); // 1 minute = 60,000 ms
-      });
+  stopBut.addEventListener('click',e=>{
+    clearInterval(recordInterval);
+    if(mediaRecorder.state === 'recording'){
+      mediaRecorder.stop()
+    }
+    startBut.disabled = 0;
+    stopBut.disabled = 1;
+  });
+  
+  
 
-      stopBut.addEventListener('click',e=>{
-        clearInterval(recordInterval);
-        if(mediaRecorder.state === 'recording'){
-          mediaRecorder.stop()
-        }
-        startBut.disabled = 0;
-        stopBut.disabled = 1;
-      });
-      
-      
-
-      statusCard.remove()
-      console.log(`load time: ${performance.now()/1000}s`)
-    })()
+  statusCard.remove()
+  console.log(`load time: ${performance.now()/1000}s`)
+})()
   </script>
 </body>
 </html>
