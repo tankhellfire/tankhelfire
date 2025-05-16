@@ -28,7 +28,7 @@
   fs=null
   
   selectDir.onclick=async()=>{
-    console.log('fs load time',await(fs=new Fs(await window.showDirectoryPicker({id:"recorder-fs"}).catch(console.warn))).setup())
+    console.log('fs load time',await(fs=new Fs(await window.showDirectoryPicker({id:"recorder-fs"}))).setup(0))
     
     startBut.disabled=0
     selectDir.textContent=`/${fs.handle.name}/`
@@ -53,10 +53,10 @@
     stopBut.disabled = 0;
 
     // Automatically stop and restart recording every minute
-    recordInterval=setInterval(e=>{
+    recordInterval=setInterval(async()=>{
       if(mediaRecorder.state==='recording'){
-        mediaRecorder.stop();
-        mediaRecorder.start();
+        await(await fs.get([`${Date.now()}.webm`])).write(new Blob(audioChunks,{type:'audio/webm; codecs=opus'}))
+        audioChunks=[];
       }
     }, 60000); // 1 minute = 60,000 ms
   });

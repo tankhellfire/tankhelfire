@@ -8,7 +8,6 @@
   <script src="/new.js"></script>
   <script src="../../../lib/lib.js"></script>
   <script src="../../../lib/fs.js"></script>
-  <script src="../../../lib/db.js"></script>
   <style>
     *{margin:0;font-family:Consolas,monospace}
   </style>
@@ -29,12 +28,6 @@
     await loading('importing/fs')
     Fs=await lib('fs.js')
   }
-  if(typeof Db=='undefined'){
-    await loading('importing/Db')
-    Fs=await lib('Db.js')
-  }
-
-  fsdb=await new Db('tankhellfire-fs-cache','fs-cache')
 
   
   await loading('loading')
@@ -47,7 +40,7 @@
   D.text.innerText="click to set location"
   
   D.button.onclick=async()=>{
-    D.fs=new Fs((await fsdb.get('D'))??await fsdb.set('D',await window.showDirectoryPicker({id:`D`})))
+    D.fs=new Fs(await window.showDirectoryPicker({id:'D'}),'D')
     
     D.text.innerText='setting up'
     D.text.innerText=`${D.fs.handle.name} ${await D.fs.setup()}`
@@ -67,10 +60,10 @@
     out.text.innerText = "click to set location"
 
     out.button.onclick = async () => {
-      out.fs=new Fs(await window.showDirectoryPicker({id:`etewaottFs${out.id}`}))
-      
-      // await out.refreshAll()
-      out.text.innerText=`${out.fs.handle.name} ${await out.fs.setup()}`
+      out.fs=new Fs(await window.showDirectoryPicker({id:`etewaottFs${out.id}`}),out.id)
+
+      out.text.innerText='setting up'
+      out.text.innerText=`${out.fs.handle.name} ${await D.fs.setup(0)}`
     }
   }
   newFs()
