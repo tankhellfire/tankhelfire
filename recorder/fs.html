@@ -1,76 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" oncontextmenu="//return false;">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>recorder with fs out</title>
-  <script src="../lib/lib.js"></script>
   <script src="../lib/fs.js"></script>
   <style>
     *{margin:0}
   </style>
 </head>
-<body style="font-family: Consolas, monospace;background-color: #000;color:#fff">
-  <h1 id="statusCard">awaiting js</h1>
+<body style="font-family:Consolas,monospace">
+  <h1 id=statusCard>awaiting js</h1>
   
-  <button id="selectDir">select dir</button>
-  <button id="startBut" disabled>start</button>
-  <button id="stopBut" disabled>stop</button>
-  
-  
+  <button id=selectDir>select dir</button>
+
   <script>
 (async()=>{
   loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
   await loading('loading')
   
-  audioChunks=[]
-  mediaRecorder=0
-  fs=null
-  
   selectDir.onclick=async()=>{
     console.log('fs load time',await(fs=new Fs(await window.showDirectoryPicker({id:"recorder-fs"}))).setup(0))
-    
-    startBut.disabled=0
     selectDir.textContent=`/${fs.handle.name}/`
     
-    if(!mediaRecorder){
-      let stream=await navigator.mediaDevices.getUserMedia({audio:true});
-      mediaRecorder=new MediaRecorder(stream);
+    stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRecorder=new MediaRecorder(stream,{mimeType:'audio/webm;codecs=opus'});
 
-      mediaRecorder.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data)}
-
-      mediaRecorder.onstop=async()=>{
-        await(await fs.get([`${Date.now()}.webm`])).write(new Blob(audioChunks,{type:'audio/webm; codecs=opus'}))
-        audioChunks=[];
-      };
+    mediaRecorder.ondataavailable=e=>{
+      console.log(e.data.slice(0,4).text())
+      if(0<e.data.size)fs.get([`${Date.now()}.webm`]).write(e.data)
     }
-    stopBut.disabled = 1
-  }
-  
-  startBut.addEventListener('click',e=>{
-    mediaRecorder.start();
-    startBut.disabled = 1;
-    stopBut.disabled = 0;
 
-    // Automatically stop and restart recording every minute
-    recordInterval=setInterval(async()=>{
-      if(mediaRecorder.state==='recording'){
-        await(await fs.get([`${Date.now()}.webm`])).write(new Blob(audioChunks,{type:'audio/webm; codecs=opus'}))
-        audioChunks=[];
-      }
-    }, 60000); // 1 minute = 60,000 ms
-  });
-
-  stopBut.addEventListener('click',e=>{
-    clearInterval(recordInterval);
-    if(mediaRecorder.state === 'recording'){
+    mediaRecorder.start()
+    
+    setInterval(e=>{
       mediaRecorder.stop()
-    }
-    startBut.disabled = 0;
-    stopBut.disabled = 1;
-  });
-  
-  
+      mediaRecorder.start()
+    },60_000);
+  }
 
   statusCard.remove()
   console.log(`load time: ${performance.now()/1000}s`)
