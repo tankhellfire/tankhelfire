@@ -32,12 +32,12 @@
       if(0<e.data.size)fs.get([`${Date.now()}.webm`]).write(e.data)
     }
 
-    mediaRecorder.start()
-    
     setInterval(e=>{
       mediaRecorder.stop()
       mediaRecorder.start()
-    },60_000);
+    },2_000);
+
+    mediaRecorder.start()
   }
 
   statusCard.remove()
