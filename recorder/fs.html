@@ -28,16 +28,10 @@
     mediaRecorder=new MediaRecorder(stream,{mimeType:'audio/webm;codecs=opus'});
 
     mediaRecorder.ondataavailable=e=>{
-      console.log(e.data.slice(0,4).text())
       if(0<e.data.size)fs.get([`${Date.now()}.webm`]).write(e.data)
     }
 
-    setInterval(e=>{
-      mediaRecorder.stop()
-      mediaRecorder.start()
-    },60_000);
-
-    mediaRecorder.start()
+    mediaRecorder.start(60_000)
   }
 
   statusCard.remove()
