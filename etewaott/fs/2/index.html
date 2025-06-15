@@ -43,7 +43,7 @@
     D.fs=new Fs(await window.showDirectoryPicker({id:'D'}),'D')
     
     D.text.innerText='setting up'
-    D.text.innerText=`${D.fs.handle.name} ${await D.fs.setup()}`
+    D.text.innerText=`${D.fs.handle.name} ${await D.fs.setup(['.etewaott'],0)}`
   }
   
   fs=[]

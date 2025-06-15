@@ -15,6 +15,23 @@
 <body>
   <button id=button>folder</button>
 <script>
+  const bySet=(a,b)=>{
+    let A=String(a?.id??a)
+    let B=String(b?.id??b)
+    if(A<B)return -1
+    if(A>B)return 1
+    return 0
+  }
+  const toSet=(a,v)=>{
+    a[String(v?.id??v)]=v
+    return a
+  }
+
+  const undef=Symbol('undefined')
+
+  const saveUndef=(_,v)=>v===undefined||v===undef?'__undefined__':v
+  const loadUndef=(_,v)=>v==='__undefined__'?undef:v
+  
   async function getGuildsFull(){
     return Object.fromEntries((await Promise.all((await getUsrGuilds()).map(e=>getGuild(e.id)))).map(e=>[e.id,e]))
   }
@@ -26,23 +43,23 @@
     return fetchWAbort(`${apiURL}/guilds/${guild}`,{headers:{authorization}}).then(e=>e.json())
   }
   function getGuildChannels(guild){
-    return fetchWAbort(`${apiURL}/guilds/${guild}/channels`,{headers:{authorization}}).then(e=>e.json())
+    return fetchWAbort(`${apiURL}/guilds/${guild}/channels`,{headers:{authorization}}).then(e=>e.json()).then(arr=>Object.fromEntries(arr.map(e=>[e.id,e])))
   }
   
   async function getAllChannelMsgs(channel){
-    let out=[]
-    let after=0
+    let out={}
+    let after=0n
     let i=0
     while(1){
-      let a=await getChannelMsgs(channel,{limit:100,after})
+      let a=await getChannelMsgs(channel,{limit:100,after:String(after)})
   
       if(a.length==0)break
-      for(let i=a.length-1;0<=i;i--) {
-        out.push(a[i])
+      for(let msg of a){
+        deepAssign(out[msg.id]={},msg)
+        if(after<BigInt(msg.id))after=BigInt(msg.id)
       }
       
-      console.log(i++,(Date.now()-Number(new Date(Number((BigInt(out[out.length-1].id)>>22n)+1420070400000n))))/1000/60/60/24)
-      after=a[0].id
+      console.log(i++,(Date.now()-Number((after>>22n)+1420070400000n))/1000/60/60/24)
     }
     return out
   }
@@ -101,27 +118,26 @@
           media.json
           media  name
   */
-  /*
-  [
-  {id:data},
-  <delta content>
-  ]
-  */
   
   function isob(obj){return typeof obj==='object'&&obj!==null}
 
   function findObjectDiff(a,b,maxDepth=100){
-    if(maxDepth<0)return null
-    let diff=Array.isArray(b)?[]:{}
+    if(maxDepth<0)return 'maxDepth'
+    let diff={}
     for(let key of new Set([...Object.keys(a),...Object.keys(b)])){
       let [ka,kb]=[a[key],b[key]]
+      if(ka===undefined)ka=undef
+      if(kb===undefined)kb=undef
+      
       if(ka===kb)continue
       
       if(isob(kb)){
         if(!isob(ka)){
-          ka=Array.isArray(kb)?[]:{}
+          ka={}
           diff[key]=ka
         }
+        if(Array.isArray(ka))ka=ka.reduce(toSet,{})
+        if(Array.isArray(kb))kb=kb.reduce(toSet,{})
         let subDiff=findObjectDiff(ka,kb,maxDepth-1)
         if(Object.keys(subDiff).length)diff[key]=subDiff
       continue}
@@ -131,49 +147,141 @@
     return diff
   }
 
-  function deepAssign(target,source,destructive=false,maxDepth=100){
-    for(let key in source){
-      if(source[key]===null){
-        target[key]=source[key]
-      continue}
-      if(destructive&&source[key]===undefined)continue
-
-      if(typeof source[key]==='object'){
-        if(target[key]===null||typeof target[key]!=='object')target[key]=Array.isArray(source[key])?[]:{}
-        deepAssign(target[key],source[key])
-      continue}
+  function deepAssign(to,from,destructive=false,maxDepth=100){
+    if(maxDepth<0)return 'maxDepth'
+    for(let key of Object.keys(from)){
+      let fk=from[key]
+      if(fk===undefined)fk=undef
       
-      target[key]=source[key]
+      if(!destructive&&fk===undef)continue
+      
+      if(isob(fk)){
+        if(!isob(to[key]))to[key]={}
+        if(Array.isArray(fk))fk=fk.reduce(toSet,{})
+        to[key]=deepAssign(to[key],fk,destructive,maxDepth-1)
+      continue}
+
+      to[key]=fk
     }
-    return target
+    return to
   }
 
-  async function run(usrId=usr){
-    if(typeof guilds==='undefined')guilds={}
 
-    localGuilds=f.get(['guilds.json']).read().then(e=>e.text()).then(e=>JSON.parse(e)).catch(_=>([]))
-    guilds[usrId]=await getGuildsFull()
-    localGuilds=await localGuilds
-
-
-    // cannonGuilds={}
-  // for(let capture of localGuilds){
-  //   for(let captureUser in capture){
-  //     deepAssign(cannonGuilds,capture[captureUser],false)
-  //   }
-  // }
-  // cannonGuilds
-  // let relativeGuilds={}
-  // for(let guildUser in guilds){
-  //   relativeGuilds[guildUser]=findObjectDiff(cannonGuilds,guilds[guildUser])
-  // }
-  // relativeGuilds
+  function loadUsr(objarr=[],archive,current){
+    let usrId=objarr.at(-1)
     
+    let ob=archive
+    for(let i=1;i<objarr.length-1;i++){
+      ob=ob[objarr[i]]
+    }
     
-    //await f.get(['guilds.json']).write(JSON.stringify(localGuilds))
+    let usrObj=ob[usrId]
+    if(!usrObj){
+      console.log(`making ${objarr.join('/')}`)
+      usrObj={}
+      ob[usrId]=usrObj
+    }
+
+    ob=current
+    for(let i=1;i<objarr.length-1;i++){
+      ob=ob[objarr[i]]
+    }
+    
+    let currentObj=ob[usrId]
+    if(!currentObj){
+      console.log(`setting up ${objarr.join('/')}`)
+      
+      currentObj={}
+      for(let timeStamp of Object.keys(usrObj).sort(bySet))deepAssign(currentObj,usrObj[timeStamp],true)
+      
+      ob[usrId]=currentObj
+    }
+    return {currentObj,usrObj}
   }
 
-  //Object.fromEntries(arr.map(e=>[e.id,e]))
+
+  let guilds=null
+  let currentGuilds=null
+  async function crawlUsr(){
+    if(!guilds){
+      console.log(`loading guilds`)
+      guilds=await f.get(['guilds.json']).read().then(e=>e.text()).then(e=>JSON.parse(e,loadUndef)).catch(_=>({}))
+      currentGuilds={}
+    }
+
+    let {usrObj:usrGuilds,currentObj:current}=loadUsr(['guilds',usr],guilds,currentGuilds)
+
+    let diff=findObjectDiff(current,await getGuildsFull())
+    usrGuilds[Date.now()]=diff
+    deepAssign(current,diff,true)
+    
+    return {current,diff}
+  }
+
+  let channels={}
+  let currentChannels={}
+  async function crawlGuild(guildId){
+    if(!channels[guildId]){
+      console.log(`loading channels/${guildId}`)
+      channels[guildId]=await f.get([guildId,'channels.json']).read().then(e=>e.text()).then(e=>JSON.parse(e,loadUndef)).catch(_=>({}))
+      currentChannels[guildId]={}
+    }
+
+    let {usrObj:usrChannels,currentObj:current}=loadUsr(['channels',guildId,usr],channels,currentChannels)
+    
+    let diff=findObjectDiff(current,await getGuildChannels(guildId))
+    usrChannels[Date.now()]=diff
+    deepAssign(current,diff,true)
+    
+    return {diff,current}
+  }
+
+
+// console.log(await crawlUsr())
+// for(let e in currentGuilds[usr]){if(guilds.ignore[e])continue;console.log(await crawlGuild(e))}
+// await f.get(['guilds.json']).write(JSON.stringify(guilds,saveUndef))
+// console.log(await Promise.all(Object.keys(currentChannels).map(e=>f.get([e,'channels.json']).write(JSON.stringify(channels[e],saveUndef)))))
+
+
+// let messages={}
+// let currentMessages={}
+// for(let guildId of Object.keys(currentChannels).sort(bySet)){
+//   if(guilds.ignore[guildId])continue
+//   let guild=currentChannels[guildId][usr]
+//   if(!guild)continue
+//   if(!messages[guildId]){
+//     console.log(`making messages/${guildId}`)
+//     messages[guildId]={}
+//     currentMessages[guildId]={}
+//   }
+  
+//   for(let channelId of Object.keys(guild).sort(bySet)){
+//     let channel=guild[channelId]
+//     if(!messages[guildId][channelId]){
+//       console.log(`loading messages/${guildId}/${channelId}`)
+//       messages[guildId][channelId]=await f.get([guildId,channelId,'msgs.json']).read().then(e=>e.text()).then(e=>JSON.parse(e,loadUndef)).catch(_=>({}))
+//       currentMessages[guildId][channelId]={}
+//     }
+  
+//     let {usrObj:usrMsg,currentObj:current}=loadUsr(['messages',guildId,channelId,usr],messages,currentMessages)
+
+//     console.log(`fetching ${currentGuilds[usr][guildId].name}/${channel.name}`)
+    
+//     let diff=findObjectDiff(current,await getAllChannelMsgs(channelId).catch(_=>undef))
+//     usrMsg[Date.now()]=diff
+//     deepAssign(current,diff,true)
+    
+//     console.log([currentGuilds[usr][guildId].name,channel.name,diff])
+//   }
+// }
+
+// for(let guid in currentMessages){
+//   for(let chuid in currentMessages[guid]){
+//     // await f.get([guid,chuid,'msgs.json']).write(JSON.stringify(messages[guid][chuid],saveUndef))
+//     console.log([currentGuilds[usr][guid].name,currentChannels[guid][usr][chuid].name],messages[guid][chuid])
+//   }
+// }
+
 </script>
 </body>
 </html>

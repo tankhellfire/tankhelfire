@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" oncontextmenu="//return false;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>name</title>
+  <script src="../lib/lib.js"></script>
+  <script src="../lib/fft.js"></script>
+  <style>
+    *{margin:0;font-family:Consolas,monospace}
+  </style>
+</head>
+<body>
+  <h1 id="statusCard">awaiting js</h1>
+  <script>
+    (async()=>{
+      loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
+      
+      await loading('importing')
+
+      
+// let file=await(await showOpenFilePicker())[0].getFile()
+// let input=(await(new (window.AudioContext || window.webkitAudioContext)()).decodeAudioData(await file.arrayBuffer())).getChannelData(0)
+
+// let size=4096
+// let f=new FFT(size)
+// let output=new Array(size).fill(0)
+// f.realTransform(output,input)
+      
+      await loading('loading')
+      
+      statusCard.remove()
+      console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
+    })()
+  </script>
+</body>
+</html>
