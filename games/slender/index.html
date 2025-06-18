@@ -21,7 +21,7 @@ statusCard.textContent='importing'
 await new Promise(resolve => setTimeout(resolve, 0));
 
 if(typeof lib=='undefined'){
-  lib=async(...e)=>(lib=eval(await(await fetch('https://tankhellfire.github.io/tankhelfire/lib/lib.js')).text()))(...e)
+  lib=async(...e)=>(lib=eval(await(await fetch(`${__dirname}lib/lib.js`)).text()))(...e)
 }
   
 [
