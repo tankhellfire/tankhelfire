@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>dis graph</title>
+  <script>__dirname='../../'</script>
+  <script src="../../new.js"></script>
+  <script src="../../lib/lib.js"></script>
+  <script src="../../lib/fs.js"></script>
+  <style>
+    *{margin:0;font-family:Consolas,monospace}
+  </style>
+</head>
+<body>
+  <h1 id="statusCard">awaiting js</h1>
+<script>
+function updateCanvas(){
+  let width=window.innerWidth
+  let height=window.innerHeight
+
+  renderer.setSize(width,height)
+  camera.aspect=width/height
+
+  camera.zoom=Math.min(1,width/height)
+  camera.updateProjectionMatrix()
+}
+  
+(async()=>{
+  loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
+  await loading('importing');
+  [
+    THREE,
+    {GLTFLoader}
+  ]=await Promise.all([
+    import(`${__dirname}lib/three/build/three.module.min.js`),
+    import(`${__dirname}lib/three/examples/jsm/loaders/GLTFLoader.js`)
+  ])
+
+  await loading('loading')
+
+  
+  THREE.Euler.DEFAULT_ORDER="YXZ"
+  
+  scene=new THREE.Scene()
+  camera=new THREE.PerspectiveCamera(90,1,0.1,1000)
+  camera.position.z=1.5
+
+  renderer=new THREE.WebGLRenderer({antialias:1})
+  
+  window.addEventListener('resize',updateCanvas);
+  updateCanvas()
+
+
+  let cubeGeometry=new THREE.BoxGeometry(1,1,1)
+  
+  let cube=new THREE.Mesh(cubeGeometry,new THREE.MeshBasicMaterial({color:'#00ff00'}))
+  cube.add(new THREE.LineSegments(new THREE.EdgesGeometry(cubeGeometry),new THREE.MeshBasicMaterial({color:'#ff0000'})));
+  scene.add(cube);
+        
+  time=performance.now()/1000
+  dt=0
+  async function animate(){
+    dt=performance.now()/1000-time
+    time=performance.now()/1000
+
+    renderer.render(scene,camera);
+    requestAnimationFrame(animate);
+  }
+        
+
+  document.body.appendChild(renderer.domElement)
+  animate()
+  
+  statusCard.remove()
+  console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
+
+})()
+</script>
+</body>
+</html>
