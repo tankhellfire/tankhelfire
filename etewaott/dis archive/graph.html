@@ -21,9 +21,9 @@
   wheelMoveSpeed=-.002
   wheelZoomSpeed=-.02
   touches={}
-  touchMoveSpeed=.5
+  touchMoveSpeed=1
   touchZoomSpeed=10
-  vmin=Math.min(window.innerWidth,window.innerHeight)/2
+  vmax=Math.max(window.innerWidth,window.innerHeight)/2
   ;(async()=>{
     loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
     await loading('importing');
@@ -48,7 +48,7 @@
 
 
     function updateCanvas(){
-      vmin=Math.min(window.innerWidth,window.innerHeight)/2
+      vmax=Math.max(window.innerWidth,window.innerHeight)/2
       
       let width=window.innerWidth
       let height=window.innerHeight
@@ -139,8 +139,8 @@
       }
       for(let touch of e.touches){
         let [x,y,id]=[
-          .5+touch.pageX/vmin,//x
-          .5-touch.pageY/vmin,//y
+          .5+touch.pageX/vmax,//x
+          .5-touch.pageY/vmax,//y
           touch.identifier//id
           
         ]
