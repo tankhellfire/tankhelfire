@@ -18,9 +18,10 @@
   <script>
   
   dMove={x:0,y:0,z:0}
-  mouseWheelSpeed=-.02
+  wheelMoveSpeed=-.002
+  wheelZoomSpeed=-.02
   touches={}
-  touchMoveSpeed=2
+  touchMoveSpeed=1
   touchZoomSpeed=5
   vmin=Math.min(window.innerWidth,window.innerHeight)/2
   ;(async()=>{
@@ -67,6 +68,9 @@
     
     let cube=new THREE.Mesh(cubeGeometry,new THREE.MeshBasicMaterial({color:'#00ff00'}))
     cube.add(new THREE.LineSegments(new THREE.EdgesGeometry(cubeGeometry),new THREE.MeshBasicMaterial({color:'#ff0000'})));
+    cube.position.x=-.5
+    cube.position.y=-.5
+    cube.position.z=-.5
     scene.add(cube);
   
   
@@ -78,8 +82,8 @@
       time=performance.now()/1000
 
       //handle delta-s
-      let dx=dMove.x
-      let dy=dMove.y
+      let dx=dMove.x*camera.position.z
+      let dy=dMove.y*camera.position.z
       let dz=dMove.z
       dMove.x=dMove.y=dMove.z=0
 
@@ -102,8 +106,8 @@
     window.addEventListener('wheel',e=>{
       e.preventDefault()
       let move={
-        x:e.deltaX*mouseWheelSpeed,
-        y:e.deltaY*mouseWheelSpeed
+        x:e.deltaX,
+        y:e.deltaY
       }
       if(e.shiftKey){
         move={
@@ -113,11 +117,11 @@
       }
       
       if(e.ctrlKey){
-        dMove.z-=move.y
+        dMove.z-=move.y*wheelZoomSpeed
       return}
       
-      dMove.x+=move.x
-      dMove.y+=move.y
+      dMove.x+=move.x*wheelMoveSpeed
+      dMove.y+=move.y*wheelMoveSpeed
 
     },{passive:false})
 
