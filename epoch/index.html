@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <title>time</title>
   <script src="../new.js"></script>
   <style>
     *{margin:0;font-family:Consolas,monospace;width:max-content;transform-origin:top left}
@@ -19,6 +18,10 @@
       requestAnimationFrame(f)
     }
     f()
+    ;(async()=>{while(1){
+      document.title=Math.floor((d=(Date.now()+1000)/86400000+.5)/28)-720+':'+(c=(28-d%28).toFixed(5).padStart(8,0)).slice(0,5)+' '+c.slice(5).padEnd(10)
+      await new Promise(r=>setTimeout(r,Math.max(864-Date.now()%864,500)))
+    }})()
 //(28-(Date.now()/86400000+.5)%28)
 //Math.floor((Date.now()/86400000+.5)/28)-720
 //n*2419200+20159.5*86400
