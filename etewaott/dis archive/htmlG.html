@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>dis graph 0.0.4</title>
+  <script>__dirname='../../'</script>
+  <script src="../../new.js"></script>
+  <script src="../../lib/lib.js"></script>
+  <script src="../../lib/fs.js"></script>
+  <style>
+    *{margin:0;font-family:Consolas,monospace}
+    .sel{
+      -webkit-user-drag: none;
+      -khtml-user-drag: none;
+      -moz-user-drag: none;
+      -o-user-drag: none;
+      user-drag: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  </style>
+</head>
+<body class="sel" style="height:100vh;width:100vw;overflow:hidden">
+  <h1 id="statusCard">awaiting js</h1>
+  <main class="sel" id="main" style="
+    position:absolute;
+    height:50vmin;
+    width:50vmin;
+    top:50vh;
+    left:50vw;
+  ">
+    hello
+  </main>
+  <div ></div>
+<script>
+  
+  dMove={x:0,y:0,z:0}
+  wheelMoveSpeed=-.002
+  wheelZoomSpeed=-.02
+  touches={}
+  touchMoveSpeed=1
+  touchZoomSpeed=10
+
+  position={x:0,y:0}
+    
+  vmin=Math.max(window.innerWidth,window.innerHeight)/2
+
+  ;(async()=>{
+    loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
+  
+    await loading('loading')
+  
+    
+    time=performance.now()/1000
+    dt=0
+    async function animate(){
+      dt=performance.now()/1000-time
+      time=performance.now()/1000
+
+      //handle delta-s
+      let dx=dMove.x
+      let dy=dMove.y
+      let dz=dMove.z
+      dMove.x=dMove.y=dMove.z=0
+
+      position.x+=dx
+      position.y+=dy
+      
+      main.style.transform=`translate(${-position.x*100}vmin,${position.y*100}vmin)`
+
+  
+      requestAnimationFrame(animate);
+    }
+  
+  
+    
+    //usr input
+    window.addEventListener('wheel',e=>{
+      e.preventDefault()
+      let move={
+        x:e.deltaX,
+        y:e.deltaY
+      }
+      if(e.shiftKey){
+        move={
+          x:-move.y,
+          y:move.x
+        }
+      }
+      
+      if(e.ctrlKey){
+        dMove.z-=move.y*wheelZoomSpeed
+      return}
+      
+      dMove.x+=move.x*wheelMoveSpeed
+      dMove.y+=move.y*wheelMoveSpeed
+
+    },{passive:false})
+
+
+    function handleTouchEvent(e){
+      e.preventDefault()
+    
+      let out={}
+      let avg={
+        pos:{x:0,y:0},
+        pastPos:{x:0,y:0},
+        dp:{x:0,y:0},
+        distance:0,
+        pastDistance:0,
+      }
+      for(let touch of e.touches){
+        let [x,y,id]=[
+          touch.pageX/vmin-1,//x
+          1-touch.pageY/vmin,//y
+          touch.identifier//id
+          
+        ]
+        avg.pos.x+=x
+        avg.pos.y+=y
+
+        let [fpx,fpy]=[
+          touches[id]?.x??x,//fpx
+          touches[id]?.y??y//fpy
+        ]
+        avg.pastPos.x+=fpx
+        avg.pastPos.y+=fpy
+        
+        let [fdx,fdy]=[
+          x-fpx,//fdx
+          y-fpy//fdy
+        ]
+        avg.dp.x+=fdx
+        avg.dp.y+=fdy
+
+        out[id]={
+          x,y,
+          fpx,fpy,
+          
+          force:touch.force??1,
+          id,
+          rx:touch.radiusX??1,
+          ry:touch.radiusY??1,
+          ra:touch.rotationAngle??0,
+          targ:touch.target,
+    
+          dx:fdx+(touches[id]?.dx??0),
+          dy:fdy+(touches[id]?.dy??0),
+          
+          fdx,fdy
+        }
+      }
+      touches=out
+
+
+      let touchList=Object.values(touches)
+      
+      let count=touchList.length||1
+
+      avg.pos.x/=count
+      avg.pos.y/=count
+
+      avg.pastPos.x/=count
+      avg.pastPos.y/=count
+      
+      avg.dp.x/=count
+      avg.dp.y/=count
+      
+      for(let touch of touchList){
+        let distance=Math.hypot(
+          touch.x-avg.pos.x,
+          touch.y-avg.pos.y
+        )
+        avg.distance+=distance
+        
+        let pastDistance=Math.hypot(
+          touch.fpx-avg.pastPos.x,
+          touch.fpy-avg.pastPos.y
+        )
+        avg.pastDistance+=pastDistance
+
+        
+      }
+      
+      avg.distance/=count
+      avg.pastDistance/=count
+      
+      avg.dDistance=avg.distance-avg.pastDistance
+      console.log(avg)
+
+
+      dMove.x-=avg.dp.x*touchMoveSpeed
+      dMove.y-=avg.dp.y*touchMoveSpeed
+      dMove.z-=avg.dDistance*touchZoomSpeed
+    }
+    document.addEventListener("touchstart",handleTouchEvent,{passive:false})
+    document.addEventListener("touchmove",handleTouchEvent,{passive:false})
+    document.addEventListener("touchend",handleTouchEvent,{passive:false})
+    
+    animate()
+    
+    statusCard.remove()
+    console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
+  
+  })()
+</script>
+</body>
+</html>

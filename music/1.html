@@ -46,6 +46,7 @@
     <span id="currentTime">0:00.00</span>
     <input type="range" id="seekBar" class="slider" step="0.01">
     <span id="totalTime">0:00.00</span>
+    <input type="number" id="speed" value="1" min="0.05" max="16" step="0.05">
 
     
     <button id="openFs" title="import a repo (etewaott)">D</button>
@@ -199,7 +200,10 @@ loadMusic=file=>{
   })
 
   // Set up event listeners for the audio player
-  audioPlayer.addEventListener('loadedmetadata',e=>totalTime.textContent=formatTime(seekBar.max=audioPlayer.duration))
+  audioPlayer.addEventListener('loadedmetadata',e=>{
+    totalTime.textContent=formatTime(seekBar.max=audioPlayer.duration)
+    audioPlayer.playbackRate=Number(speed.value)
+  })
 
   seekBar.addEventListener('input',e=>audioPlayer.currentTime=seekBar.value)
 }
@@ -239,6 +243,8 @@ playPauseButton.addEventListener('click',pausePlay=e=>{
 })
 thumbnail.addEventListener('click',pausePlay)
 
+speed.addEventListener('change',e=>audioPlayer.playbackRate=Number(speed.value))
+
 addEventListener("keydown",e=>{
   let numcode=e.keyCode-48
   if(['Space','KeyK'].includes(e.code)){
@@ -267,6 +273,7 @@ addEventListener("keydown",e=>{
   }
   
   if(0<=numcode&&numcode<=9){
+    if(document.activeElement===speed)return;
     e.preventDefault()
     return audioPlayer.currentTime=audioPlayer.duration/10*numcode
   }
