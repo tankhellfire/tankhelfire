@@ -109,7 +109,7 @@ async function cache(url){
 self.addEventListener('fetch',e=>{
   let url=fixUrl(e.request.url)
   
-  if(url.hostname!=='tankhellfire.glitch.me')return
+  if(url.hostname!==new URL(serviceWorker.scriptURL).host)return
   
   if(url!=e.request.url){
     clog(`//redirecting:
