@@ -15,7 +15,8 @@ git merge tankhellfire-glitch-me/main
 git push tankhellfire-github main
 
 
-
+git status
+git diff --cached
 
 git reset --hard tankhellfire-github/main
 

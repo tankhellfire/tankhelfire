@@ -63,6 +63,7 @@
       
     <audio id="audioPlayer" loop hidden autoplay></audio>
 <script>
+window.addEventListener('beforeunload',e=>e.preventDefault())
 DDir=undefined//setInterval(e=>console.log(DDir.saveMetadata()),1000*60)
 songList=undefined
 songNum=null
