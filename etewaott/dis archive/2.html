@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" oncontextmenu="//return false;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>diss</title>
+  <script src="/new.js"></script>
+  <script src="../../lib/lib.js"></script>
+  <script src="../../lib/fs.js"></script>
+  <style>
+    *{margin:0;font-family:Consolas,monospace}
+  </style>
+</head>
+<body>
+  <button id=button>folder</button>
+<script>
+  const bySet=(a,b)=>{
+    const toComparable=(x)=>{
+      const num=Number(x)
+      return isNaN(num)?String(x?.id??x):num
+    }
+  
+    let A=toComparable(a)
+    let B=toComparable(b)
+  
+    return A<B? -1 : A>B? 1 : 0
+  }
+  
+  const toSet=(a,v)=>{
+    a[String(v?.id??v)]=v
+    return a
+  }
+  const undef=Symbol('undefined')
+
+  const saveUndef=(_,v)=>v===undefined||v===undef?'__undefined__':v
+  const loadUndef=(_,v)=>v==='__undefined__'?undef:v
+
+  class TimeSeries{
+    constructor(obj){
+      let series=[[-Infinity,{}],...Object.entries(obj).sort((a,b)=>bySet(a[0],b[0]))]
+      
+      return new Proxy(series,{
+        get(obj,prop){
+          if(prop==='toJSON')return _=>series.reduce((ret,val)=>{
+            ret[val[0]]=val[1]
+            return ret
+          },{})
+          return obj.find((_,i,arr)=>bySet(arr[i+1]?.[0],prop)==1)
+        },
+        set(obj,prop,val){
+          
+        }
+      })
+    }
+  }
+
+  apiURL="https://discord.com/api/v9"
+  rate=5000
+  button.onclick=_=>showDirectoryPicker().then(h=>(f=new Fs.Folder(h)).requestPermission()+(button.innerHTML=h.name))
+  save={}
+
+</script>
+</body>
+</html>

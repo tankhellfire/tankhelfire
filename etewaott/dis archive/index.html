@@ -16,8 +16,10 @@
   <button id=button>folder</button>
 <script>
   const bySet=(a,b)=>{
-    let A=String(a?.id??a)
-    let B=String(b?.id??b)
+    let A=Number(a)
+    if(A!=a)A=String(a?.id??a)
+    let B=Number(b)
+    if(B!=b)B=String(b?.id??b)
     if(A<B)return -1
     if(A>B)return 1
     return 0
@@ -281,6 +283,13 @@
 //     console.log([currentGuilds[usr][guid].name,currentChannels[guid][usr][chuid].name],messages[guid][chuid])
 //   }
 // }
+
+// a=await(await fetch(`${apiURL}/users/${'947437107226509402'}/relationships`,{
+//   "headers":{
+//     authorization,
+//     "content-type":"application/json",
+//   }
+// })).json()
 
 </script>
 </body>
