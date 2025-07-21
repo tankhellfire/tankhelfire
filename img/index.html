@@ -14,57 +14,106 @@
 </head>
 <body>
   <h1 id="statusCard">awaiting js</h1>
-  <input type="text" id="dpi" placeholder="dpi" value="6">
-  <canvas id="can" style="image-rendering:pixelated;"></canvas>
+<textarea id='textarea' title="quotes">
+Hi!
+hello.
+how are you?</textarea>
+  <br>
+  <input type="number" id="blocksize" placeholder="block size" value="20" title="block size">
+  <input type="text" id="font" placeholder="font" value="13px Consolas" title="font">
+  <br>
+  <input type="number" id="dpi" placeholder="dpi" value="100" title="dpi">
+  <span id="buildinfo"></span>
+  <br>
+  <canvas id="can" style="image-rendering:pixelated"></canvas>
   <script>
-(async()=>{
+
+;(async()=>{
+
 loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
 await loading('importing')
 
 if(typeof bti=='undefined'){
   if(typeof lib=='undefined'){
     await loading('importing/lib')
-    lib=eval(await(await fetch('https://tankhellfire.glitch.me/lib/lib.js')).text())
+    lib=eval(await(await fetch(__dirname+'lib/lib.js')).text())
   }
   await loading('importing/img/bti')
   bti=await lib('img/bti.js')
 }
 
-await loading('loading')
-drawNum=(num,x,y)=>{
-  ctx.putImageData(numImg.getImageData(num*4,0,4,6),x*4,y*6)
+KnuthShuffle=arr=>{
+  for(let i=arr.length-1;0<i;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]]
+  }
+  return arr
 }
-
-gcd=(a,b)=>!b?a:gcd(b,a%b)
-lcm=(a,b)=>(a*b)/gcd(a,b)
 
   
 ctx=can.getContext('2d',{willReadFrequently:true})
 
-let numbers=[
-'0461598077',
-'0466325242',
-'0400940327'
-]
 
-draw=()=>{
+draw=_=>{
+  const texts=textarea.value.split('\n')
+  
   can.width=8.27*dpi.value
   can.height=11.69*dpi.value
-  for(let y=0;y<Math.floor(can.height/6);y++){
-    for(let x=0;x<Math.floor(can.width/4/11)*11;x++){
-      for(let n of numbers[y%numbers.length]){
-        drawNum(n,x,y)
-        x+=1
-      }
-    }
-  }
-}
 
+  ctx.font=font.value
+  
+  
+  const charWidth=ctx.measureText(' ').width
+  let up=1
+  let down=0
+  let left=1
+  let right=0
+  const gridWidth=[]
+  
+  for(let text of texts){
+    const measure=ctx.measureText(text)
+    
+    up=Math.max(measure.actualBoundingBoxAscent,up)
+    down=Math.max(-measure.actualBoundingBoxDescent,down)
+    
+    left=-measure.actualBoundingBoxLeft
+    right=measure.actualBoundingBoxRight
+    gridWidth.push(Math.ceil(left+right+charWidth*2))
+  }
+  const gridHeight=Math.ceil(up+down+charWidth)
+
+  let order=KnuthShuffle(Array.from({length:texts.length},(_,i)=>i))
+  let textNum=0
+
+  let startY=gridHeight
+  while(startY<can.height){
+    
+    let x=0
+    while(true){
+      const textId=order[textNum++%order.length]
+  
+      let textWidth=gridWidth[textId]
+      if(can.width<x+textWidth)break//
+  
+      const text=texts[textId]
+  
+      for(let i=0;i<Number(blocksize.value);i++){
+        let y=startY+i*gridHeight
+        if(can.height<y)break
+        ctx.fillText(text,x,y)
+      }
+      
+  
+    x+=textWidth}
+    
+  startY+=Number(blocksize.value)*gridHeight}
+  buildinfo.textContent=`${textNum}/${order.length}`
+}
 await loading('loading')
-numImg=await bti(await fetch('0-9.png').catch(e=>fetch('https://tankhellfire.glitch.me/img/0-9.png')).then(e=>e.blob()))
 
 draw()
-dpi.onchange=draw
+dpi.onchange=textarea.onchange=blocksize.onchange=font.onchange=draw
+
 
 statusCard.remove()
   
