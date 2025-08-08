@@ -14,7 +14,7 @@
   <script>
     f=e=>{
       a.innerHTML=(28-(Date.now()/86400000+.5)%28).toFixed(6)+'<br>'+(Math.floor((Date.now()/86400000+.5)/28)-720)
-      a.style.transform='scale('+Math.min(Math.ceil(window.innerWidth)/Math.floor(a.offsetWidth),Math.ceil(window.innerHeight)/Math.floor(a.offsetHeight))*.9+')'
+      a.style.transform='scale('+Math.min(Math.ceil(window.innerWidth)/Math.floor(a.offsetWidth),Math.ceil(window.innerHeight)/Math.floor(a.offsetHeight))+')'
       requestAnimationFrame(f)
     }
     f()
