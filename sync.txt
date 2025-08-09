@@ -9,14 +9,12 @@ git commit -a -m "msg"
 git fetch tankhellfire-github
 git merge tankhellfire-github/main
 
-git fetch tankhellfire-glitch-me
-git merge tankhellfire-glitch-me/main
-
 git push tankhellfire-github main
 
 
 git status
 git diff --cached
+git whatchanged
 
 git reset --hard tankhellfire-github/main
 

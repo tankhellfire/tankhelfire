@@ -224,7 +224,7 @@ shuffleButton.onclick=e=>{
 sortByTimeButton.onclick=e=>{
   updateSongPlayTime()
   let a=songList[songNum]
-  songNum=KnuthShuffle(songList).sort((a,b)=>(a?.public?.modified??0)-(b?.public?.modified??0)).indexOf(a)
+  songNum=KnuthShuffle(songList).sort((a,b)=>(a?.public?.created??0)-(b?.public?.created??0)).indexOf(a)
   updateUpList()
 }
 
