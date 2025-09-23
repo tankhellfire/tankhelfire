@@ -20,7 +20,7 @@ git reset --hard tankhellfire-github/main
 
 
 [System.Environment]::SetEnvironmentVariable("GIT_DIR", "C:\Users\tt\local\tankhellfire_git\.git", "User")
-[System.Environment]::SetEnvironmentVariable("GIT_WORK_TREE", "C:\Users\tt\OneDrive\Documents\D\tankhellfire", "User")
+[System.Environment]::SetEnvironmentVariable("GIT_WORK_TREE", "D:\D2.2\tankhellfire", "User")
 
 [System.Environment]::SetEnvironmentVariable("GIT_DIR", $null, "User")
 [System.Environment]::SetEnvironmentVariable("GIT_WORK_TREE", $null, "User")
