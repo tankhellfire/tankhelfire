@@ -25,6 +25,10 @@
 //(28-(Date.now()/86400000+.5)%28)
 //Math.floor((Date.now()/86400000+.5)/28)-720
 //n*2419200+20159.5*86400
+
+// let lat=-32;let lon=116
+// let m=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&minutely_15=temperature_2m,precipitation&timeformat=unixtime`).then(e=>e.json())
+// m.minutely_15.time.map((e,i)=>[new Date(e*1000),m.minutely_15.temperature_2m[i],m.minutely_15.precipitation[i]])
   </script>
 </body>
 </html>
