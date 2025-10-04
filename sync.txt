@@ -18,7 +18,7 @@ git whatchanged
 
 git reset --hard tankhellfire-github/main
 
-
+# or just put `gitdir: C:\Users\tt\local\tankhellfire_git\.git` in a .git file
 [System.Environment]::SetEnvironmentVariable("GIT_DIR", "C:\Users\tt\local\tankhellfire_git\.git", "User")
 [System.Environment]::SetEnvironmentVariable("GIT_WORK_TREE", "D:\D2.2\tankhellfire", "User")
 
