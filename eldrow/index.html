@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" oncontextmenu="//return false;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>wordle paint</title>
+  <script src="/new.js"></script>
+  <script src="/lib/lib.js"></script>
+  <style>
+    *{margin:0;font-family:Consolas,monospace}
+  </style>
+</head>
+<body>
+  <h1 id="statusCard">awaiting js</h1>
+<script>
+  const paths=[
+    '../',
+    'https://tankhellfire.github.io/tankhelfire/',
+    'https://htf.onrender.com/'
+  ]
+  
+  let words=new Promise(async(res,rej)=>{
+    const file='assets/valid-wordle-words.txt'
+    for(const path of paths){
+      await fetch(path+file).then(e=>{
+        if(e.ok)return e.text().then(e=>res(e))
+        throw e.status
+      }).catch(err=>console.warn(`failed to get '${file}' from '${path}'`,err))
+    }
+    
+    const button=document.createElement('button')
+    button.textContent='get words localy'
+    button.onclick=e=>{
+      button.textContent='asking for file'
+      showOpenFilePicker({id:file.match(/[a-zA-Z]/g)?.join('')||''}).then(e=>{
+        button.textContent='reading file'
+        return e[0].getFile()
+      }).then(e=>e.text()).then(e=>{
+        button.textContent='done'
+        res(e)
+      }).catch(err=>{
+        button.textContent='error (retry)'
+        console.warn(`failed to get '${file}' from 'local'`,err)
+      })
+    }
+    document.body.append(button)
+  })
+  
+  function match(word,pattern,solution){
+    const claimed=[0,0,0,0,0]
+    for(let i in pattern){
+      if(pattern[i]=='?')continue
+      if(pattern[i]=='.'){
+        if(solution[i]!=word[i])return 0
+        claimed[i]=1
+      continue}
+      if(solution[i]==word[i]&&(pattern[i]=='-'||pattern[i]=='/'))return 0
+    }
+  
+    for(let i in pattern){
+      if(!(pattern[i]=='-'||pattern[i]=='/'))continue
+      const letter=word[i]
+      let n=-1
+      for(let a in solution){
+        if(claimed[a]==1||a==i||solution[a]!=letter)continue
+        n=a
+        claimed[a]=1
+        break
+      }
+      if(n==-1&&pattern[i]=='-')return 0
+      if(n!=-1&&pattern[i]=='/')return 0
+    }
+    
+    return 1
+  }
+  ;(async()=>{
+    loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
+    
+    await loading('importing/words')
+    words=(await words).split('\n')
+// `.//./
+// /.-/.
+// ./-./
+// //--/
+// .///.
+// .....
+// `.split('\n').map(pattern=>words.filter(e=>match(e,pattern,'annoy')))
+    
+    await loading('loading')
+    
+    statusCard.remove()
+    console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
+  })()
+</script>
+</body>
+</html>
