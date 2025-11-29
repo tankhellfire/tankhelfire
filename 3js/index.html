@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" oncontextmenu="return false;">
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,11 +35,11 @@
 
         statusCard.textContent = 'loading'
 
-        document.addEventListener("click", _ => {
+
+        window.onclick=_=>{
           document.body.requestPointerLock()
           document.documentElement.requestFullscreen()
         }
-        );
 
         await new Promise(resolve => setTimeout(resolve, 0));
 
@@ -53,7 +53,8 @@
         camera.position.z = 7;
 
         window.renderer = new THREE.WebGLRenderer({
-          // antialias: true
+          antialias:true,
+          alpha:true
         });
 
         document.body.appendChild(renderer.domElement);
@@ -148,6 +149,76 @@
         statusCard.remove()
       }
       )()
+/*
+Fs=eval(await load('fs',e=>fetch(e+'lib/fs.js').then(e=>e.text()),1))
+
+window.onclick=async()=>{
+  window.folder=new Fs.Folder(showDirectoryPicker())
+  await window.folder.requestPermission()
+}
+
+
+
+updateCanvas = function() {
+  const width = 720;
+  const height = 720;
+
+  // Calculate vmin (smallest dimension)
+  const vmin = Math.min(1, width / height)
+
+  // Set the renderer size to match the vmin dimension (smallest dimension)
+  renderer.setSize(width, height);
+
+  // Update the camera's aspect ratio to match the window's width / height
+  camera.aspect = width / height;
+
+  // Adjust the camera's FOV based on the window size
+  camera.zoom = vmin
+  // Maintain a constant FOV
+  camera.updateProjectionMatrix();
+}
+
+const recordTime=5
+
+
+rotspeed = []
+for (let a = 0; a < scene.children.length + 1; a++) {
+  rotspeed.push([
+    2*Math.PI*Math.floor(2*Math.random())/recordTime,
+    2*Math.PI*Math.floor(2*Math.random())/recordTime,
+    2*Math.PI*Math.floor(2*Math.random())/recordTime
+  ])
+}
+window.offrot = []
+for (let a = 0; a < scene.children.length + 1; a++) {
+  offrot.push([
+    2*Math.PI*Math.random(),
+    2*Math.PI*Math.random(),
+    2*Math.PI*Math.random()
+  ])
+}
+
+let frame=0
+animate = async()=>{
+  let n = 0
+  frame++
+  t=frame/60
+  if(recordTime<t)return;
+  for (let a of scene.children) {
+    a.rotation.x = offrot[n][0] + t * rotspeed[n][0];
+    a.rotation.y = offrot[n][1] + t * rotspeed[n][1];
+    a.rotation.z = offrot[n][2] + t * rotspeed[n++][2];
+  }
+  scene.rotation.x = offrot[n][0] + t * rotspeed[n][0];
+  scene.rotation.y = offrot[n][1] + t * rotspeed[n][1];
+  scene.rotation.z = offrot[n][2] + t * rotspeed[n++][2];
+  updateCanvas()
+  renderer.render(scene, camera);
+  await window.folder.get(`${frame}.png`.padStart(9,'0')).write(await new Promise(res=>renderer.domElement.toBlob(res,'png')))
+  console.log(frame)
+  requestAnimationFrame(animate);
+}
+*/
     </script>
   </body>
 </html>
