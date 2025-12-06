@@ -30,7 +30,7 @@
   ]
   
   let words=new Promise(async(res,rej)=>{
-    const file='assets/valid-wordle-words.txt'
+    const file='assets/wordleWords.json'
     for(const path of paths){
       try{
         let e=await fetch(path+file)
@@ -86,17 +86,38 @@
     
     return 1
   }
+  function getPattern(word,solution){
+    const claimed=[0,0,0,0,0]
+    const pattern=new Array(5).fill('/')
+    for(let i in word){
+      if(word[i]==solution[i]){
+        pattern[i]='.'
+        claimed[i]=1
+      }
+    }
+    for(let i in word){
+      if(pattern[i]!='/')continue
+      for(let j in solution){
+        if(claimed[j])continue
+        if(word[i]==solution[j]){
+          pattern[i]='-'
+          claimed[j]=1
+        }
+      }
+    }
+    return pattern.join('')
+  }
   ;(async()=>{
     loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
     
     await loading('importing/words')
-    words=(await words).split('\n')
+    words=JSON.parse(await words)
 
     
     await loading('loading')
     patternInput.onblur=wordInput.onblur=e=>{
       output.innerText="loading"
-      output.innerText=patternInput.value.split('\n').map(pattern=>words.filter(e=>match(e,pattern,(wordInput.value||"naieo").toLowerCase()))).map(e=>e[0]||'not found').join('\n')
+      output.innerText=patternInput.value.split('\n').map(pattern=>words.words.filter(e=>match(e,pattern,(wordInput.value||"naieo").toLowerCase()))).map(e=>e[0]||'not found').join('\n')
     }
     
     statusCard.remove()
