@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>image pwm</title>
+    <style>
+      * {
+        margin: 0;
+        font-family: Consolas,monospace
+      }
+    </style>
+  </head>
+  <body>
+    <button onclick=getFile()>load file</button>
+    <span id="statusCard">awaiting js</span>
+    <br>
+    <canvas id=can style="image-rendering:pixelated"></canvas>
+    <script>
+      window.ctx = can.getContext('2d', {
+        willReadFrequently: true
+      })
+
+      window.getFile = async () => {
+        try {
+          await loading('getting file')
+          const handle = (await showOpenFilePicker())[0]
+          await loading(`reading "${handle.name}"`)
+          window.file = await handle.getFile()
+
+
+          await loading(`loading "${handle.name}"`)
+          let img = new Image()
+          img.src = URL.createObjectURL(file)
+          await new Promise(res => img.onload = res)
+
+          let imgCan = document.createElement('canvas')
+          can.width = imgCan.width = img.width
+          can.height = imgCan.height = img.height
+          let imgctx=imgCan.getContext('2d', {
+            willReadFrequently: true
+          })
+          imgctx.drawImage(img, 0, 0)
+          window.imgData=imgctx.getImageData(0,0,imgCan.width,imgCan.height)
+
+          let data=ctx.getImageData(0,0,can.width,can.height)
+          for(let i = 0; i < data.data.length; i +=4){
+            data.data[i]=Math.random()*256
+            data.data[i+1]=Math.random()*256
+            data.data[i+2]=Math.random()*256
+            data.data[i+3]=255
+          }
+          ctx.putImageData(data,0,0)
+
+          await loading(`done`)
+
+          window.animate=async()=>{
+            let data=ctx.getImageData(0,0,can.width,can.height)
+            for(let i = 0; i < data.data.length; i +=4){
+              data.data[i+0]=(data.data[i+0]+imgData.data[i+0])%256
+              data.data[i+1]=(data.data[i+1]+imgData.data[i+1])%256
+              data.data[i+2]=(data.data[i+2]+imgData.data[i+2])%256
+              data.data[i+3]=255
+            }
+            ctx.putImageData(data,0,0)
+            requestAnimationFrame(animate)
+          }
+          cancelAnimationFrame(animate)
+          animate()
+        } catch (err) {
+          await loading(err)
+          console.error(err)
+        }
+      }
+
+      window.loading = async (t) => console.log(statusCard.textContent = `${t} ${performance.now() / 1000}`);
+
+      window.paths = ['../../', 'https://thf.onrender.com/', 'https://tankhellfire.github.io/tankhelfire/']
+
+      window.load = async (name, asyncFn, verbose=0) => {
+        for (const path of paths) {
+          try {
+            return await asyncFn(path)
+          } catch (err) {
+            if (verbose)
+              console.warn(`couldn't import ${name} from ${path}, ${err}`)
+          }
+        }
+        throw `couldn't import ${name}`
+      }
+
+      ;
+      (async () => {
+
+        // await loading('importing')
+
+        await loading('loading')
+
+        await loading('loaded')
+
+        console.log(`%cload time: ${performance.now() / 1000}s`, "color:#0f0")
+      }
+      )()
+    </script>
+  </body>
+</html>
