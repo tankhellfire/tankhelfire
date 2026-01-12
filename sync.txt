@@ -1,5 +1,5 @@
 git remote add tankhellfire-github https://github.com/tankhellfire/tankhelfire.git
-git remote set-url tankhellfire-github https://your-username:your-token@github.com/tankhellfire/tankhelfire.git
+it remote set-url tankhellfire-github git@github.com:tankhellfire/tankhelfire.git
 
 
 git add .
