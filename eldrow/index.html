@@ -1,128 +1,215 @@
 <!DOCTYPE html>
 <html lang="en" oncontextmenu="//return false;">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light dark">
-  <title>wordle paint</title>
-  <script src="/new.js"></script>
-  <script src="/lib/lib.js"></script>
-  <style>
-    *{margin:0;font-family:Consolas,monospace}
-  </style>
-</head>
-<body>
-  <h1 id="statusCard">awaiting js</h1>
-  <input id="wordInput" type="text" title="todays words" placeholder="naieo">
-  <br>
-  <textarea id="patternInput">-/-./
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>wordle paint</title>
+    <script src="/new.js"></script>
+    <script src="/lib/lib.js"></script>
+    <style>
+      * {
+        margin: 0;
+        font-family: Consolas,monospace
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="statusCard">awaiting js</h1>
+    <input id="wordInput" type="text" title="todays words" placeholder="naieo">
+    <br>
+    <textarea id="patternInput">-/-./
 /.--/
 ----/
 /.//.
 .....</textarea>
-  <br>
-  <span id="output"></span>
-<script>
-  const paths=[
-    '../',
-    'https://tankhellfire.github.io/tankhelfire/',
-    'https://htf.onrender.com/'
-  ]
-  
-  let words=new Promise(async(res,rej)=>{
-    const file='assets/wordleWords.json'
-    for(const path of paths){
-      try{
-        let e=await fetch(path+file)
-        if(e.ok)return e.text().then(e=>res(e))
-        throw e.status
-      }catch(err){
-        console.warn(`failed to get '${file}' from '${path}'`,err)
-      }
-    }
-    
-    const button=document.createElement('button')
-    button.textContent='get words localy'
-    button.onclick=e=>{
-      button.textContent='asking for file'
-      showOpenFilePicker({id:file.match(/[a-zA-Z]/g)?.join('')||''}).then(e=>{
-        button.textContent='reading file'
-        return e[0].getFile()
-      }).then(e=>e.text()).then(e=>{
-        button.remove()
-        res(e)
-      }).catch(err=>{
-        button.textContent='error (retry)'
-        console.warn(`failed to get '${file}' from 'local'`,err)
-      })
-    }
-    document.body.before(button)
-  })
-  
-  function match(word,pattern,solution){
-    const claimed=[0,0,0,0,0]
-    for(let i in pattern){
-      if(pattern[i]=='?')continue
-      if(pattern[i]=='.'){
-        if(solution[i]!=word[i])return 0
-        claimed[i]=1
-      continue}
-      if(solution[i]==word[i]&&(pattern[i]=='-'||pattern[i]=='/'))return 0
-    }
-  
-    for(let i in pattern){
-      if(!(pattern[i]=='-'||pattern[i]=='/'))continue
-      const letter=word[i]
-      let n=-1
-      for(let a in solution){
-        if(claimed[a]==1||a==i||solution[a]!=letter)continue
-        n=a
-        claimed[a]=1
-        break
-      }
-      if(n==-1&&pattern[i]=='-')return 0
-      if(n!=-1&&pattern[i]=='/')return 0
-    }
-    
-    return 1
-  }
-  function getPattern(word,solution){
-    const claimed=[0,0,0,0,0]
-    const pattern=new Array(5).fill('/')
-    for(let i in word){
-      if(word[i]==solution[i]){
-        pattern[i]='.'
-        claimed[i]=1
-      }
-    }
-    for(let i in word){
-      if(pattern[i]!='/')continue
-      for(let j in solution){
-        if(claimed[j])continue
-        if(word[i]==solution[j]){
-          pattern[i]='-'
-          claimed[j]=1
-        }
-      }
-    }
-    return pattern.join('')
-  }
-  ;(async()=>{
-    loading=async(t)=>console.log(statusCard.textContent=`${t} ${performance.now()/1000}`)
-    
-    await loading('importing/words')
-    words=JSON.parse(await words)
+    <br>
+    <span id="output"></span>
+    <script>
+      const paths = ['../', 'https://tankhellfire.github.io/tankhelfire/', 'https://htf.onrender.com/']
 
-    
-    await loading('loading')
-    patternInput.onblur=wordInput.onblur=e=>{
-      output.innerText="loading"
-      output.innerText=patternInput.value.split('\n').map(pattern=>words.words.filter(e=>match(e,pattern,(wordInput.value||"naieo").toLowerCase()))).map(e=>e[0]||'not found').join('\n')
-    }
-    
-    statusCard.remove()
-    console.log(`%cload time: ${performance.now()/1000}s`,"color:#0f0")
-  })()
-</script>
-</body>
+      let words = new Promise(async (res, rej) => {
+        const file = 'assets/wordleWords.json'
+        for (const path of paths) {
+          try {
+            let e = await fetch(path + file)
+            if (e.ok)
+              return e.text().then(e => res(e))
+            throw e.status
+          } catch (err) {
+            console.warn(`failed to get '${file}' from '${path}'`, err)
+          }
+        }
+
+        const button = document.createElement('button')
+        button.textContent = 'get words localy'
+        button.onclick = e => {
+          button.textContent = 'asking for file'
+          showOpenFilePicker({
+            id: file.match(/[a-zA-Z]/g)?.join('') || ''
+          }).then(e => {
+            button.textContent = 'reading file'
+            return e[0].getFile()
+          }
+          ).then(e => e.text()).then(e => {
+            button.remove()
+            res(e)
+          }
+          ).catch(err => {
+            button.textContent = 'error (retry)'
+            console.warn(`failed to get '${file}' from 'local'`, err)
+          }
+          )
+        }
+        document.body.before(button)
+      }
+      )
+
+      function match(word, pattern, solution) {
+        const claimed = [0, 0, 0, 0, 0]
+        for (let i in pattern) {
+          if (pattern[i] == '?')
+            continue
+          if (pattern[i] == '.') {
+            if (solution[i] != word[i])
+              return 0
+            claimed[i] = 1
+            continue
+          }
+          if (solution[i] == word[i] && (pattern[i] == '-' || pattern[i] == '/'))
+            return 0
+        }
+
+        for (let i in pattern) {
+          if (!(pattern[i] == '-' || pattern[i] == '/'))
+            continue
+          const letter = word[i]
+          let n = -1
+          for (let a in solution) {
+            if (claimed[a] == 1 || a == i || solution[a] != letter)
+              continue
+            n = a
+            claimed[a] = 1
+            break
+          }
+          if (n == -1 && pattern[i] == '-')
+            return 0
+          if (n != -1 && pattern[i] == '/')
+            return 0
+        }
+
+        return 1
+      }
+      function getPattern(word, solution) {
+        const claimed = [0, 0, 0, 0, 0]
+        const pattern = new Array(5).fill('/')
+        for (let i in word) {
+          if (word[i] == solution[i]) {
+            pattern[i] = '.'
+            claimed[i] = 1
+          }
+        }
+        for (let i in word) {
+          if (pattern[i] != '/')
+            continue
+          for (let j in solution) {
+            if (claimed[j])
+              continue
+            if (word[i] == solution[j]) {
+              pattern[i] = '-'
+              claimed[j] = 1
+            }
+          }
+        }
+        return pattern.join('')
+      }
+      ;(async () => {
+        loading = async (t) => console.log(statusCard.textContent = `${t} ${performance.now() / 1000}`)
+
+        await loading('importing/words')
+        words = JSON.parse(await words)
+
+        await loading('loading')
+        patternInput.onblur = wordInput.onblur = e => {
+          output.innerText = "loading"
+
+          let buff = ""
+          let out = []
+          for (const letter of patternInput.value.replaceAll('\n', '').replaceAll(' ', '/')) {
+            buff += letter
+            if (buff.length == 5) {
+              out.push(buff)
+              buff = ""
+            }
+          }
+          if (buff.length != 0)
+            out.push(buff)
+          patternInput.value = out.join('\n')
+
+          output.innerText = out.map(pattern => words.words.filter(e => match(e, pattern.padEnd(5, '?'), (wordInput.value || "naieo").toLowerCase()))).map(e => e[0] || 'not found').join('\n')
+        }
+
+        statusCard.remove()
+        console.log(`%cload time: ${performance.now() / 1000}s`, "color:#0f0")
+      }
+      )()
+      /*
+let best=[null,Infinity,null,null]
+let wordId=0
+KnuthShuffle(words.words)
+
+function KnuthShuffle(arr){
+  for(let i=arr.length-1;0<i;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]]
+  }
+  return arr
+}
+function m(word=(words.words[wordId++]??words.words[0])){
+  console.log(word)
+  const patOb={}
+  for(const targWord of a){
+    const pat=getPattern(word,targWord)
+    if(!patOb[pat])patOb[pat]=0
+    if(word!=targWord)patOb[pat]++
+  }
+  const score=Object.values(patOb).reduce((a,b,i,c)=>a+b/c.length,0)
+  const winNext=Object.values(patOb).reduce((a,b,i,c)=>a+(b<=1),0)
+  if(score<best[1])best=[word,score,winNext]
+  
+  return [word,score,winNext]
+}
+// a=words.answers
+// let t=setInterval(m,0)
+
+// m('mound')
+
+
+// clearTimeout(t)
+
+// a=a.filter(e=>match('slate','////',e))
+
+
+
+
+
+
+
+
+
+
+let buff=""
+let out=[]
+for(const letter of "//....//../--/../-./.."){
+  buff+=letter
+  if(buff.length==5){
+    out.push(buff)
+    buff=""
+  }
+}
+if(buff.length!=0)out.push(buff.padEnd(5,'/'))
+out.map(pattern=>words.words.filter(e=>match(e,pattern,(wordInput.value||"naieo").toLowerCase()))).map(e=>e[0]||'not found')
+*/
+    </script>
+  </body>
 </html>
