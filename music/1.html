@@ -6,16 +6,21 @@
     <meta name="color-scheme" content="light dark">
     <link id="icon" rel="icon">
     <title id="title">music</title>
-    <script>__dirname='../'</script>
+    <script>
+      __dirname = '../'
+    </script>
     <script src="../lib/npm/jsmediatags/dist/jsmediatags.min.js"></script>
     <script src="../lib/fs.js"></script>
     <style>
       * {
         font-family: monospace, sans-serif;
-        padding:0;
-        margin:0;
+        padding: 0;
+        margin: 0;
+        word-break: normal;
+        overflow-wrap: break-word;
+        white-space: normal;
       }
-      
+
       .select {
         -webkit-user-drag: none;
         -khtml-user-drag: none;
@@ -29,28 +34,28 @@
         user-select: none;
         /* Standard syntax */
       }
+
+      #thumbnail {
+        width: 100vw
+      }
+
+      body {
+        overflow-x: clip
+      }
     </style>
   </head>
   <body>
     <h2 id="h2Title">music</h2>
-    
     <button id="playPauseButton" class="play-pause">Play</button>
-    
     <input type="file" id="fileInput" accept="audio/*">
-    
     <img id="thumbnail" class="thumbnail select" alt="Thumbnail">
-    
     <input type="range" id="volume" class="slider vertical" min="0" max="1" step="0.01" value=".25">
     <span id="volDisplay">25%</span>
-    
     <span id="currentTime">0:00.00</span>
     <input type="range" id="seekBar" class="slider" step="0.01">
     <span id="totalTime">0:00.00</span>
     <input type="number" id="speed" value="1" min="0.05" max="16" step="0.05">
-
-    
     <button id="openFs" title="import a repo (etewaott)">D</button>
-    
     <div id="FsOpt" hidden>
       <span id="FsName" title="file sys name">uhh</span>
       <span id="FsTime" title="load time(s)">uhh</span>
@@ -60,232 +65,242 @@
       <button id="nextSong" title="play the next song">Next</button>
       <div id="upList"></div>
     </div>
-      
     <audio id="audioPlayer" loop hidden autoplay></audio>
-<script>
-window.addEventListener('beforeunload',e=>e.preventDefault())
-DDir=undefined//setInterval(e=>console.log(DDir.saveMetadata()),1000*60)
-songList=undefined
-songNum=null
+    <script>
+      window.addEventListener('beforeunload', e => e.preventDefault())
+      DDir = undefined
+      //setInterval(e=>console.log(DDir.saveMetadata()),1000*60)
+      songList = undefined
+      songNum = null
 
-songStartTime=null
-startedSong=null
+      songStartTime = null
+      startedSong = null
 
-updateSongPlayTime=e=>{
-  if(!songList)return;
-  if(songList&&startedSong)Fs.deepAssign(startedSong,{local:{tankhellfire:{music:{
-    watchTime:(startedSong?.local?.tankhellfire?.music?.watchTime??0)+performance.now()-songStartTime
-  }}}})
-  songStartTime=performance.now()
-  startedSong=songList[songNum]
-}
-  
-audioPlayer.onplay=e=>{
-  if(!songList)return;
-  songList&&songList[songNum]&&(songStartTime=performance.now())
-  startedSong=songList[songNum]
-}
-audioPlayer.onpause=updateSongPlayTime
-
-KnuthShuffle=arr=>{
-  for(let i=arr.length-1;0<i;i--){
-    let j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]]
-  }
-  return arr
-}
-
-mediaSession=navigator.mediaSession.metadata=new MediaMetadata()
-
-function formatTime(seconds){
-  let secs=seconds%60;
-  return `${Math.floor(seconds/60)}:${secs<10?'0':''}${secs.toFixed(2)}`;
-}
-async function scaleToPNG(data,format,size){
-  let img=new Image()
-  img.src=URL.createObjectURL(new Blob([new Uint8Array(data)],{type:format}))
-
-  await new Promise(res=>img.onload=res)
-
-  let canvas=document.createElement('canvas')
-  canvas.width=size/9*16
-  canvas.height=size
-
-  let scale=Math.min(canvas.width/img.width,canvas.height/img.height)
-
-  canvas.getContext('2d').drawImage(
-    img,
-    (canvas.width-img.width*scale)/2,(canvas.height-img.height*scale)/2,
-    img.width*scale,img.height*scale
-  )
-  return new Promise(res=>
-    canvas.toBlob(blob=>res(URL.createObjectURL(blob)),'image/png')
-  )
-}
-
-updateUpList=id=>{
-  upList.innerText=''
-  
-  for(let a=0;a<songList.length;a++){
-    let n=songList[a].local.path
-
-    if(upList.children.length)upList.appendChild(document.createElement('br'))
-    let ele=document.createElement('span')
-    
-    ele.innerText=n[n.length-1]
-
-    let str=n.join('/')
-    let hash=0
-    for(let i=0;i<str.length;i++){
-      hash=(hash<<5)-hash+str.charCodeAt(i)
-      hash=hash&hash
-    }
-    
-    ele.style.color=`hwb(${Math.abs(hash%360)} ${(songNum==a)?100:0} 0)`
-
-    ele.onclick=e=>loadSongId(a)
-    
-    upList.appendChild(ele)
-  }
-}
-
-loadSongId=id=>{
-  if(id<0||songList.length<=id)return 0;
-  if(!songList)return 0;
-
-  navigator.mediaSession.setActionHandler('previoustrack',lastSong.onclick=0<id?
-    e=>loadSongId(songNum-1):null
-  )
-  navigator.mediaSession.setActionHandler('nexttrack',nextSong.onclick=id<songList.length-1?
-    e=>loadSongId(songNum+1):null
-  )
-  
-  songNum=id
-  updateUpList(id)
-  return DDir.get(songList[id].local.path).read().then(res=>loadMusic(res))
-}
-
-openFs.onclick=async()=>{
-  let a=new Fs(await window.showDirectoryPicker({id:`D`}))
-  let t=await a.setup()
-  songList=a.metadata.filter(e=>e?.public?.tankhellfire?.music)
-  songNum=-1
-  DDir=a
-  FsOpt.hidden=0
-  FsName.innerText=DDir.handle.name
-  FsTime.innerText=t
-  updateUpList(0)
-}
-
-loadMusic=file=>{
-  if(!file)return;
-  updateSongPlayTime()
-  h2Title.textContent=title.textContent=mediaSession.title=file.name
-
-  setVolume()
-  
-  audioPlayer.src=fileURL=URL.createObjectURL(file)
-  
-  jsmediatags.read(file,{
-    onSuccess:async(tag)=>{
-      let {picture} = tag.tags;
-      if(picture){
-        thumbnail.style.display='block';
-        
-        mediaSession.artwork=[{
-          src:icon.href=thumbnail.src=await scaleToPNG(picture.data,picture.format,screen.height)
-        }];
+      updateSongPlayTime = e => {
+        if (!songList)
+          return;
+        if (songList && startedSong)
+          Fs.deepAssign(startedSong, {
+            local: {
+              tankhellfire: {
+                music: {
+                  watchTime: (startedSong?.local?.tankhellfire?.music?.watchTime ?? 0) + performance.now() - songStartTime
+                }
+              }
+            }
+          })
+        songStartTime = performance.now()
+        startedSong = songList[songNum]
       }
-    },
-    onError:e=>console.error('Error reading metadata:',e,icon.href=thumbnail.src='')
-  })
 
-  // Set up event listeners for the audio player
-  audioPlayer.addEventListener('loadedmetadata',e=>{
-    totalTime.textContent=formatTime(seekBar.max=audioPlayer.duration)
-    audioPlayer.playbackRate=Number(speed.value)
-  })
+      audioPlayer.onplay = e => {
+        if (!songList)
+          return;
+        songList && songList[songNum] && (songStartTime = performance.now())
+        startedSong = songList[songNum]
+      }
+      audioPlayer.onpause = updateSongPlayTime
 
-  seekBar.addEventListener('input',e=>audioPlayer.currentTime=seekBar.value)
-}
-  
-fileInput.addEventListener('change',e=>loadMusic(fileInput.files[0]))
+      KnuthShuffle = arr => {
+        for (let i = arr.length - 1; 0 < i; i--) {
+          let j = Math.floor(Math.random() * (i + 1));
+          [arr[i],arr[j]] = [arr[j], arr[i]]
+        }
+        return arr
+      }
 
+      mediaSession = navigator.mediaSession.metadata = new MediaMetadata()
 
-navigator.mediaSession.setActionHandler('previoustrack',lastSong.onclick=e=>null)
-navigator.mediaSession.setActionHandler('nexttrack',nextSong.onclick=e=>loadSongId(songNum+1))
+      function formatTime(seconds) {
+        let secs = seconds % 60;
+        return `${Math.floor(seconds / 60)}:${secs < 10 ? '0' : ''}${secs.toFixed(2)}`;
+      }
+      async function scaleToPNG(data, format, size) {
+        let img = new Image()
+        img.src = URL.createObjectURL(new Blob([new Uint8Array(data)],{
+          type: format
+        }))
 
-shuffleButton.onclick=e=>{
-  let a=songList[songNum]
-  songNum=KnuthShuffle(songList).indexOf(a)
-  updateUpList()
-}
+        await new Promise(res => img.onload = res)
 
-sortByTimeButton.onclick=e=>{
-  updateSongPlayTime()
-  let a=songList[songNum]
-  songNum=KnuthShuffle(songList).sort((a,b)=>(a?.public?.created??0)-(b?.public?.created??0)).indexOf(a)
-  updateUpList()
-}
+        let canvas = document.createElement('canvas')
+        canvas.width = size / 9 * 16
+        canvas.height = size
 
-volume.addEventListener('input',setVolume=e=>
-  volDisplay.textContent=((100*(audioPlayer.volume=volume.value)).toFixed(0).padStart('2',0)+'%').substring(0,3)
-)
+        let scale = Math.min(canvas.width / img.width, canvas.height / img.height)
 
-playPauseButton.addEventListener('click',pausePlay=e=>{
-  if(fileInput.files.length&&audioPlayer.src==='')return loadMusic(fileInput.files[0])
-  else if(audioPlayer.paused||audioPlayer.ended){
-    audioPlayer.play()
-    playPauseButton.textContent='Pause'
-  }else{
-    audioPlayer.pause()
-    playPauseButton.textContent='Play'
-  }
-})
-thumbnail.addEventListener('click',pausePlay)
+        canvas.getContext('2d').drawImage(img, (canvas.width - img.width * scale) / 2, (canvas.height - img.height * scale) / 2, img.width * scale, img.height * scale)
+        return new Promise(res => canvas.toBlob(blob => res(URL.createObjectURL(blob)), 'image/png'))
+      }
 
-speed.addEventListener('change',e=>audioPlayer.playbackRate=Number(speed.value))
+      updateUpList = id => {
+        upList.innerText = ''
 
-addEventListener("keydown",e=>{
-  let numcode=e.keyCode-48
-  if(['Space','KeyK'].includes(e.code)){
-    e.preventDefault()
-    return pausePlay()
-  }
+        for (let a = 0; a < songList.length; a++) {
+          let n = songList[a].local.path
 
-  if(['KeyW','ArrowUp'].includes(e.code)){
-    e.preventDefault()
-    volume.value=Number(volume.value)+.01
-    return setVolume()
-  }
-  if(['KeyS','ArrowDown'].includes(e.code)){
-    e.preventDefault()
-    volume.value=Number(volume.value)-.01
-    return setVolume()
-  }
-  
-  if(['KeyD','ArrowRight'].includes(e.code)){
-    e.preventDefault()
-    return audioPlayer.currentTime+=5
-  }
-  if(['KeyA','ArrowLeft'].includes(e.code)){
-    e.preventDefault()
-    return audioPlayer.currentTime-=5
-  }
-  
-  if(0<=numcode&&numcode<=9){
-    if(document.activeElement===speed)return;
-    e.preventDefault()
-    return audioPlayer.currentTime=audioPlayer.duration/10*numcode
-  }
-});
+          if (upList.children.length)
+            upList.appendChild(document.createElement('br'))
+          let ele = document.createElement('span')
 
+          ele.innerText = n[n.length - 1]
 
-(frame=e=>{
-  seekBar.value = audioPlayer.currentTime;
-  currentTime.textContent = formatTime(audioPlayer.currentTime);
-  requestAnimationFrame(frame)
-})()
-</script>
+          let str = n.join('/')
+          let hash = 0
+          for (let i = 0; i < str.length; i++) {
+            hash = (hash << 5) - hash + str.charCodeAt(i)
+            hash = hash & hash
+          }
+
+          ele.style.color = `hwb(${Math.abs(hash % 360)} ${(songNum == a) ? 100 : 0} 0)`
+
+          ele.onclick = e => loadSongId(a)
+
+          upList.appendChild(ele)
+        }
+      }
+
+      loadSongId = id => {
+        if (id < 0 || songList.length <= id)
+          return 0;
+        if (!songList)
+          return 0;
+
+        navigator.mediaSession.setActionHandler('previoustrack', lastSong.onclick = 0 < id ? e => loadSongId(songNum - 1) : null)
+        navigator.mediaSession.setActionHandler('nexttrack', nextSong.onclick = id < songList.length - 1 ? e => loadSongId(songNum + 1) : null)
+
+        songNum = id
+        updateUpList(id)
+        return DDir.get(songList[id].local.path).read().then(res => loadMusic(res))
+      }
+
+      openFs.onclick = async () => {
+        let a = new Fs(await window.showDirectoryPicker({
+          id: `D`
+        }))
+        let t = await a.setup()
+        songList = a.metadata.filter(e => e?.public?.tankhellfire?.music)
+        songNum = -1
+        DDir = a
+        FsOpt.hidden = 0
+        FsName.innerText = DDir.handle.name
+        FsTime.innerText = t
+        updateUpList(0)
+      }
+
+      loadMusic = file => {
+        if (!file)
+          return;
+        updateSongPlayTime()
+        h2Title.textContent = title.textContent = mediaSession.title = file.name
+
+        setVolume()
+
+        audioPlayer.src = fileURL = URL.createObjectURL(file)
+
+        jsmediatags.read(file, {
+          onSuccess: async (tag) => {
+            let {picture} = tag.tags;
+            if (picture) {
+              thumbnail.style.display = 'block';
+
+              mediaSession.artwork = [{
+                src: icon.href = thumbnail.src = await scaleToPNG(picture.data, picture.format, screen.height)
+              }];
+            }
+          }
+          ,
+          onError: e => console.error('Error reading metadata:', e, icon.href = thumbnail.src = '')
+        })
+
+        // Set up event listeners for the audio player
+        audioPlayer.addEventListener('loadedmetadata', e => {
+          totalTime.textContent = formatTime(seekBar.max = audioPlayer.duration)
+          audioPlayer.playbackRate = Number(speed.value)
+        }
+        )
+
+        seekBar.addEventListener('input', e => audioPlayer.currentTime = seekBar.value)
+      }
+
+      fileInput.addEventListener('change', e => loadMusic(fileInput.files[0]))
+
+      navigator.mediaSession.setActionHandler('previoustrack', lastSong.onclick = e => null)
+      navigator.mediaSession.setActionHandler('nexttrack', nextSong.onclick = e => loadSongId(songNum + 1))
+
+      shuffleButton.onclick = e => {
+        let a = songList[songNum]
+        songNum = KnuthShuffle(songList).indexOf(a)
+        updateUpList()
+      }
+
+      sortByTimeButton.onclick = e => {
+        updateSongPlayTime()
+        let a = songList[songNum]
+        songNum = KnuthShuffle(songList).sort( (a, b) => (a?.public?.created ?? 0) - (b?.public?.created ?? 0)).indexOf(a)
+        updateUpList()
+      }
+
+      volume.addEventListener('input', setVolume = e => volDisplay.textContent = ((100 * (audioPlayer.volume = volume.value)).toFixed(0).padStart('2', 0) + '%').substring(0, 3))
+
+      playPauseButton.addEventListener('click', pausePlay = e => {
+        if (fileInput.files.length && audioPlayer.src === '')
+          return loadMusic(fileInput.files[0])
+        else if (audioPlayer.paused || audioPlayer.ended) {
+          audioPlayer.play()
+          playPauseButton.textContent = 'Pause'
+        } else {
+          audioPlayer.pause()
+          playPauseButton.textContent = 'Play'
+        }
+      }
+      )
+      thumbnail.addEventListener('click', pausePlay)
+
+      speed.addEventListener('change', e => audioPlayer.playbackRate = Number(speed.value))
+
+      addEventListener("keydown", e => {
+        let numcode = e.keyCode - 48
+        if (['Space', 'KeyK'].includes(e.code)) {
+          e.preventDefault()
+          return pausePlay()
+        }
+
+        if (['KeyW', 'ArrowUp'].includes(e.code)) {
+          e.preventDefault()
+          volume.value = Number(volume.value) + .01
+          return setVolume()
+        }
+        if (['KeyS', 'ArrowDown'].includes(e.code)) {
+          e.preventDefault()
+          volume.value = Number(volume.value) - .01
+          return setVolume()
+        }
+
+        if (['KeyD', 'ArrowRight'].includes(e.code)) {
+          e.preventDefault()
+          return audioPlayer.currentTime += 5
+        }
+        if (['KeyA', 'ArrowLeft'].includes(e.code)) {
+          e.preventDefault()
+          return audioPlayer.currentTime -= 5
+        }
+
+        if (0 <= numcode && numcode <= 9) {
+          if (document.activeElement === speed)
+            return;
+          e.preventDefault()
+          return audioPlayer.currentTime = audioPlayer.duration / 10 * numcode
+        }
+      }
+      );
+
+      (frame = e => {
+        seekBar.value = audioPlayer.currentTime;
+        currentTime.textContent = formatTime(audioPlayer.currentTime);
+        requestAnimationFrame(frame)
+      }
+      )()
+    </script>
   </body>
 </html>
