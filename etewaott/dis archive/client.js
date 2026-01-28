@@ -82,7 +82,7 @@ class Client {
             op:6,
             d:{
               token:this.auth,
-              session_id,
+              session_id:this.session_id,
               seq
             }
           }))
@@ -117,6 +117,8 @@ class Client {
             console.log('<IDENTIFY (success) sid:',this.session_id)
             
             console.log('guilds',data.guilds)
+            for(const a of data.guilds)guilds.update(a)
+            
             console.log('relationships',data.relationships)
 
             for(const ob of data.relationships)users.update(ob.user)
@@ -129,15 +131,14 @@ class Client {
             
           case 'MESSAGE_CREATE':
             console.log('<msg',data)
-            users.update(data.author)
-            console.log(`${users.get(data.author.id)?.name}\n${data.content}\n${new Date(data.timestamp)}`)
+            // users.update(data.author)
+            console.log(`${channels.getFullName(data.channel_id)}\n${users.getName(data.author.id)}\n${data.content}\n${new Date(data.timestamp)} ${data.id}`)
           break
 
           case 'PRESENCE_UPDATE':
             console.log('<presence',data);
-            users.update(data.user)
-            
-            console.log(users.get(data.user.id)?.name,data.status,data.client_status)
+            // users.update(data.user)
+            console.log(users.getName(data.user.id),data.status,data.client_status)
           break
             
           default:console.warn('<unknown dispatch',msg)
@@ -150,17 +151,19 @@ class Client {
   }
 }
 
+
 class User{
   constructor(data){
-    this.usr={}
+    this.data={}
     this.update(data)
   }
   update(data){
-    deepAssign(this.usr,data)
-    return this
+    if(!data)return;
+    
+    deepAssign(this.data,data)
   }
-  get name(){
-    return this.usr.global_name??this.usr.username??this.usr.id
+  getName(){
+    return `${this.data.global_name??'?'} (${this.data.username??'?'} ${this.data.id})`
   }
 }
 
@@ -171,11 +174,91 @@ class Users{
   update(data){
     if(!data.id)return console.warn('no id?',data)
     ;(this.usrs[data.id]??(this.usrs[data.id]=new User)).update(data)
-    return this
   }
-  get(id){
-    return this.usrs[id]
+  getName(id){
+    const usr=this.usrs[id]
+    if(!usr)return `<unknow user ${id}>`
+    return usr.getName()
+  }
+}
+
+
+class Guild {
+  constructor(data) {
+    this.channels=new Set
+    this.name="nnf"
+    this.update(data)
+  }
+  update(data){
+    if(!data)return;
+    
+    if(data.id)this.id=data.id
+    if(data.name)this.name=data.name
+    if(data.channels){
+      this.channels=new Set(Object.keys(data.channels))
+      for(const a of data.channels)channels.update(a,this.id)
+    }
+  }
+  getName(){
+    return this.name
+  }
+}
+
+class Guilds {
+  constructor(){
+    this.guilds={}
+  }
+  update(data){
+    const id=data.id
+    if(!id)return console.error('no id?',data)
+    ;(this.guilds[id]??(this.guilds[id]=new Guild)).update(data)
+  }
+  getName(id){
+    const guild=this.guilds[id]
+    if(!guild)return `<unknown guild ${id}>`
+    return guild.getName()
+  }
+}
+
+
+class Channel {
+  constructor(data) {
+    this.channels=new Set
+    this.name="nnf"
+    this.update(data)
+  }
+  update(data,guild){
+    if(!data)return;
+    
+    if(data.id)this.id=data.id
+    if(data.name)this.name=data.name
+    if(data.topic)this.topic=data.topic
+    if(guild)this.guild=guild
+  }
+  getFullName(){
+    return `${guilds.getName(this.guild)}/${this.name} (${this.guild}/${this.id})`
+  }
+}
+
+class Channels {
+  constructor(){
+    this.channels={}
+  }
+  update(data,guild){
+    const id=data.id
+    if(!id)return console.error('no id?',data)
+    ;(this.channels[id]??(this.channels[id]=new Channel)).update(data,guild)
+  }
+  getFullName(id){
+    const channel=this.channels[id]
+    if(!channel)return `<unknown channel ${id}>`
+    return channel.getFullName()
   }
 }
 
 const users=new Users
+const guilds=new Guilds
+const channels=new Channels
+
+walt=new Client(auths.walt)
+walt.connect()
