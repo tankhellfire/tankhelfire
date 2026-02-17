@@ -198,6 +198,13 @@
 
         audioPlayer.src = fileURL = URL.createObjectURL(file)
 
+        // Set up event listeners for the audio player
+        audioPlayer.addEventListener('loadedmetadata', e => {
+          totalTime.textContent = formatTime(seekBar.max = audioPlayer.duration)
+          audioPlayer.playbackRate = Number(speed.value)
+        }
+        )
+
         jsmediatags.read(file, {
           onSuccess: async (tag) => {
             let {picture} = tag.tags;
@@ -212,13 +219,6 @@
           ,
           onError: e => console.error('Error reading metadata:', e, icon.href = thumbnail.src = '')
         })
-
-        // Set up event listeners for the audio player
-        audioPlayer.addEventListener('loadedmetadata', e => {
-          totalTime.textContent = formatTime(seekBar.max = audioPlayer.duration)
-          audioPlayer.playbackRate = Number(speed.value)
-        }
-        )
 
         seekBar.addEventListener('input', e => audioPlayer.currentTime = seekBar.value)
       }

@@ -1,295 +1,289 @@
 <!DOCTYPE html>
-<html lang="en" oncontextmenu="//return false;">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <title>name</title>
-  <script src="/new.js"></script>
-  <script src="../../lib/lib.js"></script>
-  <script src="../../lib/fs.js"></script>
+  <title></title>
   <style>
     *{margin:0;font-family:Consolas,monospace}
   </style>
 </head>
 <body>
-  <button id=button>folder</button>
-<script>
-  const bySet=(a,b)=>{
-    let A=Number(a)
-    if(A!=a)A=String(a?.id??a)
-    let B=Number(b)
-    if(B!=b)B=String(b?.id??b)
-    if(A<B)return -1
-    if(A>B)return 1
-    return 0
-  }
-  const toSet=(a,v)=>{
-    a[String(v?.id??v)]=v
-    return a
-  }
+<script src="client.js">
+//   const bySet=(a,b)=>{
+//     let A=Number(a)
+//     if(A!=a)A=String(a?.id??a)
+//     let B=Number(b)
+//     if(B!=b)B=String(b?.id??b)
+//     if(A<B)return -1
+//     if(A>B)return 1
+//     return 0
+//   }
+//   const toSet=(a,v)=>{
+//     a[String(v?.id??v)]=v
+//     return a
+//   }
 
-  const undef=Symbol('undefined')
+//   const undef=Symbol('undefined')
 
-  const saveUndef=(_,v)=>v===undefined||v===undef?'__undefined__':v
-  const loadUndef=(_,v)=>v==='__undefined__'?undef:v
+//   const saveUndef=(_,v)=>v===undefined||v===undef?'__undefined__':v
+//   const loadUndef=(_,v)=>v==='__undefined__'?undef:v
   
-  async function getGuildsFull(){
-    return Object.fromEntries((await Promise.all((await getUsrGuilds()).map(e=>getGuild(e.id)))).map(e=>[e.id,e]))
-  }
-  function getUsrGuilds(){
-    return fetchWAbort(`${apiURL}/users/@me/guilds`,{headers:{authorization}}).then(e=>e.json())
-  }
-  
-  function getGuild(guild){
-    return fetchWAbort(`${apiURL}/guilds/${guild}`,{headers:{authorization}}).then(e=>e.json())
-  }
-  function getGuildChannels(guild){
-    return fetchWAbort(`${apiURL}/guilds/${guild}/channels`,{headers:{authorization}}).then(e=>e.json()).then(arr=>Object.fromEntries(arr.map(e=>[e.id,e])))
-  }
-  
-  async function getAllChannelMsgs(channel){
-    let out={}
-    let after=0n
-    let i=0
-    while(1){
-      let a=await getChannelMsgs(channel,{limit:100,after:String(after)})
-  
-      if(a.length==0)break
-      for(let msg of a){
-        deepAssign(out[msg.id]={},msg)
-        if(after<BigInt(msg.id))after=BigInt(msg.id)
-      }
-      
-      console.log(i++,(Date.now()-Number((after>>22n)+1420070400000n))/1000/60/60/24)
-    }
-    return out
-  }
-  function getChannelMsgs(channel,{limit=50,after,before}={}){
-    let q=[]
-    if(limit!=undefined)q.push('limit='+Math.min(Math.max(limit,1),100))
-    if(after!=undefined)q.push('after='+after)
-    if(before!=undefined)q.push('before='+before)
-    return fetchWAbort(`${apiURL}/channels/${channel}/messages?${q.join('&')}`,{headers:{authorization}}).then(e=>e.json())
-  }
-  
-  function downloadStr(content, filename) {
-    let link=document.createElement("a")
-    link.download=filename
-    let url=link.href=URL.createObjectURL(new Blob([content],{type:"text/plain"}))
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  }
-  async function fetchWAbort(url,options={},timeout=rate,maxRetries=5){
-    for(let attempt=1;attempt<=maxRetries;attempt++){
-      let controller=new AbortController()
-      let id=setTimeout(e=>controller.abort(),timeout)
-  
-      try{
-        let response=await fetch(url,{
-          ...options,
-          signal:controller.signal
-        })
-        clearTimeout(id)
-  
-        return response
-      }catch(err){
-        clearTimeout(id)
-  
-        // Only retry if it was aborted (timeout)
-        if(err.name==='AbortError'){
-          console.warn(`Attempt ${attempt}: Request timed out`)
-          if(attempt==maxRetries)throw new Error(`Fetch aborted after ${maxRetries} retries`)
-        }else{return err}
-      }
-    }
-  }
-  apiURL="https://discord.com/api/v9"
-  rate=5000
-  button.onclick=_=>showDirectoryPicker().then(h=>(f=new Fs.Folder(h)).requestPermission()+(button.innerHTML=h.name))
-  /*
-  root
-    servers.json
-    folder id
-      channels.json
-      channel id
-        msgs.json
-        media
-          media.json
-          media  name
-  */
-  
-  function isob(obj){return typeof obj==='object'&&obj!==null}
-
-  function findObjectDiff(a,b,maxDepth=100){
-    if(maxDepth<0)return 'maxDepth'
-    let diff={}
-    for(let key of new Set([...Object.keys(a),...Object.keys(b)])){
-      let [ka,kb]=[a[key],b[key]]
-      if(ka===undefined)ka=undef
-      if(kb===undefined)kb=undef
-      
-      if(ka===kb)continue
-      
-      if(isob(kb)){
-        if(!isob(ka)){
-          ka={}
-          diff[key]=ka
-        }
-        if(Array.isArray(ka))ka=ka.reduce(toSet,{})
-        if(Array.isArray(kb))kb=kb.reduce(toSet,{})
-        let subDiff=findObjectDiff(ka,kb,maxDepth-1)
-        if(Object.keys(subDiff).length)diff[key]=subDiff
-      continue}
-      
-      diff[key]=kb
-    }
-    return diff
-  }
-
-  function deepAssign(to,from,destructive=false,maxDepth=100){
-    if(maxDepth<0)return 'maxDepth'
-    for(let key of Object.keys(from)){
-      let fk=from[key]
-      if(fk===undefined)fk=undef
-      
-      if(!destructive&&fk===undef)continue
-      
-      if(isob(fk)){
-        if(!isob(to[key]))to[key]={}
-        if(Array.isArray(fk))fk=fk.reduce(toSet,{})
-        to[key]=deepAssign(to[key],fk,destructive,maxDepth-1)
-      continue}
-
-      to[key]=fk
-    }
-    return to
-  }
-
-
-  function loadUsr(objarr=[],archive,current){
-    let usrId=objarr.at(-1)
-    
-    let ob=archive
-    for(let i=1;i<objarr.length-1;i++){
-      ob=ob[objarr[i]]
-    }
-    
-    let usrObj=ob[usrId]
-    if(!usrObj){
-      console.log(`making ${objarr.join('/')}`)
-      usrObj={}
-      ob[usrId]=usrObj
-    }
-
-    ob=current
-    for(let i=1;i<objarr.length-1;i++){
-      ob=ob[objarr[i]]
-    }
-    
-    let currentObj=ob[usrId]
-    if(!currentObj){
-      console.log(`setting up ${objarr.join('/')}`)
-      
-      currentObj={}
-      for(let timeStamp of Object.keys(usrObj).sort(bySet))deepAssign(currentObj,usrObj[timeStamp],true)
-      
-      ob[usrId]=currentObj
-    }
-    return {currentObj,usrObj}
-  }
-
-
-  let guilds=null
-  let currentGuilds=null
-  async function crawlUsr(){
-    if(!guilds){
-      console.log(`loading guilds`)
-      guilds=await f.get(['guilds.json']).read().then(e=>e.text()).then(e=>JSON.parse(e,loadUndef)).catch(_=>({}))
-      currentGuilds={}
-    }
-
-    let {usrObj:usrGuilds,currentObj:current}=loadUsr(['guilds',usr],guilds,currentGuilds)
-
-    let diff=findObjectDiff(current,await getGuildsFull())
-    usrGuilds[Date.now()]=diff
-    deepAssign(current,diff,true)
-    
-    return {current,diff}
-  }
-
-  let channels={}
-  let currentChannels={}
-  async function crawlGuild(guildId){
-    if(!channels[guildId]){
-      console.log(`loading channels/${guildId}`)
-      channels[guildId]=await f.get([guildId,'channels.json']).read().then(e=>e.text()).then(e=>JSON.parse(e,loadUndef)).catch(_=>({}))
-      currentChannels[guildId]={}
-    }
-
-    let {usrObj:usrChannels,currentObj:current}=loadUsr(['channels',guildId,usr],channels,currentChannels)
-    
-    let diff=findObjectDiff(current,await getGuildChannels(guildId))
-    usrChannels[Date.now()]=diff
-    deepAssign(current,diff,true)
-    
-    return {diff,current}
-  }
-
-
-// console.log(await crawlUsr())
-// for(let e in currentGuilds[usr]){if(guilds.ignore[e])continue;console.log(await crawlGuild(e))}
-// await f.get(['guilds.json']).write(JSON.stringify(guilds,saveUndef))
-// console.log(await Promise.all(Object.keys(currentChannels).map(e=>f.get([e,'channels.json']).write(JSON.stringify(channels[e],saveUndef)))))
-
-
-// let messages={}
-// let currentMessages={}
-// for(let guildId of Object.keys(currentChannels).sort(bySet)){
-//   if(guilds.ignore[guildId])continue
-//   let guild=currentChannels[guildId][usr]
-//   if(!guild)continue
-//   if(!messages[guildId]){
-//     console.log(`making messages/${guildId}`)
-//     messages[guildId]={}
-//     currentMessages[guildId]={}
+//   async function getGuildsFull(){
+//     return Object.fromEntries((await Promise.all((await getUsrGuilds()).map(e=>getGuild(e.id)))).map(e=>[e.id,e]))
+//   }
+//   function getUsrGuilds(){
+//     return fetchWAbort(`${apiURL}/users/@me/guilds`,{headers:{authorization}}).then(e=>e.json())
 //   }
   
-//   for(let channelId of Object.keys(guild).sort(bySet)){
-//     let channel=guild[channelId]
-//     if(!messages[guildId][channelId]){
-//       console.log(`loading messages/${guildId}/${channelId}`)
-//       messages[guildId][channelId]=await f.get([guildId,channelId,'msgs.json']).read().then(e=>e.text()).then(e=>JSON.parse(e,loadUndef)).catch(_=>({}))
-//       currentMessages[guildId][channelId]={}
-//     }
+//   function getGuild(guild){
+//     return fetchWAbort(`${apiURL}/guilds/${guild}`,{headers:{authorization}}).then(e=>e.json())
+//   }
+//   function getGuildChannels(guild){
+//     return fetchWAbort(`${apiURL}/guilds/${guild}/channels`,{headers:{authorization}}).then(e=>e.json()).then(arr=>Object.fromEntries(arr.map(e=>[e.id,e])))
+//   }
   
-//     let {usrObj:usrMsg,currentObj:current}=loadUsr(['messages',guildId,channelId,usr],messages,currentMessages)
+//   async function getAllChannelMsgs(channel){
+//     let out={}
+//     let after=0n
+//     let i=0
+//     while(1){
+//       let a=await getChannelMsgs(channel,{limit:100,after:String(after)})
+  
+//       if(a.length==0)break
+//       for(let msg of a){
+//         deepAssign(out[msg.id]={},msg)
+//         if(after<BigInt(msg.id))after=BigInt(msg.id)
+//       }
+      
+//       console.log(i++,(Date.now()-Number((after>>22n)+1420070400000n))/1000/60/60/24)
+//     }
+//     return out
+//   }
+//   function getChannelMsgs(channel,{limit=50,after,before}={}){
+//     let q=[]
+//     if(limit!=undefined)q.push('limit='+Math.min(Math.max(limit,1),100))
+//     if(after!=undefined)q.push('after='+after)
+//     if(before!=undefined)q.push('before='+before)
+//     return fetchWAbort(`${apiURL}/channels/${channel}/messages?${q.join('&')}`,{headers:{authorization}}).then(e=>e.json())
+//   }
+  
+//   function downloadStr(content, filename) {
+//     let link=document.createElement("a")
+//     link.download=filename
+//     let url=link.href=URL.createObjectURL(new Blob([content],{type:"text/plain"}))
+//     document.body.appendChild(link)
+//     link.click()
+//     document.body.removeChild(link)
+//     URL.revokeObjectURL(url)
+//   }
+//   async function fetchWAbort(url,options={},timeout=rate,maxRetries=5){
+//     for(let attempt=1;attempt<=maxRetries;attempt++){
+//       let controller=new AbortController()
+//       let id=setTimeout(e=>controller.abort(),timeout)
+  
+//       try{
+//         let response=await fetch(url,{
+//           ...options,
+//           signal:controller.signal
+//         })
+//         clearTimeout(id)
+  
+//         return response
+//       }catch(err){
+//         clearTimeout(id)
+  
+//         // Only retry if it was aborted (timeout)
+//         if(err.name==='AbortError'){
+//           console.warn(`Attempt ${attempt}: Request timed out`)
+//           if(attempt==maxRetries)throw new Error(`Fetch aborted after ${maxRetries} retries`)
+//         }else{return err}
+//       }
+//     }
+//   }
+//   apiURL="https://discord.com/api/v9"
+//   rate=5000
+//   button.onclick=_=>showDirectoryPicker().then(h=>(f=new Fs.Folder(h)).requestPermission()+(button.innerHTML=h.name))
+//   /*
+//   root
+//     servers.json
+//     folder id
+//       channels.json
+//       channel id
+//         msgs.json
+//         media
+//           media.json
+//           media  name
+//   */
+  
+//   function isob(obj){return typeof obj==='object'&&obj!==null}
 
-//     console.log(`fetching ${currentGuilds[usr][guildId].name}/${channel.name}`)
+//   function findObjectDiff(a,b,maxDepth=100){
+//     if(maxDepth<0)return 'maxDepth'
+//     let diff={}
+//     for(let key of new Set([...Object.keys(a),...Object.keys(b)])){
+//       let [ka,kb]=[a[key],b[key]]
+//       if(ka===undefined)ka=undef
+//       if(kb===undefined)kb=undef
+      
+//       if(ka===kb)continue
+      
+//       if(isob(kb)){
+//         if(!isob(ka)){
+//           ka={}
+//           diff[key]=ka
+//         }
+//         if(Array.isArray(ka))ka=ka.reduce(toSet,{})
+//         if(Array.isArray(kb))kb=kb.reduce(toSet,{})
+//         let subDiff=findObjectDiff(ka,kb,maxDepth-1)
+//         if(Object.keys(subDiff).length)diff[key]=subDiff
+//       continue}
+      
+//       diff[key]=kb
+//     }
+//     return diff
+//   }
+
+//   function deepAssign(to,from,destructive=false,maxDepth=100){
+//     if(maxDepth<0)return 'maxDepth'
+//     for(let key of Object.keys(from)){
+//       let fk=from[key]
+//       if(fk===undefined)fk=undef
+      
+//       if(!destructive&&fk===undef)continue
+      
+//       if(isob(fk)){
+//         if(!isob(to[key]))to[key]={}
+//         if(Array.isArray(fk))fk=fk.reduce(toSet,{})
+//         to[key]=deepAssign(to[key],fk,destructive,maxDepth-1)
+//       continue}
+
+//       to[key]=fk
+//     }
+//     return to
+//   }
+
+
+//   function loadUsr(objarr=[],archive,current){
+//     let usrId=objarr.at(-1)
     
-//     let diff=findObjectDiff(current,await getAllChannelMsgs(channelId).catch(_=>undef))
-//     usrMsg[Date.now()]=diff
+//     let ob=archive
+//     for(let i=1;i<objarr.length-1;i++){
+//       ob=ob[objarr[i]]
+//     }
+    
+//     let usrObj=ob[usrId]
+//     if(!usrObj){
+//       console.log(`making ${objarr.join('/')}`)
+//       usrObj={}
+//       ob[usrId]=usrObj
+//     }
+
+//     ob=current
+//     for(let i=1;i<objarr.length-1;i++){
+//       ob=ob[objarr[i]]
+//     }
+    
+//     let currentObj=ob[usrId]
+//     if(!currentObj){
+//       console.log(`setting up ${objarr.join('/')}`)
+      
+//       currentObj={}
+//       for(let timeStamp of Object.keys(usrObj).sort(bySet))deepAssign(currentObj,usrObj[timeStamp],true)
+      
+//       ob[usrId]=currentObj
+//     }
+//     return {currentObj,usrObj}
+//   }
+
+
+//   let guilds=null
+//   let currentGuilds=null
+//   async function crawlUsr(){
+//     if(!guilds){
+//       console.log(`loading guilds`)
+//       guilds=await f.get(['guilds.json']).read().then(e=>e.text()).then(e=>JSON.parse(e,loadUndef)).catch(_=>({}))
+//       currentGuilds={}
+//     }
+
+//     let {usrObj:usrGuilds,currentObj:current}=loadUsr(['guilds',usr],guilds,currentGuilds)
+
+//     let diff=findObjectDiff(current,await getGuildsFull())
+//     usrGuilds[Date.now()]=diff
 //     deepAssign(current,diff,true)
     
-//     console.log([currentGuilds[usr][guildId].name,channel.name,diff])
+//     return {current,diff}
 //   }
-// }
 
-// for(let guid in currentMessages){
-//   for(let chuid in currentMessages[guid]){
-//     await f.get([guid,chuid,'msgs.json']).write(JSON.stringify(messages[guid][chuid],saveUndef))
-//     console.log([currentGuilds[usr][guid].name,currentChannels[guid][usr][chuid].name],messages[guid][chuid])
-//   }
-// }
+//   let channels={}
+//   let currentChannels={}
+//   async function crawlGuild(guildId){
+//     if(!channels[guildId]){
+//       console.log(`loading channels/${guildId}`)
+//       channels[guildId]=await f.get([guildId,'channels.json']).read().then(e=>e.text()).then(e=>JSON.parse(e,loadUndef)).catch(_=>({}))
+//       currentChannels[guildId]={}
+//     }
 
-// a=await(await fetch(`${apiURL}/users/${'947437107226509402'}/relationships`,{
-//   "headers":{
-//     authorization,
-//     "content-type":"application/json",
+//     let {usrObj:usrChannels,currentObj:current}=loadUsr(['channels',guildId,usr],channels,currentChannels)
+    
+//     let diff=findObjectDiff(current,await getGuildChannels(guildId))
+//     usrChannels[Date.now()]=diff
+//     deepAssign(current,diff,true)
+    
+//     return {diff,current}
 //   }
-// })).json()
+
+
+// // console.log(await crawlUsr())
+// // for(let e in currentGuilds[usr]){if(guilds.ignore[e])continue;console.log(await crawlGuild(e))}
+// // await f.get(['guilds.json']).write(JSON.stringify(guilds,saveUndef))
+// // console.log(await Promise.all(Object.keys(currentChannels).map(e=>f.get([e,'channels.json']).write(JSON.stringify(channels[e],saveUndef)))))
+
+
+// // let messages={}
+// // let currentMessages={}
+// // for(let guildId of Object.keys(currentChannels).sort(bySet)){
+// //   if(guilds.ignore[guildId])continue
+// //   let guild=currentChannels[guildId][usr]
+// //   if(!guild)continue
+// //   if(!messages[guildId]){
+// //     console.log(`making messages/${guildId}`)
+// //     messages[guildId]={}
+// //     currentMessages[guildId]={}
+// //   }
+  
+// //   for(let channelId of Object.keys(guild).sort(bySet)){
+// //     let channel=guild[channelId]
+// //     if(!messages[guildId][channelId]){
+// //       console.log(`loading messages/${guildId}/${channelId}`)
+// //       messages[guildId][channelId]=await f.get([guildId,channelId,'msgs.json']).read().then(e=>e.text()).then(e=>JSON.parse(e,loadUndef)).catch(_=>({}))
+// //       currentMessages[guildId][channelId]={}
+// //     }
+  
+// //     let {usrObj:usrMsg,currentObj:current}=loadUsr(['messages',guildId,channelId,usr],messages,currentMessages)
+
+// //     console.log(`fetching ${currentGuilds[usr][guildId].name}/${channel.name}`)
+    
+// //     let diff=findObjectDiff(current,await getAllChannelMsgs(channelId).catch(_=>undef))
+// //     usrMsg[Date.now()]=diff
+// //     deepAssign(current,diff,true)
+    
+// //     console.log([currentGuilds[usr][guildId].name,channel.name,diff])
+// //   }
+// // }
+
+// // for(let guid in currentMessages){
+// //   for(let chuid in currentMessages[guid]){
+// //     await f.get([guid,chuid,'msgs.json']).write(JSON.stringify(messages[guid][chuid],saveUndef))
+// //     console.log([currentGuilds[usr][guid].name,currentChannels[guid][usr][chuid].name],messages[guid][chuid])
+// //   }
+// // }
+
+// // a=await(await fetch(`${apiURL}/users/${'947437107226509402'}/relationships`,{
+// //   "headers":{
+// //     authorization,
+// //     "content-type":"application/json",
+// //   }
+// // })).json()
 
 </script>
 </body>

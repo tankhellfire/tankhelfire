@@ -83,7 +83,7 @@ class Client {
             d:{
               token:this.auth,
               session_id:this.session_id,
-              seq
+              seq:this.seq
             }
           }))
           console.log(">RESUME");
@@ -93,6 +93,7 @@ class Client {
             d:{
               token:this.auth,
               properties:{},
+              capabilities:1734653
             }
           }))
           console.log(">IDENTIFY")
@@ -116,12 +117,9 @@ class Client {
             this.session_id=data.session_id
             console.log('<IDENTIFY (success) sid:',this.session_id)
             
-            console.log('guilds',data.guilds)
             for(const a of data.guilds)guilds.update(a)
             
-            console.log('relationships',data.relationships)
-
-            for(const ob of data.relationships)users.update(ob.user)
+            for(const usr of data.users)users.update(usr)
             
           break
             
@@ -131,14 +129,30 @@ class Client {
             
           case 'MESSAGE_CREATE':
             console.log('<msg',data)
-            // users.update(data.author)
+            users.update(data.author)
             console.log(`${channels.getFullName(data.channel_id)}\n${users.getName(data.author.id)}\n${data.content}\n${new Date(data.timestamp)} ${data.id}`)
           break
 
           case 'PRESENCE_UPDATE':
             console.log('<presence',data);
-            // users.update(data.user)
+            users.update(data.user)
             console.log(users.getName(data.user.id),data.status,data.client_status)
+          break
+
+          case 'GUILD_MEMBER_LIST_UPDATE':
+            for(const operation of data.ops){
+              switch(operation.op){
+                case "SYNC":
+
+                  for(const item of operation.items){
+                    if(!item.member)continue
+                    users.update(item.member.user)
+                  }
+                  
+                break
+                // default:console.warn('<unknown GUILD_MEMBER_LIST_UPDATE operation',data)
+              }
+            }
           break
             
           default:console.warn('<unknown dispatch',msg)
@@ -173,7 +187,7 @@ class Users{
   }
   update(data){
     if(!data.id)return console.warn('no id?',data)
-    ;(this.usrs[data.id]??(this.usrs[data.id]=new User)).update(data)
+    if(this.usrs[data.id]){this.usrs[data.id].update(data)}else{this.usrs[data.id]=new User(data)}
   }
   getName(id){
     const usr=this.usrs[id]
@@ -190,13 +204,17 @@ class Guild {
     this.update(data)
   }
   update(data){
-    if(!data)return;
+    if(!data)return console.warn('no data',this)
     
     if(data.id)this.id=data.id
+    if(!this.id)return console.warn('no id',this,data)
+    
     if(data.name)this.name=data.name
+    if(data.properties){
+      if(data.properties.name)this.name=data.properties.name
+    }
     if(data.channels){
-      this.channels=new Set(Object.keys(data.channels))
-      for(const a of data.channels)channels.update(a,this.id)
+      for(const a of data.channels)channels.update(a,this)
     }
   }
   getName(){
@@ -210,8 +228,8 @@ class Guilds {
   }
   update(data){
     const id=data.id
-    if(!id)return console.error('no id?',data)
-    ;(this.guilds[id]??(this.guilds[id]=new Guild)).update(data)
+    if(!id)return console.warn('no id?',data)
+    if(this.guilds[id]){this.guilds[id].update(data)}else{this.guilds[id]=new Guild(data)}
   }
   getName(id){
     const guild=this.guilds[id]
@@ -222,21 +240,25 @@ class Guilds {
 
 
 class Channel {
-  constructor(data) {
-    this.channels=new Set
+  constructor(data,guild) {
     this.name="nnf"
-    this.update(data)
+    this.update(data,guild)
   }
   update(data,guild){
-    if(!data)return;
+    if(!data)return console.warn('no data',guild,this);
+    
     
     if(data.id)this.id=data.id
+    if(!this.id)return console.warn('no id',guild,this);
+    
+    guild.channels[this.id]=this
+    
     if(data.name)this.name=data.name
     if(data.topic)this.topic=data.topic
     if(guild)this.guild=guild
   }
   getFullName(){
-    return `${guilds.getName(this.guild)}/${this.name} (${this.guild}/${this.id})`
+    return `${this.guild.getName()}/${this.name} (${this.guild.id}/${this.id})`
   }
 }
 
@@ -247,7 +269,7 @@ class Channels {
   update(data,guild){
     const id=data.id
     if(!id)return console.error('no id?',data)
-    ;(this.channels[id]??(this.channels[id]=new Channel)).update(data,guild)
+    if(this.channels[id]){this.channels[id].update(data,guild)}else{this.channels[id]=new Channel(data,guild)}
   }
   getFullName(id){
     const channel=this.channels[id]
@@ -260,5 +282,23 @@ const users=new Users
 const guilds=new Guilds
 const channels=new Channels
 
-walt=new Client(auths.walt)
-walt.connect()
+// cl=new Client(auths.walt)
+// cl.connect()
+
+// cl.ws.send(JSON.stringify({"op":36,"d":{"guild_id":"1389578717080326146"}})) //ch stat
+// cl.ws.send(JSON.stringify({"op":43,"d":{"guild_id":"1389578717080326146","fields":["status","voice_start_time"]}})) //ch info
+// cl.ws.send(JSON.stringify({"op":37,"d":{"subscriptions":{"1389578717080326146":{"typing":true,"activities":true,"threads":true,"channels":{"1389578718321574059":[[0,99]]}}}}})) //threads, guil_dmembers
+
+// fetch("https://discord.com/api/v9/guilds/1465269139697303658/members-search", {//requres mod
+//   "headers": {
+//     "authorization": auth,
+//     "content-type": "application/json"
+//   },
+//   "body": "{\"or_query\":{},\"and_query\":{},\"limit\":250}",
+//   "method": "POST",
+// });
+
+// for(const guid in guilds.guilds){
+//   await cl.ws.send(JSON.stringify({"op":37,"d":{"subscriptions":{[guid]:{"channels":{[Object.keys(guilds.guilds[guid].channels)[0]]:[[0,99]]}}}}})) //threads, guil_dmembers
+//   await new Promise(res=>setTimeout(res,1000))
+// }
