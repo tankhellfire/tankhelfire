@@ -133,6 +133,12 @@
         patternInput.onblur = wordInput.onblur = e => {
           output.innerText = "loading"
 
+          let patterns={}
+          for (let word of words.words){
+            let pat=getPattern(word,wordInput.value||"naieo")
+            patterns[pat]=word
+          }
+          
           let buff = ""
           let out = []
           for (const letter of patternInput.value.replaceAll('\n', '').replaceAll(' ', '/')) {
@@ -146,7 +152,7 @@
             out.push(buff)
           patternInput.value = out.join('\n')
 
-          output.innerText = out.map(pattern => words.words.filter(e => match(e, pattern.padEnd(5, '?'), (wordInput.value || "naieo").toLowerCase()))).map(e => e[0] || 'not found').join('\n')
+          output.innerText = out.map(pattern =>(patterns[pattern]|| 'not found').toLowerCase()).join('\n')
         }
 
         statusCard.remove()
@@ -209,6 +215,61 @@ for(const letter of "//....//../--/../-./.."){
 }
 if(buff.length!=0)out.push(buff.padEnd(5,'/'))
 out.map(pattern=>words.words.filter(e=>match(e,pattern,(wordInput.value||"naieo").toLowerCase()))).map(e=>e[0]||'not found')
+*/
+
+/*
+let patterns={}
+for (let word of words.words){
+  let pat=getPattern(word,wordInput.value||"naieo")
+  patterns[pat]=word
+}
+
+let inp=`11111
+12121
+32222
+33245
+33267`.split('\n')
+let chars={}
+for (let char of inp.join('')) {
+  if(char=='/'||char=='.'||char=='-')continue
+  chars[char]=1
+}
+chars=Object.keys(chars)
+
+function rec(obj={},chars,depth=0,inp,out=[]){
+  obj['.']='.'
+  obj['/']='/'
+  obj['-']='-'
+  // if(out.length)return out//
+  
+  if(depth>=chars.length){
+    if(obj['1']==obj['2'])return out
+    if(obj['1']==obj['3'])return out
+
+    
+    let words=[]
+    let pats=[]
+    for (let pat of inp) {
+      let pattern=pat.split('').map(e=>obj[e]).join('')
+      pats.push(pattern)
+      let word=patterns[pattern]
+      if(!word) return;
+      words.push(word)
+    }
+    console.warn(pats.join('\n'))
+    out.push(words)
+    return out
+  }
+  let myChar=chars[depth]
+  for(let char of './-'){
+    obj[myChar]=char
+    rec(obj,chars,depth+1,inp,out)
+    // if(out.length)return out//
+  }
+  return out
+}
+
+rec({},chars,0,inp)
 */
     </script>
   </body>

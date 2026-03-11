@@ -1,3 +1,5 @@
+
+
 function isob(val){return typeof val==='object'&&val!==null}
 const undef=Symbol('undefined')
 const bySet=(a,b)=>{
@@ -31,6 +33,14 @@ function deepAssign(to,from,destructive=false,maxDepth=100){
     to[key]=fk
   }
   return to
+}
+
+function sendMsg(msg,chid,auth) {
+  return fetch(`https://discord.com/api/v9/channels/${chid}/messages`,{
+    headers:{authorization:auth,"content-type":"application/json"},
+    "body": JSON.stringify({"content":"I must be lv 69","nonce":String(Math.random())}),
+    "method": "POST"
+  })
 }
 
 class Client {
@@ -302,3 +312,14 @@ const channels=new Channels
 //   await cl.ws.send(JSON.stringify({"op":37,"d":{"subscriptions":{[guid]:{"channels":{[Object.keys(guilds.guilds[guid].channels)[0]]:[[0,99]]}}}}})) //threads, guil_dmembers
 //   await new Promise(res=>setTimeout(res,1000))
 // }
+
+
+// interval=1000*60
+// if(window.timeout)clearInterval(window.timeout)
+// function main() {
+//   sendMsg("I must be lv 69",'1469260498359943313',auth.thsg)
+//   sendMsg("I must be lv 69",'1474614174935027946',auth.thsg)
+//   let time=interval-Date.now()%(interval)
+//   window.timeout=setTimeout(main,interval<time?interval:time)
+// }
+// window.timeout=setTimeout(main,interval-Date.now()%(interval))

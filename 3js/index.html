@@ -31,7 +31,7 @@
       ;(async () => {
         statusCard.textContent = 'importing'
 
-        window.THREE = await load('3.js', e => import(e + 'lib/three/build/three.module.js'), 1)
+        window.THREE = await load('3.js', e => import(e + 'lib/three/build/three.module.min.js'), 1)
 
         statusCard.textContent = 'loading'
 
@@ -57,6 +57,8 @@
           alpha:true
         });
 
+        renderer.shadowMap.enabled=1
+
         document.body.appendChild(renderer.domElement);
 
         window.updateCanvas = function() {
@@ -79,7 +81,7 @@
         }
 
         // Add a cube
-
+        
         let cubePose = []
         let hash = window.location.hash.substr(1)
         if (hash) {
@@ -94,13 +96,17 @@
           cubePose = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 1], ]
         }
 
+        window.group=new THREE.Object3D()
+        scene.add(group);
+        
+        const geometry = new THREE.BoxGeometry(document.location.search.substr(1) || 1,document.location.search.substr(1) || 1,document.location.search.substr(1) || 1);
+
+        window.cubes=[]
         for (let props of cubePose) {
-          const geometry = new THREE.BoxGeometry(document.location.search.substr(1) || 1,document.location.search.substr(1) || 1,document.location.search.substr(1) || 1);
-          const material = new THREE.MeshBasicMaterial
-          const edgeMaterial = new THREE.MeshBasicMaterial({
-            color: '#000000'
-          })
-          const edges = new THREE.EdgesGeometry(geometry);
+
+          const material = new THREE.MeshPhongMaterial
+          
+
           // Extract edges
           const cube = new THREE.Mesh(geometry,material);
           cube.material.color.r = Math.abs(props[0])
@@ -110,16 +116,22 @@
           cube.position.x = props[0] * 2
           cube.position.y = props[1] * 2
           cube.position.z = -props[2] * 2
-
-          const edgeLines = new THREE.LineSegments(edges,edgeMaterial);
-          cube.add(edgeLines);
           // Add edges as a child of the cube
 
-          scene.add(cube);
+          cube.receiveShadow=1
+          cube.castShadow=1
+
+          group.add(cube);
+          cubes.push(cube)
         }
 
+        window.light=new THREE.DirectionalLight(0xFFFFFF,1)
+        light.position.set(10,10,10)
+        light.castShadow=1
+        scene.add(light)
+
         window.rotspeed = []
-        for (let a = 0; a < scene.children.length + 1; a++) {
+        for (let a = 0; a < cubes.length +1 ; a++) {
           rotspeed.push([2 * (2 * Math.random() - 1), 2 * (2 * Math.random() - 1), 2 * (2 * Math.random() - 1)])
         }
         // Animation loop
@@ -127,18 +139,19 @@
           let n = 0
           requestAnimationFrame(animate);
           let t = performance.now() * .001
-          for (let a of scene.children) {
+          for (let a of cubes) {
             a.rotation.x = t * rotspeed[n][0];
             a.rotation.y = t * rotspeed[n][1];
             a.rotation.z = t * rotspeed[n++][2];
           }
-          scene.rotation.x = t * rotspeed[n][0];
-          scene.rotation.y = t * rotspeed[n][1];
-          scene.rotation.z = t * rotspeed[n++][2];
+          group.rotation.x = t * rotspeed[n][0]/5;
+          group.rotation.y = t * rotspeed[n][1]/5;
+          group.rotation.z = t * rotspeed[n++][2]/5;
           updateCanvas()
           renderer.render(scene, camera);
         }
         animate();
+
 
         // Initial update of canvas and camera aspect
         updateCanvas();

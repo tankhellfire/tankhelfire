@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Feed</title>
+    <style>
+      video {
+        width: 100%;
+        max-width: 600px;
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Camera Feed</h1>
+    <select id="sourceSelect" onchange="updateSource()"></select>
+    <video id="videoElement" autoplay playsinline></video>
+    <script>
+      const videoElement = document.getElementById('videoElement');
+      const sourceSelect = document.getElementById('sourceSelect');
+      let currentStream;
+
+      async function getMediaSources() {
+        const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+        mediaDevices.forEach(device => {
+          if (device.kind === 'videoinput') {
+            const option = document.createElement('option');
+            option.value = device.deviceId;
+            option.text = device.label || `Camera ${sourceSelect.length + 1}`;
+            sourceSelect.appendChild(option);
+          }
+        }
+        );
+      }
+
+      async function updateSource() {
+        if (currentStream) {
+          const tracks = currentStream.getTracks();
+          tracks.forEach(track => track.stop());
+          // Stop any current tracks
+        }
+        const constraints = {
+          video: {
+            deviceId: {
+              ideal: sourceSelect.value
+            }// Use 'ideal' instead of 'exact'
+          }
+        };
+
+        try {
+          currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+          videoElement.srcObject = currentStream;
+        } catch (error) {
+          console.error("Error accessing media devices.", error);
+          alert("Could not access the selected camera. Please select another one.");
+        }
+      }
+
+      // Initialize the camera and populate dropdown
+      getMediaSources().then(updateSource);
+    </script>
+  </body>
+</html>
