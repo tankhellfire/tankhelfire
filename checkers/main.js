@@ -1,3 +1,6 @@
+const playerSpeed=5
+
+
 const rot=2*Math.PI
 
 const paths = ['../', 'https://thf.onrender.com/', 'https://tankhellfire.github.io/tankhelfire/']
@@ -28,7 +31,8 @@ async function setup(){
   window.camera = new THREE.PerspectiveCamera(90,1,0.1,1000);
   // camera.rotation._order='YXZ'
 
-  camera.position.z = 7;
+  camera.position.y=7
+  camera.rotation.x=-rot*.2
 
   window.renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -102,19 +106,32 @@ async function buildScene(){
 }
 
 
-window.frameLoop=async function(time=window.frameStartTime){
-  const dt=time/1000-frameStartTime
-  frameStartTime=time/1000
-  
+function inputs(dt) {
+  camera.position.add(new THREE.Vector3(key('ArrowRight').down-key('ArrowLeft').down,0,key('ArrowDown').down-key('ArrowUp').down).normalize().multiplyScalar(dt*playerSpeed).applyAxisAngle({x:0,y:1,z:0},camera.rotation.y))
+  key.end()
+}
+
+function gameLoop(dt) {
   scene.children[1].rotation.x+=rot*dt
   scene.children[1].rotation.y+=rot/5*dt
-  
+}
+
+function render(dt) {
   updateCanvas()
   renderer.render(scene, camera);
+}
 
-  key.endOfFrame()
+async function frameLoop(time=window.frameStartTime){
+  const dt=time/1000-frameStartTime
+  frameStartTime=time/1000
+
+  inputs(dt)
+  gameLoop(dt)
+  render(dt)
+
   requestAnimationFrame(frameLoop)
 }
+
 
 ;(async () => {
   await importAll()
@@ -127,3 +144,7 @@ window.frameLoop=async function(time=window.frameStartTime){
   statusCard.remove()
 }
 )()
+
+
+
+
