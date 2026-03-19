@@ -185,15 +185,14 @@ function m(word=(words.words[wordId++]??words.words[0])){
   
   return [word,score,winNext]
 }
-// a=words.answers
-// let t=setInterval(m,0)
-
-// m('mound')
+a=words.answers
+let t=setInterval(m,0)
 
 
 // clearTimeout(t)
 
-// a=a.filter(e=>match('slate','////',e))
+a=a.filter(e=>match('slate','//-/-',e))
+a.map(m)
 
 
 

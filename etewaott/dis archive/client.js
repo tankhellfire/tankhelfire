@@ -1,4 +1,4 @@
-
+rel=null
 
 function isob(val){return typeof val==='object'&&val!==null}
 const undef=Symbol('undefined')
@@ -35,12 +35,75 @@ function deepAssign(to,from,destructive=false,maxDepth=100){
   return to
 }
 
+apiURL="https://discord.com/api/v9"
+rate=500
+
 function sendMsg(msg,chid,auth) {
   return fetch(`https://discord.com/api/v9/channels/${chid}/messages`,{
     headers:{authorization:auth,"content-type":"application/json"},
     "body": JSON.stringify({"content":"I must be lv 69","nonce":String(Math.random())}),
     "method": "POST"
   })
+}
+
+async function fetchWAbort(url,options={},timeout=rate,maxRetries=5){
+  for(let attempt=1;attempt<=maxRetries;attempt++){
+    let controller=new AbortController()
+    let id=setTimeout(e=>controller.abort(),timeout)
+
+    try{
+      let response=await fetch(url,{
+        ...options,
+        signal:controller.signal
+      })
+      clearTimeout(id)
+
+      return response
+    }catch(err){
+      clearTimeout(id)
+
+      // Only retry if it was aborted (timeout)
+      if(err.name==='AbortError'){
+        console.warn(`Attempt ${attempt}: Request timed out`)
+        if(attempt==maxRetries)throw new Error(`Fetch aborted after ${maxRetries} retries`)
+      }else{return err}
+    }
+  }
+}
+async function getAllChannelMsgs(channe,authorizationl){
+  let out={}
+  let after=0n
+  let i=0
+  while(1){
+    let a=await getChannelMsgs(channel,authorization,{limit:100,after:String(after)})
+
+    if(a.length==0)break
+    for(let msg of a){
+      deepAssign(out[msg.id]={},msg)
+      if(after<BigInt(msg.id))after=BigInt(msg.id)
+    }
+  
+    console.log(i++,(Date.now()-Number((after>>22n)+1420070400000n))/1000/60/60/24)
+  }
+  return out
+}
+function getChannelMsgs(channel,authorization,{limit=100,after,before}={}){
+  let q=[]
+  if(limit!=undefined)q.push('limit='+Math.min(Math.max(limit,1),100))
+  if(after!=undefined)q.push('after='+after)
+  if(before!=undefined)q.push('before='+before)
+  return fetchWAbort(`${apiURL}/channels/${channel}/messages?${q.join('&')}`,{headers:{authorization}}).then(e=>e.json())
+}
+
+function getUsrGuilds(authorization){
+  return fetchWAbort(`${apiURL}/users/@me/guilds`,{headers:{authorization}}).then(e=>e.json())
+}
+
+function getGuild(guild,authorization){
+  return fetchWAbort(`${apiURL}/guilds/${guild}`,{headers:{authorization}}).then(e=>e.json())
+}
+function getGuildChannels(guild,authorization){
+  return fetchWAbort(`${apiURL}/guilds/${guild}/channels`,{headers:{authorization}}).then(e=>e.json()).then(arr=>Object.fromEntries(arr.map(e=>[e.id,e])))
 }
 
 class Client {
@@ -56,9 +119,10 @@ class Client {
     this.disconnect()
 
     console.log('>new wss')
-    this.ws=new WebSocket('wss://gateway.discord.gg/?v=9')
+    this.ws=new WebSocket(this.resume_gateway_url??'wss://gateway.discord.gg/?v=9');this.resume_gateway_url=undefined
     this.ws.open=e=>console.log('open',e)
     this.ws.onmessage=e=>this.onmessage(e)
+    this.ws.onerror=_=>this.connect()
   }
 
   disconnect(){
@@ -125,11 +189,13 @@ class Client {
         switch(eventName){
           case "READY":
             this.session_id=data.session_id
-            console.log('<IDENTIFY (success) sid:',this.session_id)
+            this.resume_gateway_url=data.resume_gateway_url
+            console.log('<IDENTIFY (success) sid:',this.session_id,data)
             
             for(const a of data.guilds)guilds.update(a)
             
             for(const usr of data.users)users.update(usr)
+            for(const dm of data.private_channels)channels.update(dm,'dm')
             
           break
             
@@ -139,8 +205,7 @@ class Client {
             
           case 'MESSAGE_CREATE':
             console.log('<msg',data)
-            users.update(data.author)
-            console.log(`${channels.getFullName(data.channel_id)}\n${users.getName(data.author.id)}\n${data.content}\n${new Date(data.timestamp)} ${data.id}`)
+            console.log(channels.msg(data).view)
           break
 
           case 'PRESENCE_UPDATE':
@@ -164,6 +229,11 @@ class Client {
               }
             }
           break
+
+          case "MESSAGE_UPDATE":
+            console.log('<msg edit',data)
+            console.log(channels.msg(data).view)
+          break
             
           default:console.warn('<unknown dispatch',msg)
         }
@@ -173,12 +243,41 @@ class Client {
       default:console.warn('<unknown op',msg)
     }
   }
+  async getAllMsg(chid){
+    let out={}
+    let after=0n
+    let i=0
+    while(1){
+      let a=await this.getChannelMsgs(chid,{limit:100,after:String(after)})
+  
+      if(a.length==0)break
+      for(let msg of a){
+        deepAssign(out[msg.id]={},msg)
+        if(after<BigInt(msg.id))after=BigInt(msg.id)
+      }
+    
+      console.log(i++,(Date.now()-Number((after>>22n)+1420070400000n))/1000/60/60/24)
+    }
+    return out
+  }
+
+  async getChannelMsgs(chid,{limit=100,after,before}={}){
+    let q=[]
+    if(limit!=undefined)q.push('limit='+Math.min(Math.max(limit,1),100))
+    if(after!=undefined)q.push('after='+after)
+    if(before!=undefined)q.push('before='+before)
+    const ret=await fetchWAbort(`${apiURL}/channels/${chid}/messages?${q.join('&')}`,{headers:{authorization:this.auth}}).then(e=>e.json())
+    
+    const ch=channels.get(chid)
+    return ret.map(e=>ch.msg(e))
+  }
 }
 
 
 class User{
   constructor(data){
     this.data={}
+    
     this.update(data)
   }
   update(data){
@@ -195,7 +294,7 @@ class Users{
   constructor(){
     this.usrs={}
   }
-  update(data){
+  update(data={}){
     if(!data.id)return console.warn('no id?',data)
     if(this.usrs[data.id]){this.usrs[data.id].update(data)}else{this.usrs[data.id]=new User(data)}
   }
@@ -208,23 +307,21 @@ class Users{
 
 
 class Guild {
-  constructor(data) {
-    this.channels=new Set
-    this.name="nnf"
-    this.update(data)
+  constructor(id) {
+    this.channels={}
+    this.id=id
+
+    this.data={}
   }
-  update(data){
-    if(!data)return console.warn('no data',this)
-    
-    if(data.id)this.id=data.id
-    if(!this.id)return console.warn('no id',this,data)
-    
+  update(data={}){
+    this.data[Date.now()]=data
+        
     if(data.name)this.name=data.name
     if(data.properties){
       if(data.properties.name)this.name=data.properties.name
     }
     if(data.channels){
-      for(const a of data.channels)channels.update(a,this)
+      for(const a of data.channels)channels.update(a,this.id)
     }
   }
   getName(){
@@ -237,9 +334,11 @@ class Guilds {
     this.guilds={}
   }
   update(data){
-    const id=data.id
-    if(!id)return console.warn('no id?',data)
-    if(this.guilds[id]){this.guilds[id].update(data)}else{this.guilds[id]=new Guild(data)}
+    if(!data.id)return console.warn('no id?',data)
+    this.get(data.id).update(data)
+  }
+  get(id){
+    return this.guilds[id]??(this.guilds[id]=new Guild(id))
   }
   getName(id){
     const guild=this.guilds[id]
@@ -250,25 +349,32 @@ class Guilds {
 
 
 class Channel {
-  constructor(data,guild) {
-    this.name="nnf"
-    this.update(data,guild)
+  constructor(id){
+    this.id=id
+
+    this.data=[]
+    this.msgs={}
   }
-  update(data,guild){
-    if(!data)return console.warn('no data',guild,this);
-    
-    
-    if(data.id)this.id=data.id
-    if(!this.id)return console.warn('no id',guild,this);
-    
-    guild.channels[this.id]=this
-    
+  update(data={},guid){
+    this.data.push(data)
+    if(guid){
+      this.guild=guilds.get(guid)
+      this.guild[this.id]=this
+    }
     if(data.name)this.name=data.name
     if(data.topic)this.topic=data.topic
-    if(guild)this.guild=guild
   }
   getFullName(){
-    return `${this.guild.getName()}/${this.name} (${this.guild.id}/${this.id})`
+    return `${this.guild?this.guild.getName():'unknown'}/${this.name} (${this.guild?.id}/${this.id})`
+  }
+  msg(data){
+    let msg=this.msgs[data.id]
+    if(msg){
+      msg.update(data)
+    }else{
+      msg=this.msgs[data.id]=new Msg(data)
+    }
+    return msg
   }
 }
 
@@ -276,15 +382,46 @@ class Channels {
   constructor(){
     this.channels={}
   }
-  update(data,guild){
-    const id=data.id
-    if(!id)return console.error('no id?',data)
-    if(this.channels[id]){this.channels[id].update(data,guild)}else{this.channels[id]=new Channel(data,guild)}
+  update(data,guid){
+    this.get(data.id).update(data,guid)
+  }
+  get(id){
+    return this.channels[id]??(this.channels[id]=new Channel(id))
   }
   getFullName(id){
     const channel=this.channels[id]
     if(!channel)return `<unknown channel ${id}>`
     return channel.getFullName()
+  }
+  msg(data){
+    let ch=this.channels[data.channel_id]
+    if(!ch){ch=this.channels[data.channel_id]=new Channel({id:data.channel_id})}
+    return ch.msg(data)
+  }
+}
+
+class Msg {
+  constructor(data){
+    this.content={}
+    this.id=data.id
+    this.author=data.author.id
+    this.channel_id=data.channel_id
+    if(data.message_reference)this.message_reference=data.message_reference.message_id
+    if(data.attachments.length){
+      this.attachments={}
+      for(const att of data.attachments)this.attachments[att.id]=att.proxy_url
+    }
+    this.update(data)
+  }
+  update(data){
+    if(data.author)users.update(data.author)
+    this.content[data.edited_timestamp??data.timestamp]=data.content
+  }
+  get view(){
+    return `${channels.getFullName(this.channel_id)}
+${users.getName(this.author)}
+${Object.values(this.content).at(-1)}
+${new Date(Object.keys(this.content).at(-1))} ${this.id}`
   }
 }
 
@@ -313,13 +450,25 @@ const channels=new Channels
 //   await new Promise(res=>setTimeout(res,1000))
 // }
 
+/*
+interval=1000*60
+if(window.timeout)clearInterval(window.timeout)
+function main() {
+  sendMsg("I must be lv 69",'1469260498359943313',auth.thsg)
+  sendMsg("I must be lv 69",'1474614174935027946',auth.thsg)
+  sendMsg("I must be lv 69",'1479694730622402693',auth.thsg)
+  let time=interval-Date.now()%(interval)
+  window.timeout=setTimeout(main,interval<time?interval:time)
+}
+window.timeout=setTimeout(main,interval-Date.now()%(interval))
+*/
 
-// interval=1000*60
-// if(window.timeout)clearInterval(window.timeout)
-// function main() {
-//   sendMsg("I must be lv 69",'1469260498359943313',auth.thsg)
-//   sendMsg("I must be lv 69",'1474614174935027946',auth.thsg)
-//   let time=interval-Date.now()%(interval)
-//   window.timeout=setTimeout(main,interval<time?interval:time)
-// }
-// window.timeout=setTimeout(main,interval-Date.now()%(interval))
+/*
+a.map(e=>{
+  let a={id:e.id,author:e.author.id}
+  for(let b of ["content","message_reference","attachments","components","reactions", "sticker_items"]){
+     if(e[b])a[b]=e[b]
+  }
+  return a
+}).find(e=>e.referenced_message)
+*/
