@@ -105,9 +105,31 @@ async function buildScene(){
   }
 }
 
+pointerCubes={}
 
 function inputs(dt) {
   camera.position.add(new THREE.Vector3(key('ArrowRight').down-key('ArrowLeft').down,0,key('ArrowDown').down-key('ArrowUp').down).normalize().multiplyScalar(dt*playerSpeed).applyAxisAngle({x:0,y:1,z:0},camera.rotation.y))
+
+  const geometry = new THREE.BoxGeometry(document.location.search.substr(1) || 1,document.location.search.substr(1) || 1,document.location.search.substr(1) || 1);
+  let ray=new THREE.Raycaster()
+  for(const i of Object.keys(pointer)){
+    if(!pointerCubes[i]){
+      const material = new THREE.MeshBasicMaterial
+      const cube = new THREE.Mesh(geometry,material);
+      material.color.r = Math.random()
+      material.color.g = Math.random()
+      material.color.b = Math.random()
+      cube.rotation.x=Math.random()*rot
+      cube.rotation.y=Math.random()*rot
+      cube.rotation.z=Math.random()*rot
+      scene.add(cube)
+      pointerCubes[i]=cube
+    }
+    const a=pointer[i]
+    ray.setFromCamera(new THREE.Vector2(a.x,a.y),camera)
+    ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),pointerCubes[i].position)
+  }
+
   key.end()
 }
 

@@ -117,8 +117,8 @@ function pointerHandler(event, sets={}) {
     new: 1,
     pointerType: event.pointerType,
 
-    mx: 2 * (event.movementX / vmin) + (pointer[event.pointerId].mx ?? 0),
-    my: -2 * (event.movementY / vmin) + (pointer[event.pointerId].my ?? 0),
+    mx: 2 * (event.movementX / window.innerWidth) + (pointer[event.pointerId].mx ?? 0),
+    my: -2 * (event.movementY / window.innerHeight) + (pointer[event.pointerId].my ?? 0),
 
     mxPx: event.movementX,
     myPx: -event.movementY,
@@ -130,11 +130,11 @@ function pointerHandler(event, sets={}) {
     targets: currentElements,
   });
   if (event.pointerType === "mouse" && document.pointerLockElement) {
-    pointer[event.pointerId].x += 2 * (event.movementX / vmin)
-    pointer[event.pointerId].y += -2 * (event.movementY / vmin)
+    pointer[event.pointerId].x += 2 * (event.movementX / window.innerWidth)
+    pointer[event.pointerId].y += -2 * (event.movementY / window.innerHeight)
   } else {
-    pointer[event.pointerId].x = ((event.x - window.innerWidth / 2) / vmin) * 2
-    pointer[event.pointerId].y = -((event.y - window.innerHeight / 2) / vmin) * 2
+    pointer[event.pointerId].x = ((event.x - window.innerWidth / 2) / window.innerWidth) * 2
+    pointer[event.pointerId].y = -((event.y - window.innerHeight / 2) / window.innerHeight) * 2
   }
 
   Object.assign(pointer[event.pointerId], sets);
