@@ -1,12 +1,13 @@
-document.addEventListener("touchmove", function(e) {
+document.addEventListener("touchmove", e => {
   e.preventDefault();
-}, {
+}
+, {
   passive: false,
 });
 
-
-window.onclick = _ => {// document.body.requestPointerLock()
-// document.documentElement.requestFullscreen()
+document.onclick = _ => {
+  document.body.requestPointerLock()
+  document.body.requestFullscreen()
 }
 
 let vmin;
@@ -77,11 +78,21 @@ document.addEventListener("keyup", e => {
 
 //POINTERS
 
-let pointer = {};
+function pointer(i){
+  return pointer.pointers[i]??{live:0}
+}
+pointer.new=[]
+pointer.pointers={}
+pointer.end=function() {
+  for(const o of pointer.new)o.new=0
+  pointer.new=[]
+}
 function pointerHandler(event, sets={}) {
-  if (!pointer[event.pointerId]) {
-    pointer[event.pointerId] = {
+  if (!pointer(event.pointerId).live) {
+    pointer.new.push(pointer.pointers[event.pointerId] = {
+      id:event.pointerId,
       time: 0,
+      live:1,
       new: 1,
 
       pointerType: null,
@@ -107,18 +118,18 @@ function pointerHandler(event, sets={}) {
       startTarget: null,
       target: null,
       targets: null,
-    };
+    })
   }
   const currentElement = document.elementFromPoint(event.x, event.y);
   const currentElements = document.elementsFromPoint(event.x, event.y);
   // clog(event)
-  Object.assign(pointer[event.pointerId], {
+  const o=pointer(event.pointerId)
+  Object.assign(o, {
     time: event.timeStamp,
-    new: 1,
     pointerType: event.pointerType,
 
-    mx: 2 * (event.movementX / window.innerWidth) + (pointer[event.pointerId].mx ?? 0),
-    my: -2 * (event.movementY / window.innerHeight) + (pointer[event.pointerId].my ?? 0),
+    mx: 2 * (event.movementX / window.innerWidth) + (o.mx ?? 0),
+    my: -2 * (event.movementY / window.innerHeight) + (o.my ?? 0),
 
     mxPx: event.movementX,
     myPx: -event.movementY,
@@ -130,14 +141,14 @@ function pointerHandler(event, sets={}) {
     targets: currentElements,
   });
   if (event.pointerType === "mouse" && document.pointerLockElement) {
-    pointer[event.pointerId].x += 2 * (event.movementX / window.innerWidth)
-    pointer[event.pointerId].y += -2 * (event.movementY / window.innerHeight)
+    o.x += 2 * (event.movementX / window.innerWidth)
+    o.y += -2 * (event.movementY / window.innerHeight)
   } else {
-    pointer[event.pointerId].x = ((event.x - window.innerWidth / 2) / window.innerWidth) * 2
-    pointer[event.pointerId].y = -((event.y - window.innerHeight / 2) / window.innerHeight) * 2
+    o.x = ((event.x - window.innerWidth / 2) / window.innerWidth) * 2
+    o.y = -((event.y - window.innerHeight / 2) / window.innerHeight) * 2
   }
 
-  Object.assign(pointer[event.pointerId], sets);
+  Object.assign(o, sets);
 }
 
 document.addEventListener("pointerdown", (event) => {
@@ -166,7 +177,7 @@ document.addEventListener("pointermove", (event) => {
 );
 
 document.addEventListener("pointerleave", (event) => {
-  delete pointer[event.pointerId];
+  pointerHandler(event,{live:0})
+  delete pointer.pointers[event.pointerId];
 }
 );
-
