@@ -106,30 +106,51 @@ async function buildScene(){
 
 pointerCubes={}
 
+drage={}
+
 function inputs(dt) {
   camera.position.add(new THREE.Vector3(key('ArrowRight').down-key('ArrowLeft').down,0,key('ArrowDown').down-key('ArrowUp').down).normalize().multiplyScalar(dt*playerSpeed).applyAxisAngle({x:0,y:1,z:0},camera.rotation.y))
 
   const geometry = new THREE.BoxGeometry(document.location.search.substr(1) || 1,document.location.search.substr(1) || 1,document.location.search.substr(1) || 1);
   let ray=new THREE.Raycaster()
-  for(const i of Object.keys(pointer)){
-    if(!pointerCubes[i]){
-      const material = new THREE.MeshBasicMaterial
-      const cube = new THREE.Mesh(geometry,material);
-      material.color.r = Math.random()
-      material.color.g = Math.random()
-      material.color.b = Math.random()
-      cube.rotation.x=Math.random()*rot
-      cube.rotation.y=Math.random()*rot
-      cube.rotation.z=Math.random()*rot
-      scene.add(cube)
-      pointerCubes[i]=cube
+  for(const o of pointer.new){
+    const material = new THREE.MeshBasicMaterial
+    const cube = new THREE.Mesh(geometry,material);
+    material.color.r = Math.random()
+    material.color.g = Math.random()
+    material.color.b = Math.random()
+    cube.rotation.x=Math.random()*rot
+    cube.rotation.y=Math.random()*rot
+    cube.rotation.z=Math.random()*rot
+    scene.add(cube)
+    pointerCubes[o.id]=cube
+  }
+  if(!drage?.pointer?.live&&Object.values(pointer.pointers).at(-1)?.live){
+    const o=drage.pointer=Object.values(pointer.pointers).at(-1)
+    drage.pos=new THREE.Vector3
+    ray.setFromCamera(new THREE.Vector2(o.x,o.y),camera)
+    ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),drage.pos)
+    drage.pos
+  }
+  if(drage?.pointer?.live){
+    const o=drage.pointer=Object.values(pointer.pointers).at(-1)
+    ray.setFromCamera(new THREE.Vector2(o.x,o.y),camera)
+    ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),pointerCubes[o.id].position)
+    camera.position.add(pointerCubes[drage.pointer.id].position.clone().multiplyScalar(-1).add(drage.pos))
+  }
+  for(const i of Object.keys(pointerCubes)){
+    const a=pointer(i)
+    if(!a.live){
+      scene.remove(pointerCubes[i])
+      delete pointerCubes[i];continue
     }
-    const a=pointer[i]
     ray.setFromCamera(new THREE.Vector2(a.x,a.y),camera)
     ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),pointerCubes[i].position)
   }
+  
 
   key.end()
+  pointer.end()
 }
 
 function gameLoop(dt) {
