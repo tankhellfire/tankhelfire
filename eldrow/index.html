@@ -129,16 +129,20 @@
         await loading('importing/words')
         words = JSON.parse(await words)
 
-        await loading('loading')
-        patternInput.onblur = wordInput.onblur = e => {
+        window.patterns={}
+        
+        window.updatePatterns=function(){
           output.innerText = "loading"
 
-          let patterns={}
           for (let word of words.words){
             let pat=getPattern(word,wordInput.value||"naieo")
             patterns[pat]=word
           }
-          
+
+          displayPatterns()
+        }
+
+        window.displayPatterns=function(){
           let buff = ""
           let out = []
           for (const letter of patternInput.value.replaceAll('\n', '').replaceAll(' ', '/')) {
@@ -151,10 +155,13 @@
           if (buff.length != 0)
             out.push(buff)
           patternInput.value = out.join('\n')
-
-          output.innerText = out.map(pattern =>(patterns[pattern]|| 'not found').toLowerCase()).join('\n')
+          
+          output.innerText = out.map(pattern =>(patterns[pattern]||Object.keys(patterns).filter(e=>e.startsWith(pattern)).join(' ')||'not found').toLowerCase()).join('\n')
         }
 
+        await loading('loading')
+        wordInput.onblur=updatePatterns
+        patternInput.oninput=displayPatterns
         statusCard.remove()
         console.log(`%cload time: ${performance.now() / 1000}s`, "color:#0f0")
       }

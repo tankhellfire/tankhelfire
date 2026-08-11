@@ -4,9 +4,8 @@ document.addEventListener("touchmove", function(e) {
   passive: false,
 });
 
-
-window.onclick = _ => {// document.body.requestPointerLock()
-// document.documentElement.requestFullscreen()
+window.onclick = _ => {document.body.requestPointerLock()
+  document.documentElement.requestFullscreen()
 }
 
 let vmin;

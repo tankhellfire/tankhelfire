@@ -171,13 +171,14 @@ class Client {
     this.ws.open = e => console.log('open', e)
     this.ws.onmessage = e => this.onmessage(e)
     this.ws.onclose = _ => {
-      this.ws.onclose = null
+      this.disconnect()
       this.connect()
     }
 
   }
 
   disconnect() {
+    if(this.ws)this.ws.onclose = null
     this.heartbeatInterval = null
     console.log(">close4000")
     if (this.ws)
@@ -202,6 +203,7 @@ class Client {
 
   async onmessage(e) {
     const msg = JSON.parse(e.data)
+    console.log(msg)
     const {op, t: eventName, d: data, s: eventId} = msg
     if (eventId)
       this.seq = eventId;
@@ -277,7 +279,7 @@ class Client {
 
       case 'MESSAGE_CREATE':
         console.log('<msg', data)
-        console.log(channels.msg(data).view)
+        console.warn(channels.msg(data).view)
         break
 
       case 'PRESENCE_UPDATE':
@@ -287,6 +289,7 @@ class Client {
         break
 
       case 'GUILD_MEMBER_LIST_UPDATE':
+        window.a=data
         for (const operation of data.ops) {
           switch (operation.op) {
           case "SYNC":
@@ -587,6 +590,7 @@ function main() {
   sendMsg("I must be lv 69",'1469260498359943313',auth.thsg)
   sendMsg("I must be lv 69",'1474614174935027946',auth.thsg)
   sendMsg("I must be lv 69",'1479694730622402693',auth.thsg)
+  sendMsg("I must be lv 69",'1492028992696352798',auth.thsg)
   let time=interval-Date.now()%(interval)
   window.timeout=setTimeout(main,interval<time?interval:time)
 }

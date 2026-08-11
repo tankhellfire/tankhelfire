@@ -1,6 +1,5 @@
 const playerSpeed=5
 
-
 const rot=2*Math.PI
 
 const paths = ['../', 'https://thf.onrender.com/', 'https://tankhellfire.github.io/tankhelfire/']
